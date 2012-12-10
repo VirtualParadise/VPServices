@@ -1,0 +1,7 @@
+bin/
+obj/
+*.dat
+*.pdb
+*vshost*
+*.suo
+VPServices.csproj.user
