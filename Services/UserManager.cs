@@ -5,9 +5,9 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using VpNet.Core;
-using VpNet.Core.EventData;
-using VpNet.Core.Structs;
+using VP.Core;
+using VP.Core.EventData;
+using VP.Core.Structs;
 
 namespace VPServices.Services
 {

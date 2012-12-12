@@ -5,3 +5,4 @@ obj/
 *vshost*
 *.suo
 VPServices.csproj.user
+Build/VPServices Failsafe.bat

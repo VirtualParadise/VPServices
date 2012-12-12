@@ -5,9 +5,9 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using VpNet.Core;
-using VpNet.Core.EventData;
-using VpNet.Core.Structs;
+using VP.Core;
+using VP.Core.EventData;
+using VP.Core.Structs;
 
 namespace VPServices.Services
 {
@@ -145,10 +145,9 @@ namespace VPServices.Services
             if (name == "") return;
 
             var jump = (name == "random")
-                //? storedJumps[new Random().Next(0, storedJumps.Count)]
-                ? getJump(name)
+                ? storedJumps[new Random().Next(0, storedJumps.Count)]
                 : getJump(name);
-            if (jump.Name == name)
+            if (jump.Name == name || name == "random")
             {
                 bot.CallbackObjectAdd += OnJumpAddCallback;
                 bot.AddObject(new VpObject
