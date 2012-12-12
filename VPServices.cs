@@ -6,9 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Threading;
-using VP.Core;
-using VP.Core.EventData;
-using VP.Core.Structs;
+using VP;
 
 namespace VPServices
 {
@@ -40,7 +38,6 @@ namespace VPServices
         public static Services.UserManager UserManager = new Services.UserManager();
         public static Services.Telegrams Telegrams = new Services.Telegrams();
         public static Services.Jumps Jumps = new Services.Jumps();
-        static int test = 0;
 
         static void Main(string[] args)
         {
@@ -60,18 +57,16 @@ namespace VPServices
                 world = args[2];
 
                 // Connect to world
-                Console.WriteLine("VP Services Bot");
+                Console.WriteLine("Connecting to universe...");
                 ConnectToUniverse();
-                Bot.Enter(world);
-                Bot.UpdateAvatar();
 
                 // Set up global events
                 Console.WriteLine("Connected to world.");
-                Bot.EventChat += OnChat;
-                Bot.EventWorldDisconnect += Bot_EventWorldDisconnect;
-                Bot.EventUniverseDisconnect += Bot_EventUniverseDisconnect;
-                Bot.EventObjectChange += OnObjChange;
-                Bot.EventObjectCreate += OnObjChange;
+                Bot.Comms.Chat += OnChat;
+                Bot.World.Disconnect += onWorldDisconnect;
+                Bot.Universe.Disconnect += onUniverseDisconnect;
+                Bot.Property.ObjectCreate += OnObjChange;
+                Bot.Property.ObjectChange += OnObjChange;
                 while (true) { UpdateLoop(); }
             }
             catch (Exception e) {
@@ -99,10 +94,9 @@ namespace VPServices
         {
             Bot.Wait(-1);
             Thread.Sleep(1000);
-            Jumps.Update();
         }
 
-        static void OnObjChange(Instance sender, int sessionId, VpObject o)
+        static void OnObjChange(Instance sender, int sessionId, VPObject o)
         {
             BuildMon.WriteLine("{0},{1},{2},{3}",
                 Math.Round(o.Position.X, 3),
@@ -132,20 +126,20 @@ namespace VPServices
                     Telegrams.OnCommand(sender, chat, data);
                     return;
                 case "blocktelegrams":
-                    Telegrams.Block(sender, chat.Username.ToLower());
+                    Telegrams.Block(sender, chat.Name.ToLower());
                     return;
                 case "help":
                 case "commands":
                     if (DateTime.Now.Subtract(lastHelp).TotalSeconds < 60) return;
-                    Bot.Say("!telegram <who>: <message> , !blocktelegrams , !seed, !mycoords, !addjump <name>, !deljump <name>, !j(ump) <name>");
+                    Bot.Comms.Say("!telegram <who>: <message> , !blocktelegrams , !seed, !mycoords, !addjump <name>, !deljump <name>, !j(ump) <name>");
                     lastHelp = DateTime.Now;
                     return;
                 case "seed":
-                    Bot.UpdateAvatar(requester.X, requester.Y, requester.Z);
-                    Bot.Say("At your location; right click me to duplicate my avatar into a new object");
+                    Bot.World.UpdateAvatar(requester.X, requester.Y, requester.Z);
+                    Bot.Comms.Say("At your location; right click me to duplicate my avatar into a new object");
                     return;
                 case "mycoords":
-                    Bot.Say(string.Format("{0}: {1}, {2}, {3}", requester.Name, requester.X, requester.Y, requester.Z));
+                    Bot.Comms.Say("{0}: {1}, {2}, {3}", requester.Name, requester.X, requester.Y, requester.Z);
                     return;
                 case "addjump":
                     Jumps.CmdAddJump(sender, requester, data);
@@ -155,10 +149,7 @@ namespace VPServices
                     return;
                 case "jump":
                 case "j":
-                    Jumps.CmdSpawnJump(sender, requester, data);
-                    return;
-                case "listjumps":
-                    Jumps.CmdListJump(sender, requester, data);
+                    Jumps.CmdJump(sender, requester, data);
                     return;
                 case "back":
                     UserManager.CmdGoBack(sender, requester, data);
@@ -166,9 +157,6 @@ namespace VPServices
                 case "crash":
                     if (requester.Name != "Roy Curtis") return;
                     throw new Exception("Forced crash");
-                //case "cloth":
-                    //Bot.AddObject(new VpObject { ObjectType = int.Parse(data), Position = new Vector3(requester.X, requester.Y, requester.Z) });
-                    //return;
                 default:
                     Console.WriteLine("Unknown command: {0}", command);
                     return;
