@@ -6,9 +6,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Threading;
-using VpNet.Core;
-using VpNet.Core.EventData;
-using VpNet.Core.Structs;
+using VP.Core;
+using VP.Core.EventData;
+using VP.Core.Structs;
 
 namespace VPServices
 {
@@ -102,15 +102,13 @@ namespace VPServices
             Jumps.Update();
         }
 
-        
-
         static void OnObjChange(Instance sender, int sessionId, VpObject o)
         {
             BuildMon.WriteLine("{0},{1},{2},{3}",
-                o.Position.X,
-                o.Position.Y,
-                o.Position.Z,
-                DateTime.Now.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, 0)).TotalSeconds
+                Math.Round(o.Position.X, 3),
+                Math.Round(o.Position.Y, 2),
+                Math.Round(o.Position.Z, 3),
+                (int) DateTime.Now.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, 0)).TotalSeconds
                 );
         }
 
