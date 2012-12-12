@@ -1,5 +1,5 @@
 ﻿using System;
-using VP.Core;
+using VP;
 
 namespace VPServices
 {
@@ -10,14 +10,13 @@ namespace VPServices
         static void ConnectToUniverse()
         {
             ConnAttempts = 0;
-
             while (ConnAttempts < 10)
             {
                 try
                 {
-                    Console.WriteLine("Connecting to universe...");
-                    Bot.Connect();
-                    Bot.Login(userName, password, "Services");
+                    Bot.Universe.Login(userName, password, "Services");
+                    Bot.World.Enter(world);
+                    Bot.World.UpdateAvatar();
                     return;
                 }
                 catch (Exception e)
@@ -30,13 +29,13 @@ namespace VPServices
             throw new Exception("Could not connect to uniserver after ten attempts.");
         }
 
-        static void Bot_EventUniverseDisconnect(Instance sender)
+        static void onUniverseDisconnect(Instance sender)
         {
             Console.WriteLine("Disconnected from universe! Reconnecting...");
             ConnectToUniverse();
         }
 
-        static void Bot_EventWorldDisconnect(Instance sender)
+        static void onWorldDisconnect(Instance sender)
         {
             Console.WriteLine("Disconnected from world! Reconnecting...");
             ConnectToUniverse();

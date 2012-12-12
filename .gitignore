@@ -6,3 +6,5 @@ obj/
 *.suo
 VPServices.csproj.user
 Build/VPServices Failsafe.bat
+Build/VPServices.exe
+Build/VPServices.exe.config

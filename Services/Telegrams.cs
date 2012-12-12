@@ -5,9 +5,7 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using VP.Core;
-using VP.Core.EventData;
-using VP.Core.Structs;
+using VP;
 
 namespace VPServices.Services
 {
@@ -62,7 +60,7 @@ namespace VPServices.Services
             if (File.Exists(TBLOCKED))
                 DoNotTelegram = new List<string>(File.ReadAllLines(TBLOCKED));
             
-            VPServices.Bot.EventChat += checkTelegrams;
+            VPServices.Bot.Comms.Chat += checkTelegrams;
         }
 
         public void SaveTelegrams()
@@ -83,13 +81,13 @@ namespace VPServices.Services
 
             if (DoNotTelegram.Contains(target))
             {
-                bot.Say(string.Format("{0}: {1} is not accepting telegrams.", chat.Username, target));
+                bot.Comms.Say("{0}: {1} is not accepting telegrams.", chat.Name, target);
                 return;
             }
 
-            StoredGrams.Add(new Telegram { From = chat.Username, To = target, Message = msg });
-            bot.Say(string.Format("{0}: Saved for {1}", chat.Username, target));
-            Console.WriteLine("Telegram by {0} recorded for {1}.", chat.Username, target);
+            StoredGrams.Add(new Telegram { From = chat.Name, To = target, Message = msg });
+            bot.Comms.Say("{0}: Saved for {1}", chat.Name, target);
+            Console.WriteLine("Telegram by {0} recorded for {1}.", chat.Name, target);
             SaveTelegrams();
         }
 
@@ -97,12 +95,12 @@ namespace VPServices.Services
         {
             if (DoNotTelegram.Contains(name))
             {
-                bot.Say(string.Format("{0}: You are now accepting telegrams.", name));
+                bot.Comms.Say("{0}: You are now accepting telegrams.", name);
                 DoNotTelegram.Remove(name);
             }
             else
             {
-                bot.Say(string.Format("{0}: You are now blocking telegrams.", name));
+                bot.Comms.Say("{0}: You are now blocking telegrams.", name);
                 DoNotTelegram.Add(name);
             }
 
@@ -111,19 +109,19 @@ namespace VPServices.Services
 
         void checkTelegrams(Instance bot, Chat chat)
         {
-            if (DoNotTelegram.Contains(chat.Username.ToLower())) return;
+            if (DoNotTelegram.Contains(chat.Name.ToLower())) return;
 
             bool sentOne = false;
             foreach (var tg in StoredGrams)
-                if (!tg.Sent && chat.Username.ToLower() == tg.To)
+                if (!tg.Sent && chat.Name.ToLower() == tg.To)
                 {
-                    bot.Say(string.Format("{0}: You have a telegram from {1}: {2}", chat.Username, tg.From, tg.Message));
+                    bot.Comms.Say("{0}: You have a telegram from {1}: {2}", chat.Name, tg.From, tg.Message);
                     tg.Sent = true;
                     sentOne = true;
                     SaveTelegrams();
                 }
 
-            if (sentOne) bot.Say("(Say '!telegram <recepient>: <message>' to respond or !blocktelegrams to prevent further)");
+            if (sentOne) bot.Comms.Say("(Say '!telegram <recepient>: <message>' to respond or !blocktelegrams to prevent further)");
         }
     }
 }

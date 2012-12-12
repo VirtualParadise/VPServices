@@ -43,7 +43,6 @@
   <ItemGroup>
     <Compile Include="Services\UserManager.cs" />
     <Compile Include="Services\Jumps.cs" />
-    <Compile Include="Services\JoinsInvites.cs" />
     <Compile Include="Services\Telegrams.cs" />
     <Compile Include="VPServices.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -53,7 +52,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\vpnet\VPNet.csproj">
+    <ProjectReference Include="..\VPNet\VPNet\VPNet.csproj">
       <Project>{dbe501a7-0176-473f-b2e8-f4ada721917f}</Project>
       <Name>VPNet</Name>
     </ProjectReference>

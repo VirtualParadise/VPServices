@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Express 2012 for Windows Desktop
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPServices", "VPServices.csproj", "{185C1F00-9F11-4986-A49C-0CB97E0BDE37}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPNet", "..\vpnet\VPNet.csproj", "{DBE501A7-0176-473F-B2E8-F4ADA721917F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPNet", "..\VPNet\VPNet\VPNet.csproj", "{DBE501A7-0176-473F-B2E8-F4ADA721917F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

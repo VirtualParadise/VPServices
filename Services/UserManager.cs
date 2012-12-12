@@ -5,13 +5,11 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using VP.Core;
-using VP.Core.EventData;
-using VP.Core.Structs;
+using VP;
 
 namespace VPServices.Services
 {
-    public class User
+    public class ServicesUser
     {
         public Stack<Vector3> TeleportHistory = new Stack<Vector3>();
         public Vector3 LastLocation;
@@ -21,21 +19,21 @@ namespace VPServices.Services
         public int Session { get { return Avatar.Session; } }
     }
 
-    class UserManager : List<User>
+    class UserManager : List<ServicesUser>
     {
         public const int TELEPORT_THRESHOLD = 20;
 
         public UserManager()
         {
-            VPServices.Bot.EventAvatarAdd += OnAvatarAdd;
-            VPServices.Bot.EventAvatarDelete += OnAvatarDelete;
-            VPServices.Bot.EventAvatarChange += OnAvatarChange;
+            VPServices.Bot.World.AvatarAdd += OnAvatarAdd;
+            VPServices.Bot.World.AvatarDelete += OnAvatarDelete;
+            VPServices.Bot.World.AvatarChange += OnAvatarChange;
         }
 
         /// <summary>
         /// Gets user by name or returns null
         /// </summary>
-        public User this[string name]
+        public ServicesUser this[string name]
         {
             get
             {
@@ -50,7 +48,7 @@ namespace VPServices.Services
         /// <summary>
         /// Gets user by session number or returns null
         /// </summary>
-        public User this[int session]
+        public new ServicesUser this[int session]
         {
             get
             {
@@ -69,10 +67,15 @@ namespace VPServices.Services
                 DateTime.Now.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, 0)).TotalSeconds
                 );
 
-            this.Add(new User
+            this.Add(new ServicesUser
             {
                 Avatar = avatar,
-                LastLocation = new Vector3(avatar.X, avatar.Y, avatar.Z),
+                LastLocation = new Vector3
+                {
+                    X = avatar.X,
+                    Y = avatar.Y,
+                    Z = avatar.Z
+                }
             });
         }
 
@@ -89,9 +92,14 @@ namespace VPServices.Services
         public void OnAvatarChange(Instance sender, Avatar avatar)
         {
             var user = this[avatar.Session];
-            var ll = user.LastLocation;
-            var nl = new Vector3(avatar.X, avatar.Y, avatar.Z);
             user.Avatar = avatar;
+            var ll = user.LastLocation;
+            var nl = new Vector3
+            {
+                X = avatar.X,
+                Y = avatar.Y,
+                Z = avatar.Z
+            };
             
             if (Math.Abs(avatar.X - ll.X) > TELEPORT_THRESHOLD
                 || Math.Abs(avatar.Y - ll.Y) > (TELEPORT_THRESHOLD * 2)
@@ -109,19 +117,20 @@ namespace VPServices.Services
             var user = this[who.Session];
             if (user.TeleportHistory.Count == 0)
             {
-                bot.Say(string.Format("{0}: No teleport history", who.Name));
+                bot.Comms.Say("{0}: No teleport history", who.Name);
                 return;
             }
 
             var jump = user.TeleportHistory.Pop();
-            bot.CallbackObjectAdd += VPServices.Jumps.OnJumpAddCallback;
-            bot.AddObject(new VpObject
-            {
-                Model = "zcomp1.rwx",
-                Description = string.Format(Jumps.JUMPBACK_DESC),
-                Action = string.Format(Jumps.JUMP_ACTION, jump.X, jump.Y, jump.Z, 0),
-                Position = new Vector3(who.X, who.Y + 0.025f, who.Z)
-            });
+            bot.World.TeleportAvatar(
+                who.Session,
+                "",
+                new Vector3
+                {
+                    X = jump.X,
+                    Y = jump.Y,
+                    Z = jump.Z
+                }, 0, 0);
 
             return;
         }
