@@ -38,6 +38,8 @@ namespace VPServices
         public static Services.UserManager UserManager = new Services.UserManager();
         public static Services.Telegrams Telegrams = new Services.Telegrams();
         public static Services.Jumps Jumps = new Services.Jumps();
+        public static Services.JoinsInvites JoinsInvites = new Services.JoinsInvites();
+        public static Services.KickBans KickBans = new Services.KickBans();
 
         static void Main(string[] args)
         {
@@ -93,7 +95,7 @@ namespace VPServices
         static void UpdateLoop()
         {
             Bot.Wait(-1);
-            Thread.Sleep(1000);
+            Thread.Sleep(100);
         }
 
         static void OnObjChange(Instance sender, int sessionId, VPObject o)
@@ -108,6 +110,7 @@ namespace VPServices
 
         static void OnChat(Instance sender, Chat chat)
         {
+            // Accept only commands
             if (!chat.Message.StartsWith("!")) return;
 
             var intercept = chat.Message
@@ -120,6 +123,9 @@ namespace VPServices
                 ? intercept[1].Trim()
                 : "";
 
+            // Reject bots
+            if (requester.IsBot) return;
+
             switch (command)
             {
                 case "telegram":
@@ -130,8 +136,9 @@ namespace VPServices
                     return;
                 case "help":
                 case "commands":
-                    if (DateTime.Now.Subtract(lastHelp).TotalSeconds < 60) return;
-                    Bot.Comms.Say("!telegram <who>: <message> , !blocktelegrams , !seed, !mycoords, !addjump <name>, !deljump <name>, !j(ump) <name>");
+                    if (DateTime.Now.Subtract(lastHelp).TotalMinutes < 5) return;
+                    Bot.Comms.Say("!telegram <who>: <message> , !blocktelegrams , !seed, !mycoords, !petition <who>");
+                    Bot.Comms.Say("!(add/del)jump <name>, !j(ump) <name>, !back, !(join/invite) <who>, !(x/alt/z) <offset>");
                     lastHelp = DateTime.Now;
                     return;
                 case "seed":
@@ -157,6 +164,72 @@ namespace VPServices
                 case "crash":
                     if (requester.Name != "Roy Curtis") return;
                     throw new Exception("Forced crash");
+                case "join":
+                    JoinsInvites.OnRequest(requester.Name, data, false);
+                    return;
+                case "invite":
+                    JoinsInvites.OnRequest(requester.Name, data, true);
+                    return;
+                case "yes":
+                    JoinsInvites.OnResponse(requester.Name, true);
+                    return;
+                case "no":
+                    JoinsInvites.OnResponse(requester.Name, false);
+                    return;
+                case "petition":
+                    KickBans.OnPetition(requester.Name, data);
+                    return;
+                case "kickvote":
+                    KickBans.OnVote(requester.Name, false);
+                    return;
+                case "banvote":
+                    KickBans.OnVote(requester.Name, true);
+                    return;
+                case "alt":
+                    float alt;
+
+                    if (float.TryParse(data, out alt))
+                        Bot.World.TeleportAvatar(
+                            requester.Session,
+                            "",
+                            new Vector3
+                            {
+                                X = requester.X,
+                                Y = requester.Y + alt,
+                                Z = requester.Z
+                            },
+                            0, 0);
+                    return;
+                case "x":
+                    float x;
+
+                    if (float.TryParse(data, out x))
+                        Bot.World.TeleportAvatar(
+                            requester.Session,
+                            "",
+                            new Vector3
+                            {
+                                X = requester.X + x,
+                                Y = requester.Y,
+                                Z = requester.Z
+                            },
+                            0, 0);
+                    return;
+                case "z":
+                    float z;
+
+                    if (float.TryParse(data, out z))
+                        Bot.World.TeleportAvatar(
+                            requester.Session,
+                            "",
+                            new Vector3
+                            {
+                                X = requester.X,
+                                Y = requester.Y,
+                                Z = requester.Z + z
+                            },
+                            0, 0);
+                    return;
                 default:
                     Console.WriteLine("Unknown command: {0}", command);
                     return;
