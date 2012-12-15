@@ -22,6 +22,8 @@ namespace VPServices.Services
     class UserManager : List<ServicesUser>
     {
         public const int TELEPORT_THRESHOLD = 20;
+        public int UniqueUsers = 0;
+        public int Bots = 0;
 
         public UserManager()
         {
@@ -31,14 +33,14 @@ namespace VPServices.Services
         }
 
         /// <summary>
-        /// Gets user by name or returns null
+        /// Gets case-insensitive user by name or returns null
         /// </summary>
         public ServicesUser this[string name]
         {
             get
             {
                 foreach (var user in this)
-                    if (user.Name == name)
+                    if (user.Name.ToLower() == name.ToLower())
                         return user;
 
                 return null;
@@ -62,6 +64,12 @@ namespace VPServices.Services
 
         public void OnAvatarAdd(Instance sender, Avatar avatar)
         {
+            if (VPServices.KickBans.IsKickBanned(avatar.Name))
+            {
+                VPServices.KickBans.Eject(avatar.Session);
+                return;
+            }
+
             VPServices.UserMon.WriteLine("enter,{0},{1}",
                 avatar.Name,
                 DateTime.Now.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, 0)).TotalSeconds
@@ -77,6 +85,11 @@ namespace VPServices.Services
                     Z = avatar.Z
                 }
             });
+
+            if (avatar.IsBot)
+                Bots++;
+            else if (this[avatar.Name] != null)
+                UniqueUsers++;
         }
 
         public void OnAvatarDelete(Instance sender, Avatar avatar)
@@ -87,11 +100,17 @@ namespace VPServices.Services
                 );
 
             this.Remove(this[avatar.Session]);
+
+            if (avatar.IsBot)
+                Bots--;
+            else if (this[avatar.Name] == null)
+                UniqueUsers--;
         }
 
         public void OnAvatarChange(Instance sender, Avatar avatar)
         {
             var user = this[avatar.Session];
+            if (user == null) return;
             user.Avatar = avatar;
             var ll = user.LastLocation;
             var nl = new Vector3
@@ -115,6 +134,8 @@ namespace VPServices.Services
         public void CmdGoBack(Instance bot, Avatar who, string data)
         {
             var user = this[who.Session];
+            if (user == null) return;
+
             if (user.TeleportHistory.Count == 0)
             {
                 bot.Comms.Say("{0}: No teleport history", who.Name);

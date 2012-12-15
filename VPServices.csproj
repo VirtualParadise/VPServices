@@ -41,6 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Services\KickBans.cs" />
+    <Compile Include="Services\JoinsInvites.cs" />
     <Compile Include="Services\UserManager.cs" />
     <Compile Include="Services\Jumps.cs" />
     <Compile Include="Services\Telegrams.cs" />
