@@ -6,30 +6,77 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using VP;
+using Nini.Config;
 
 namespace VPServices.Services
 {
-    public class ServicesUser
+    public class ServicesUser : IDisposable
     {
-        public Stack<Vector3> TeleportHistory = new Stack<Vector3>();
-        public Vector3 LastLocation;
+        public Stack<AvatarPosition> TeleportHistory = new Stack<AvatarPosition>();
+        public AvatarPosition LastPosition;
         public Avatar Avatar;
+
+        public IConfig Settings;
 
         public string Name { get { return Avatar.Name; } }
         public int Session { get { return Avatar.Session; } }
+        public AvatarPosition Position
+        {
+            get
+            {
+                return new AvatarPosition
+                {
+                    X = Avatar.X,
+                    Y = Avatar.Y,
+                    Z = Avatar.Z,
+                    Pitch = Avatar.Pitch,
+                    Yaw = Avatar.Yaw
+                };
+            }
+        }
+
+        public void Dispose()
+        {
+            TeleportHistory.Clear();
+            Settings = null;
+        }
     }
 
-    class UserManager : List<ServicesUser>
+    class UserManager : List<ServicesUser>, IDisposable
     {
         public const int TELEPORT_THRESHOLD = 20;
+        public const string FILE_USERSETTINGS = "UserSettings.ini";
+        public const string SETTING_HOME = "Home";
+
+        /// <summary>
+        /// User entry/exit monitor
+        /// </summary>
+        public static StreamWriter UserMon = new StreamWriter("UserHist.dat", true)
+        {
+            AutoFlush = true
+        };
+
+        /// <summary>
+        /// User settings INI
+        /// </summary>
+        public IniConfigSource UserSettings = new IniConfigSource
+        {
+            AutoSave = true
+        };
+
         public int UniqueUsers = 0;
         public int Bots = 0;
 
         public UserManager()
         {
-            VPServices.Bot.World.AvatarAdd += OnAvatarAdd;
-            VPServices.Bot.World.AvatarDelete += OnAvatarDelete;
-            VPServices.Bot.World.AvatarChange += OnAvatarChange;
+            VPServices.Bot.Avatars.Enter += OnAvatarAdd;
+            VPServices.Bot.Avatars.Leave += OnAvatarDelete;
+            VPServices.Bot.Avatars.Change += OnAvatarChange;
+
+            if (File.Exists(FILE_USERSETTINGS))
+                UserSettings.Load(FILE_USERSETTINGS);
+            else
+                UserSettings.Save(FILE_USERSETTINGS);
         }
 
         /// <summary>
@@ -62,6 +109,10 @@ namespace VPServices.Services
             }
         }
 
+        /// <summary>
+        /// Checks if user is kickbanned, otherwise logs them in the entry log and
+        /// creates a user entry
+        /// </summary>
         public void OnAvatarAdd(Instance sender, Avatar avatar)
         {
             if (VPServices.KickBans.IsKickBanned(avatar.Name))
@@ -70,55 +121,68 @@ namespace VPServices.Services
                 return;
             }
 
-            VPServices.UserMon.WriteLine("enter,{0},{1}",
+            // Write to log
+            Console.WriteLine("User {0} has entered", avatar.Name);
+            UserMon.WriteLine("enter,{0},{1}",
                 avatar.Name,
-                DateTime.Now.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, 0)).TotalSeconds
-                );
+                (int) DateTime.Now.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, 0)).TotalSeconds);
 
-            this.Add(new ServicesUser
-            {
-                Avatar = avatar,
-                LastLocation = new Vector3
-                {
-                    X = avatar.X,
-                    Y = avatar.Y,
-                    Z = avatar.Z
-                }
-            });
+            var user = new ServicesUser { Avatar = avatar };
+            user.LastPosition = user.Position;
+            this.Add(user);
 
+            // Do not load settings for bots
             if (avatar.IsBot)
                 Bots++;
-            else if (this[avatar.Name] != null)
-                UniqueUsers++;
+            else
+            {
+                // Only add to unique user counts if name is not present
+                if (this[avatar.Name] != null) UniqueUsers++;
+
+                // Load / create settings
+                user.Settings = UserSettings.Configs[avatar.Name] ?? UserSettings.AddConfig(avatar.Name);
+
+                // Teleport home
+                if (DateTime.Now.Subtract(VPServices.StartUpTime).TotalSeconds > 10
+                    && user.Settings.Contains(SETTING_HOME))
+                    CmdGoHome(user.Avatar);
+            }
         }
 
+        /// <summary>
+        /// Logs exits of unejected users
+        /// </summary>
         public void OnAvatarDelete(Instance sender, Avatar avatar)
         {
-            VPServices.UserMon.WriteLine("leave,{0},{1}",
+            // Write to log
+            Console.WriteLine("User {0} has exited", avatar.Name);
+            UserMon.WriteLine("leave,{0},{1}",
                 avatar.Name,
-                DateTime.Now.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, 0)).TotalSeconds
-                );
+                (int) DateTime.Now.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, 0)).TotalSeconds);
 
-            this.Remove(this[avatar.Session]);
+            var user = this[avatar.Session];
+            this.Remove(user);
 
             if (avatar.IsBot)
                 Bots--;
-            else if (this[avatar.Name] == null)
-                UniqueUsers--;
+            else
+            {
+                if (this[avatar.Name] == null) UniqueUsers--;
+                user.Dispose();
+            }
         }
 
+        /// <summary>
+        /// Tracks user movements for teleport history
+        /// </summary>
         public void OnAvatarChange(Instance sender, Avatar avatar)
         {
             var user = this[avatar.Session];
             if (user == null) return;
+
             user.Avatar = avatar;
-            var ll = user.LastLocation;
-            var nl = new Vector3
-            {
-                X = avatar.X,
-                Y = avatar.Y,
-                Z = avatar.Z
-            };
+            var ll = user.LastPosition;
+            var nl = user.Position;
             
             if (Math.Abs(avatar.X - ll.X) > TELEPORT_THRESHOLD
                 || Math.Abs(avatar.Y - ll.Y) > (TELEPORT_THRESHOLD * 2)
@@ -128,9 +192,12 @@ namespace VPServices.Services
                 user.TeleportHistory.Push(ll);
             }
             
-            user.LastLocation = nl;
+            user.LastPosition = nl;
         }
 
+        /// <summary>
+        /// Handles the !back command
+        /// </summary>
         public void CmdGoBack(Instance bot, Avatar who, string data)
         {
             var user = this[who.Session];
@@ -138,12 +205,12 @@ namespace VPServices.Services
 
             if (user.TeleportHistory.Count == 0)
             {
-                bot.Comms.Say("{0}: No teleport history", who.Name);
+                bot.Say("{0}: No teleport history", who.Name);
                 return;
             }
 
             var jump = user.TeleportHistory.Pop();
-            bot.World.TeleportAvatar(
+            bot.Avatars.Teleport(
                 who.Session,
                 "",
                 new Vector3
@@ -155,5 +222,42 @@ namespace VPServices.Services
 
             return;
         }
+
+        public void CmdGoHome(Avatar user)
+        {
+            var pos = this[user.Name].Settings
+                .Get(SETTING_HOME, "0,0,0,0,0");
+
+            VPServices.Bot.Avatars.Teleport(
+                user.Session,
+                "",
+                new AvatarPosition(pos));
+        }
+
+        public void CmdSetHome(Avatar av)
+        {
+            var user = this[av.Name];
+            user.Settings.Set(SETTING_HOME, user.Position.ToString());
+                
+            VPServices.Bot.Say("{0}: Set your home to {1}, {2}, {3}",
+                av.Name,
+                av.X, av.Y, av.Z);
+
+            Console.WriteLine("Set home for {0} at {1}, {2}, {3}",
+                av.Name,
+                av.X, av.Y, av.Z);
+        }
+
+        /// <summary>
+        /// Closes the user entry/exit monitor and saves settings
+        /// </summary>
+        public void Dispose()
+        {
+            UserMon.Flush();
+            UserMon.Close();
+            UserSettings.Save();
+        }
+
+        
     }
 }

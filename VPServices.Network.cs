@@ -14,9 +14,10 @@ namespace VPServices
             {
                 try
                 {
-                    Bot.Universe.Login(userName, password, "Services");
-                    Bot.World.Enter(world);
-                    Bot.World.UpdateAvatar();
+                    Bot.Login(userName, password, "Services");
+                    VPServices.StartUpTime = DateTime.Now;
+                    Bot.Enter(world);
+                    Bot.GoTo(0,10,0);
                     return;
                 }
                 catch (Exception e)
