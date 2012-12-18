@@ -24,21 +24,28 @@ namespace VPServices.Services
         List<JoinInvite> requests = new List<JoinInvite>();
 
         public void OnRequest(string who, string forWhom, bool invite) {
+            // Ignore if self
+            if (who.Equals(forWhom, StringComparison.CurrentCultureIgnoreCase))
+                return;
+
+            // Ignore if not nearby
             if (VPServices.UserManager[forWhom] == null) return;
 
+            // Reject if requestee is pending
             if (!IsRequestee(who).Equals(JoinInvite.Nobody))
             {
-                VPServices.Bot.Comms.Say("{0}: You already have a pending request", who);
+                VPServices.Bot.Say("{0}: You already have a pending request", who);
                 return;
             }
 
+            // Reject if requester is pending
             if (!IsRequested(forWhom).Equals(JoinInvite.Nobody))
             {
-                VPServices.Bot.Comms.Say("{0}: That person already has a pending request", who);
+                VPServices.Bot.Say("{0}: That person already has a pending request", who);
                 return;
             }
 
-            VPServices.Bot.Comms.Say(
+            VPServices.Bot.Say(
                 "{0}: {1} would like to {2} you; respond with !yes or !no",
                 forWhom,
                 who,
@@ -55,7 +62,6 @@ namespace VPServices.Services
 
         public void OnResponse(string from, bool yes)
         {
-
             var req = IsRequested(from);
             // Reject non-requested
             if (req.Equals(JoinInvite.Nobody)) return;
@@ -69,12 +75,12 @@ namespace VPServices.Services
             if (by == null) return;
             if (who == null)
             {
-                VPServices.Bot.Comms.Say("{0}: That person is no longer here", by.Name);
+                VPServices.Bot.Say("{0}: That person is no longer here", by.Name);
                 return;
             }
 
-            var target = req.Invite ? by.LastLocation : who.LastLocation;
-            VPServices.Bot.World.TeleportAvatar(
+            var target = req.Invite ? by.LastPosition : who.LastPosition;
+            VPServices.Bot.Avatars.Teleport(
                 req.Invite ? who.Session : by.Session,
                 "",
                 new Vector3

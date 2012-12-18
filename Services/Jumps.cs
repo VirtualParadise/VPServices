@@ -16,6 +16,7 @@ namespace VPServices.Services
         public float Y;
         public float Z;
         public float Yaw;
+        public float Pitch;
         public static Jump Empty = new Jump { Name = "" };
 
         public static Jump FromString(string dat)
@@ -31,6 +32,7 @@ namespace VPServices.Services
                 Y = float.Parse(parts[2]),
                 Z = float.Parse(parts[3]),
                 Yaw = float.Parse(parts[4]),
+                Pitch = float.Parse(parts[5])
             };
         }
 
@@ -38,7 +40,8 @@ namespace VPServices.Services
         {
             return string.Join(",",
                 Name,
-                X, Y, Z, Yaw);
+                X, Y, Z,
+                Yaw, Pitch);
         }
     }
 
@@ -71,15 +74,15 @@ namespace VPServices.Services
 
             if (getJump(name).Name != "")
             {
-                bot.Comms.Say("{0}: Jump already exists", who.Name);
+                bot.Say("{0}: Jump already exists", who.Name);
                 return;
             }
 
             var x = (float)Math.Round(who.X, 2);
             var y = (float)Math.Round(who.Y, 2);
             var z = (float)Math.Round(who.Z, 2);
-            storedJumps.Add(new Jump { Name = name, X = x, Y = y, Z = z, Yaw = who.Yaw });
-            bot.Comms.Say("{0}: Saved a jump at {1}, {2}, {3} for {4}",
+            storedJumps.Add(new Jump { Name = name, X = x, Y = y, Z = z, Yaw = who.Yaw, Pitch = who.Pitch });
+            bot.Say("{0}: Saved a jump at {1}, {2}, {3} for {4}",
                 who.Name,
                 who.X, who.Y, who.Z,
                 name);
@@ -99,11 +102,11 @@ namespace VPServices.Services
             var jump = getJump(name);
             if (jump.Name == "")
             {
-                bot.Comms.Say("{0}: Jump does not exist", who.Name);
+                bot.Say("{0}: Jump does not exist", who.Name);
                 return;
             }
             else storedJumps.Remove(jump);
-            bot.Comms.Say("{0}: Jump deleted", who.Name);
+            bot.Say("{0}: Jump deleted", who.Name);
             Console.WriteLine("Deleted {0} jump for {1}", name, who.Name);
             SaveJumps();
         }
@@ -117,7 +120,7 @@ namespace VPServices.Services
                 ? storedJumps[new Random().Next(0, storedJumps.Count)]
                 : getJump(name);
             if (jump.Name == name || name == "random")
-                bot.World.TeleportAvatar(
+                bot.Avatars.Teleport(
                     who.Session,
                     "",
                     new Vector3
@@ -126,9 +129,9 @@ namespace VPServices.Services
                         Y = jump.Y,
                         Z = jump.Z
                     },
-                    jump.Yaw, 0);
+                    jump.Yaw, jump.Pitch);
             else
-                bot.Comms.Say("{0}: No such jump", who.Name);
+                bot.Say("{0}: No such jump", who.Name);
 
             return;
         }

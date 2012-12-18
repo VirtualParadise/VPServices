@@ -20,15 +20,9 @@ namespace VPServices
             AutoFlush = true
         };
 
-        /// <summary>
-        /// Build monitor
-        /// </summary>
-        public static StreamWriter UserMon = new StreamWriter("UserHist.dat", true)
-        {
-            AutoFlush = true
-        };
-
         public static Instance Bot = new Instance();
+        public static Random Rand = new Random();
+        public static DateTime StartUpTime;
 
         static string userName;
         static string password;
@@ -63,10 +57,10 @@ namespace VPServices
                 ConnectToUniverse();
 
                 // Set up global events
-                Console.WriteLine("Connected to world.");
-                Bot.Comms.Chat += OnChat;
-                Bot.World.Disconnect += onWorldDisconnect;
-                Bot.Universe.Disconnect += onUniverseDisconnect;
+                Console.WriteLine("Connected to {0}.", Bot.CurrentWorld);
+                Bot.Chat += OnChat;
+                Bot.WorldDisconnect += onWorldDisconnect;
+                Bot.UniverseDisconnect += onUniverseDisconnect;
                 Bot.Property.ObjectCreate += OnObjChange;
                 Bot.Property.ObjectChange += OnObjChange;
                 while (true) { UpdateLoop(); }
@@ -83,12 +77,14 @@ namespace VPServices
                     }
                     else break;
                 }
+
                 goto exit;
             }
 
         exit:
             BuildMon.Flush();
             BuildMon.Close();
+            UserManager.Dispose();
             return;
         }
 
@@ -129,24 +125,21 @@ namespace VPServices
             switch (command)
             {
                 case "telegram":
-                    Telegrams.OnCommand(sender, chat, data);
-                    return;
-                case "blocktelegrams":
-                    Telegrams.Block(sender, chat.Name.ToLower());
+                    Telegrams.CmdTelegram(chat, data);
                     return;
                 case "help":
                 case "commands":
                     if (DateTime.Now.Subtract(lastHelp).TotalMinutes < 5) return;
-                    Bot.Comms.Say("!telegram <who>: <message> , !blocktelegrams , !seed, !mycoords, !petition <who>");
-                    Bot.Comms.Say("!(add/del)jump <name>, !j(ump) <name>, !back, !(join/invite) <who>, !(x/alt/z) <offset>");
+                    Bot.Say("!telegram <who>: <message> , !seed, !mycoords, !petition <who>, !(set)home, !random");
+                    Bot.Say("!(add/del)jump <name>, !j(ump) <name>, !back, !(join/invite) <who>, !(x/alt/z) <offset>");
                     lastHelp = DateTime.Now;
                     return;
                 case "seed":
-                    Bot.World.UpdateAvatar(requester.X, requester.Y, requester.Z);
-                    Bot.Comms.Say("At your location; right click me to duplicate my avatar into a new object");
+                    Bot.GoTo(requester.X, requester.Y, requester.Z);
+                    Bot.Say("At your location; right click me to duplicate my avatar into a new object");
                     return;
                 case "mycoords":
-                    Bot.Comms.Say("{0}: {1}, {2}, {3}", requester.Name, requester.X, requester.Y, requester.Z);
+                    Bot.Say("{0}: {1:f4}, {2:f4}, {3:f4}", requester.Name, requester.X, requester.Y, requester.Z);
                     return;
                 case "addjump":
                     Jumps.CmdAddJump(sender, requester, data);
@@ -157,6 +150,12 @@ namespace VPServices
                 case "jump":
                 case "j":
                     Jumps.CmdJump(sender, requester, data);
+                    return;
+                case "sethome":
+                    UserManager.CmdSetHome(requester);
+                    return;
+                case "home":
+                    UserManager.CmdGoHome(requester);
                     return;
                 case "back":
                     UserManager.CmdGoBack(sender, requester, data);
@@ -189,7 +188,7 @@ namespace VPServices
                     float alt;
 
                     if (float.TryParse(data, out alt))
-                        Bot.World.TeleportAvatar(
+                        Bot.Avatars.Teleport(
                             requester.Session,
                             "",
                             new Vector3
@@ -204,7 +203,7 @@ namespace VPServices
                     float x;
 
                     if (float.TryParse(data, out x))
-                        Bot.World.TeleportAvatar(
+                        Bot.Avatars.Teleport(
                             requester.Session,
                             "",
                             new Vector3
@@ -219,7 +218,7 @@ namespace VPServices
                     float z;
 
                     if (float.TryParse(data, out z))
-                        Bot.World.TeleportAvatar(
+                        Bot.Avatars.Teleport(
                             requester.Session,
                             "",
                             new Vector3
@@ -230,13 +229,47 @@ namespace VPServices
                             },
                             0, 0);
                     return;
+                case "random":
+                    Bot.Avatars.Teleport(
+                        requester.Session,
+                        "",
+                        new Vector3
+                        {
+                            X = Rand.Next(-32750, 32750),
+                            Z = Rand.Next(-32750, 32750)
+                        },
+                        0, 0);
+
+                    return;
+                case "terrain":
+                    for (var i = 0; i < 16; i++)
+                        for (var j = 0; j < 16; j++)
+                        {
+                            // Comment line out below to not pump during node sets
+                            Bot.Wait(100);
+                            Bot.Terrain.SetNode(
+                                new TerrainNode
+                                {
+                                    TileX = 0,
+                                    TileZ = 0,
+                                    X = i,
+                                    Z = j,
+                                    Hole = false,
+                                    Rotation = TerrainRotation.North,
+                                    Texture = 6,
+                                    Height = 1.0f
+                                });
+                        }
+
+                    return;
+                case "terrainquery":
+                    Bot.Terrain.Query(0, 0, new int[32, 32]);
+
+                    return;
                 default:
                     Console.WriteLine("Unknown command: {0}", command);
                     return;
             }
-
         }
-
-        
     }
 }

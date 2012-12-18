@@ -44,10 +44,9 @@ namespace VPServices.Services
     class Telegrams
     {
         const string TGRAMS = "Telegrams.dat";
-        const string TBLOCKED = "DoNotTelegram.dat";
+        const string SETTING_BLOCKED = "BlockingGrams";
 
         List<Telegram> StoredGrams = new List<Telegram>();
-        List<string> DoNotTelegram = new List<string>();
 
         public Telegrams()
         {
@@ -55,12 +54,8 @@ namespace VPServices.Services
             if (File.Exists(TGRAMS))
                 foreach (var tgram in File.ReadAllLines(TGRAMS))
                     StoredGrams.Add(Telegram.FromString(tgram));
-
-            // Load block list
-            if (File.Exists(TBLOCKED))
-                DoNotTelegram = new List<string>(File.ReadAllLines(TBLOCKED));
             
-            VPServices.Bot.Comms.Chat += checkTelegrams;
+            VPServices.Bot.Chat += checkTelegrams;
         }
 
         public void SaveTelegrams()
@@ -71,57 +66,38 @@ namespace VPServices.Services
                 , Encoding.UTF8);
         }
 
-        public void OnCommand(Instance bot, Chat chat, string data)
+        public void CmdTelegram(Chat chat, string data)
         {
             var matches = Regex.Match(data, "^(.+?): (.+?)$", RegexOptions.IgnoreCase);
             if (!matches.Success) return;
             
-            var target = matches.Groups[1].Value.ToLower().Trim();
+            var target = matches.Groups[1].Value.Trim();
             var msg = matches.Groups[2].Value.Trim();
 
-            if (DoNotTelegram.Contains(target))
-            {
-                bot.Comms.Say("{0}: {1} is not accepting telegrams.", chat.Name, target);
-                return;
-            }
-
             StoredGrams.Add(new Telegram { From = chat.Name, To = target, Message = msg });
-            bot.Comms.Say("{0}: Saved for {1}", chat.Name, target);
+            VPServices.Bot.Say("{0}: Saved for {1}", chat.Name, target);
             Console.WriteLine("Telegram by {0} recorded for {1}.", chat.Name, target);
             SaveTelegrams();
         }
 
-        public void Block(Instance bot, string name)
-        {
-            if (DoNotTelegram.Contains(name))
-            {
-                bot.Comms.Say("{0}: You are now accepting telegrams.", name);
-                DoNotTelegram.Remove(name);
-            }
-            else
-            {
-                bot.Comms.Say("{0}: You are now blocking telegrams.", name);
-                DoNotTelegram.Add(name);
-            }
-
-            File.WriteAllLines(TBLOCKED, DoNotTelegram, Encoding.UTF8);
-        }
-
         void checkTelegrams(Instance bot, Chat chat)
         {
-            if (DoNotTelegram.Contains(chat.Name.ToLower())) return;
+            var user = VPServices.UserManager[chat.Name];
+            if (user.Avatar.IsBot) return;
+
+            if (user.Settings.GetBoolean(SETTING_BLOCKED, false)) return;
 
             bool sentOne = false;
             foreach (var tg in StoredGrams)
-                if (!tg.Sent && chat.Name.ToLower() == tg.To)
+                if (!tg.Sent && chat.Name.ToLower() == tg.To.ToLower())
                 {
-                    bot.Comms.Say("{0}: You have a telegram from {1}: {2}", chat.Name, tg.From, tg.Message);
+                    bot.Say("{0}: You have a telegram from {1}: {2}", chat.Name, tg.From, tg.Message);
                     tg.Sent = true;
                     sentOne = true;
                     SaveTelegrams();
                 }
 
-            if (sentOne) bot.Comms.Say("(Say '!telegram <recepient>: <message>' to respond or !blocktelegrams to prevent further)");
+            if (sentOne) bot.Say("(Say '!telegram <recepient>: <message>' to respond)");
         }
     }
 }

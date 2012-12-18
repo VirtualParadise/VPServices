@@ -25,13 +25,13 @@ namespace VPServices.Services
             checkExpired();
             if (lastPetition != DateTime.MinValue)
             {
-                VPServices.Bot.Comms.Say("{0}: There is an ongoing petition", who);
+                VPServices.Bot.Say("{0}: There is an ongoing petition", who);
                 return;
             }
 
             if (VPServices.UserManager.UniqueUsers < 4)
             {
-                VPServices.Bot.Comms.Say("{0}: At least four unique non-bot users required for petition", who);
+                VPServices.Bot.Say("{0}: At least four unique non-bot users required for petition", who);
                 return;
             }
 
@@ -40,7 +40,7 @@ namespace VPServices.Services
             votes.Clear();
             majority = (int) ((float)VPServices.UserManager.UniqueUsers * 0.6);
             Console.WriteLine("Beginning petition to moderate {0} by {1}", target, who);
-            VPServices.Bot.Comms.Say(
+            VPServices.Bot.Say(
                 "Petitioning moderation for {0}; vote to !kickvote or !banvote or neither; at least {1} votes (out of {2} unique users) required",
                 target, majority, VPServices.UserManager.UniqueUsers);
         }
@@ -53,7 +53,7 @@ namespace VPServices.Services
             // Remove and ignore expired petition
             if (checkExpired())
             {
-                VPServices.Bot.Comms.Say("{0}: Sorry, the petition has timed out.", from);
+                VPServices.Bot.Say("{0}: Sorry, the petition has timed out.", from);
                 return;
             }
 
@@ -106,7 +106,7 @@ namespace VPServices.Services
         public void Eject(int session)
         {
             Console.WriteLine("Ejecting session {0}", session);
-            VPServices.Bot.World.TeleportAvatar(
+            VPServices.Bot.Avatars.Teleport(
                 session,
                 "void", Vector3.Zero, 0, 0);
         }
@@ -128,13 +128,13 @@ namespace VPServices.Services
 
             if (kicks >= bans)
             {
-                VPServices.Bot.Comms.Say("Kicking {0} out for five minutes", petitioningFor);
+                VPServices.Bot.Say("Kicking {0} out for five minutes", petitioningFor);
                 Console.WriteLine("Kicking {0} for five minutes", petitioningFor);
                 Kicked.Add(petitioningFor, DateTime.Now);
             }
             else
             {
-                VPServices.Bot.Comms.Say("Banning {0} for 24 hours", petitioningFor);
+                VPServices.Bot.Say("Banning {0} for 24 hours", petitioningFor);
                 Console.WriteLine("Banning {0} for 24 hours", petitioningFor);
                 Banned.Add(petitioningFor, DateTime.Now);
             }
