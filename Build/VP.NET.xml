@@ -4,6 +4,22 @@
         <name>VP.NET</name>
     </assembly>
     <members>
+        <member name="T:VP.InstanceTerrain">
+            <summary>
+            Container class for Instance's terrain-related members
+            </summary>
+        </member>
+        <member name="M:VP.InstanceTerrain.SetNode(VP.TerrainNode,System.Int32,System.Int32)">
+            <summary>
+            Sets a terrain node data to world
+            </summary>
+        </member>
+        <member name="M:VP.InstanceTerrain.QueryTile(System.Int32,System.Int32,System.Int32[0:,0:])">
+            <summary>
+            Queries a tile, using a 2 dimensional array of node revisions for versioning.
+            Fires the GetNode event after each node received
+            </summary>
+        </member>
         <member name="M:VP.Instance.Wait(System.Int32)">
             <summary>
             Pumps incoming events, fires any registered events or callbacks, then sleeps
@@ -20,6 +36,12 @@
             <summary>
             Logs into the default Virtual Paradise universe with the given authentication
             details. Chainable.
+            </summary>
+        </member>
+        <member name="M:VP.Instance.Login(System.String,System.String)">
+            <summary>
+            Logs into the default Virtual Paradise universe with the given authentication
+            details and initialized bot name. Chainable.
             </summary>
         </member>
         <member name="M:VP.Instance.Enter(System.String)">
@@ -66,6 +88,11 @@
             <summary>
             Methods, events and properties related to property and object handling,
             including queries
+            </summary>
+        </member>
+        <member name="F:VP.Instance.Terrain">
+            <summary>
+            Methods, events and properties related to terrain modificaton and queries
             </summary>
         </member>
         <member name="M:VP.Instance.#ctor">
@@ -171,6 +198,11 @@
             Note: The native VP SDK uses the ObjectCreate event for query cell results
             </summary>
         </member>
+        <member name="M:VP.Native.DataConverters.TerrainNodeData(System.Byte[])">
+            <summary>
+            Converts terrain node data to a 2D TerrainCell array
+            </summary>
+        </member>
         <member name="M:VP.Avatar.#ctor(System.IntPtr)">
             <summary>
             Creates an Avatar from a native instance's attributes
@@ -182,6 +214,16 @@
             in square brackets
             </summary>
         </member>
+        <member name="P:VP.Avatar.Coordinates">
+            <summary>
+            Gets or sets the coordinates of this avatar as a Vector3
+            </summary>
+        </member>
+        <member name="P:VP.Avatar.Position">
+            <summary>
+            Gets or sets the position of this avatar as an AvatarPosition
+            </summary>
+        </member>
         <member name="M:VP.AvatarPosition.#ctor(System.String)">
             <summary>
             Creates an avatar position from a comma-seperated list
@@ -190,6 +232,105 @@
         <member name="M:VP.AvatarPosition.ToString">
             <summary>
             Formats the position to a comma-seperated list
+            </summary>
+        </member>
+        <member name="P:VP.AvatarPosition.Coordinates">
+            <summary>
+            Gets or sets a Vector3 value for coordinates
+            </summary>
+        </member>
+        <member name="F:VP.TerrainPosition.GlobalCellX">
+            <summary>
+            Global cell X coordinate
+            </summary>
+        </member>
+        <member name="F:VP.TerrainPosition.GlobalCellZ">
+            <summary>
+            Global cell Z coordinate
+            </summary>
+        </member>
+        <member name="F:VP.TerrainPosition.CellX">
+            <summary>
+            Cell X coordinate relative to node
+            </summary>
+        </member>
+        <member name="F:VP.TerrainPosition.CellZ">
+            <summary>
+            Cell Z coordinate relative to node
+            </summary>
+        </member>
+        <member name="F:VP.TerrainPosition.NodeX">
+            <summary>
+            Node X relative to tile
+            </summary>
+        </member>
+        <member name="F:VP.TerrainPosition.NodeZ">
+            <summary>
+            Node Z relative to tile
+            </summary>
+        </member>
+        <member name="F:VP.TerrainPosition.TileX">
+            <summary>
+            Global tile X relative to world
+            </summary>
+        </member>
+        <member name="F:VP.TerrainPosition.TileZ">
+            <summary>
+            Global tile Z relative to world
+            </summary>
+        </member>
+        <member name="M:VP.TerrainPosition.#ctor(System.Single,System.Single,System.Single)">
+            <summary>
+            Creates a fully calculated terrain position from world coordinates
+            </summary>
+        </member>
+        <member name="M:VP.TerrainPosition.CellToTile(System.Int32)">
+            <summary>
+            Gets tile number from a global cell
+            </summary>
+        </member>
+        <member name="M:VP.TerrainPosition.CellToLocal(System.Int32)">
+            <summary>
+            Gets a global cell's local coordinate reletive to tile
+            </summary>
+        </member>
+        <member name="M:VP.TerrainPosition.CellToNode(System.Int32)">
+            <summary>
+            Gets a global cell's local coordinate relative to node
+            </summary>
+        </member>
+        <member name="M:VP.TerrainNode.#ctor(System.IntPtr)">
+            <summary>
+            Creates a terrain node from an instances' attributes and byte array
+            </summary>
+        </member>
+        <member name="P:VP.TerrainNode.Item(System.Int32)">
+            <summary>
+            Gets or sets a TerrainCell value based on one-dimensional index, in column-major
+            order (e.g. TerrainNode[5] = col 0, row 5)
+            </summary>
+        </member>
+        <member name="P:VP.TerrainNode.Item(System.Int32,System.Int32)">
+            <summary>
+            Gets or sets a TerrainCell value based on two-dimensional index
+            </summary>
+        </member>
+        <member name="F:VP.TerrainTile.BaseRevision">
+            <summary>
+            A 2D array of revision numbers to force the server to send even unmodified
+            terrain nodes back
+            </summary>
+        </member>
+        <member name="P:VP.TerrainTile.Item(System.Int32)">
+            <summary>
+            Gets or sets a TerrainNode object based on one-dimensional index, in column-major
+            order (e.g. TerrainTile[4] = col 1, row 0)
+            </summary>
+        </member>
+        <member name="P:VP.TerrainTile.Item(System.Int32,System.Int32)">
+            <summary>
+            Gets or sets a TerrainNode object based on two-dimensional index.
+            Automatically sets the node's X, Y and Parent value
             </summary>
         </member>
         <member name="M:VP.User.#ctor(System.IntPtr)">

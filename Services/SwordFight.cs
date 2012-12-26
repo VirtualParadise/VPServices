@@ -7,14 +7,12 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using VP;
 
-namespace VPServices.Services
+namespace VPServ.Services
 {
     class SwordFight
     {
         public SwordFight()
         {
         }
-
-
     }
 }
