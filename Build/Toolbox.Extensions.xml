@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Toolbox.Extensions</name>
+    </assembly>
+    <members>
+        <member name="T:System.Collections.Generic.TBXCollections">
+            <summary>
+            Provides useful extensions to various generic collection classes
+            </summary>
+        </member>
+        <member name="M:System.Collections.Generic.TBXCollections.GetOrNullR``2(System.Collections.Generic.Dictionary{``0,``1},``0)">
+            <summary>
+            Safer getter for dictionary that returns null on non-existant key for
+            reference types
+            </summary>
+        </member>
+        <member name="M:System.Collections.Generic.TBXCollections.GetOrNullV``2(System.Collections.Generic.Dictionary{``0,``1},``0)">
+            <summary>
+            Safer getter for dictionary that returns default on non-existant key for value
+            types
+            </summary>
+        </member>
+        <member name="M:System.Collections.Generic.TBXCollections.AddRange``1(System.Collections.Generic.SortedSet{``0},System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Implementation of AddRange for SortedSets
+            </summary>
+        </member>
+        <member name="M:System.Collections.Generic.TBXCollections.AddRange``1(System.Collections.Generic.HashSet{``0},System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Implementation of AddRange for HashSets
+            </summary>
+        </member>
+        <member name="T:System.TBXConsole">
+            <summary>
+            Provides additional thread-safe methods for writing to the console using colors
+            </summary>
+        </member>
+        <member name="M:System.TBXConsole.WriteLineColored(System.ConsoleColor,System.String,System.Object[])">
+            <summary>
+            Writes colored text to the console, resetting the foreground color to the
+            previous value
+            </summary>
+        </member>
+        <member name="M:System.TBXConsole.WriteLineHighlighted(System.ConsoleColor,System.String,System.Object[])">
+            <summary>
+            Writes highlighted text to the console, resetting the background color to the
+            previous value
+            </summary>
+        </member>
+        <member name="M:System.TBXConsole.WriteLineColored(System.ConsoleColor,System.ConsoleColor,System.String,System.Object[])">
+            <summary>
+            Writes both highlighted and colored text to the console, resetting both values
+            to the previous
+            </summary>
+        </member>
+        <member name="T:System.Text.RegularExpressions.TBXRegex">
+            <summary>
+            Provides useful extensions to the Regex class
+            </summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.TBXRegex.ToArray(System.Text.RegularExpressions.Match)">
+            <summary>
+            Converts all groups of a match to simple string array
+            </summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.TBXRegex.IsMatch(System.String,System.String)">
+            <summary>
+            Shortcut to Regex.IsMatch() with auto case-insensitivity
+            </summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.TBXRegex.TryMatch(System.Text.RegularExpressions.Regex,System.String,System.String[]@)">
+            <summary>
+            Shortcut to using Regex.Match in if conditionals
+            </summary>
+            <param name="matches">Outputs a list of matches, null if unsuccessful</param>
+            <returns>True on success, false otherwise</returns>
+        </member>
+        <member name="M:System.Text.RegularExpressions.TBXRegex.TryMatch(System.String,System.String,System.String[]@)">
+            <summary>
+            Shortcut of Regex.TryMatch extension, which creates a regex that assumes
+            IgnoreCase
+            </summary>
+            <param name="matches">Outputs a list of matches, null if successful</param>
+            <returns>True on success, false otherwise</returns>
+        </member>
+    </members>
+</doc>
