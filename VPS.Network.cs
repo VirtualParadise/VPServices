@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using VP;
 
 namespace VPServ
@@ -10,15 +11,13 @@ namespace VPServ
 
         string userName;
         string password;
-        short connAttempts;
 
         /// <summary>
         /// Makes up to 10 connection attempts to the universe
         /// </summary>
         void ConnectToUniverse()
         {
-            connAttempts = 1;
-            while (connAttempts <= 10)
+            while (true)
             {
                 try
                 {
@@ -31,8 +30,8 @@ namespace VPServ
                 }
                 catch (Exception e)
                 {
-                    Log.Warn("Network", "Failed to connect to universe: {0} ({1} / 10)", e.Message, connAttempts);
-                    connAttempts++;
+                    Log.Warn("Network", "Failed to connect to universe: {0}", e.Message);
+                    Thread.Sleep(30000);
                 }
             }
 
@@ -44,8 +43,7 @@ namespace VPServ
         /// </summary>
         void ConnectToWorld()
         {
-            connAttempts = 1;
-            while (connAttempts <= 10)
+            while (true)
             {
                 try
                 {
@@ -56,8 +54,8 @@ namespace VPServ
                 }
                 catch (Exception e)
                 {
-                    Log.Warn("Network", "Failed to connect to world: {0} ({1} / 10)", e.Message, connAttempts);
-                    connAttempts++;
+                    Log.Warn("Network", "Failed to connect to world: {0}", e.Message);
+                    Thread.Sleep(30000);
                 }
             }
 

@@ -59,7 +59,7 @@ namespace VPServ.Services
 
             serv.Bot.Say("{0}: {1} would like to {2} you; respond with !yes or !no",
                 whomUser.Name,
-                who,
+                who.Name,
                 invite ? "invite" : "join");
 
             requests.Add(new JoinInvite
