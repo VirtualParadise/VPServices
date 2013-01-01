@@ -26,6 +26,7 @@ namespace VPServ
 
         void parseCommand(Instance sender, Chat chat)
         {
+            var beginTime = DateTime.Now;
             // Accept only commands
             if (!chat.Message.StartsWith("!")) return;
 
@@ -50,15 +51,25 @@ namespace VPServ
                         Log.Info("Commands", "User {0} tried to invoke {1} too soon", user.Name, cmd.Name);
                     else
                     {
-                        Log.Fine("Commands", "User {0} firing command {1}", user.Name, cmd.Name);
-                        cmd.LastInvoked = DateTime.Now;
-                        cmd.Handler(this, user, data);
+                        try
+                        {
+                            Log.Fine("Commands", "User {0} firing command {1}", user.Name, cmd.Name);
+                            cmd.LastInvoked = DateTime.Now;
+                            cmd.Handler(this, user, data);
+                        }
+                        catch (Exception e)
+                        {
+                            Log.Severe("Commands", "Exception firing command {0}", cmd.Name);
+                            e.LogFullStackTrace();
+                        }
                     }
 
+                    Log.Fine("Commands", "Command {0} took {1} seconds to process", cmd.Name, DateTime.Now.Subtract(beginTime).TotalSeconds);
                     return;
                 }
 
             Log.Debug("Commands", "Unknown: {0}", targetCommand);
+            Log.Fine("Commands", "Took {0} seconds to process",DateTime.Now.Subtract(beginTime).TotalSeconds);
             return;
         }
     }
