@@ -43,7 +43,7 @@ namespace VPServ
             SetupSettings();
             userName = NetworkSettings.Get("Username");
             password = NetworkSettings.Get("Password");
-            World = NetworkSettings.Get("World");
+            World    = NetworkSettings.Get("World");
 
             // Connect to network
             ConnectToUniverse();

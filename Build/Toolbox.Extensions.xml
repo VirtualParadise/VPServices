@@ -21,14 +21,9 @@
             types
             </summary>
         </member>
-        <member name="M:System.Collections.Generic.TBXCollections.AddRange``1(System.Collections.Generic.SortedSet{``0},System.Collections.Generic.IEnumerable{``0})">
+        <member name="M:System.Collections.Generic.TBXCollections.AddRange``1(System.Collections.Generic.ISet{``0},System.Collections.Generic.IEnumerable{``0})">
             <summary>
-            Implementation of AddRange for SortedSets
-            </summary>
-        </member>
-        <member name="M:System.Collections.Generic.TBXCollections.AddRange``1(System.Collections.Generic.HashSet{``0},System.Collections.Generic.IEnumerable{``0})">
-            <summary>
-            Implementation of AddRange for HashSets
+            Implementation of AddRange for ISets
             </summary>
         </member>
         <member name="T:System.TBXConsole">
@@ -52,6 +47,47 @@
             <summary>
             Writes both highlighted and colored text to the console, resetting both values
             to the previous
+            </summary>
+        </member>
+        <member name="T:System.TBXDateTime">
+            <summary>
+            Provides useful extensions to DateTime
+            </summary>
+        </member>
+        <member name="M:System.TBXDateTime.SecondsToNow(System.DateTime)">
+            <summary>
+            Returns an integer amount of seconds difference between DateTime.Now and
+            this DateTime value
+            </summary>
+        </member>
+        <member name="T:System.TBXString">
+            <summary>
+            Provides useful extensions to strings
+            </summary>
+        </member>
+        <member name="F:System.TBXString.SplitComma">
+            <summary>
+            Constant array for string.Split for splitting by commas
+            </summary>
+        </member>
+        <member name="M:System.TBXString.TerseSplit(System.String,System.Char[])">
+            <summary>
+            Shortcut to string.Split(char[]) that removes empty entries by default
+            </summary>
+        </member>
+        <member name="M:System.TBXString.TerseSplit(System.String,System.String[])">
+            <summary>
+            Shortcut to string.Split(string[]) that removes empty entries by default
+            </summary>
+        </member>
+        <member name="M:System.TBXString.SplitCSV(System.String,System.Boolean)">
+            <summary>
+            Splits a comma-seperated string to an array
+            </summary>
+        </member>
+        <member name="M:System.TBXString.ToCSV(System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Joins an array of objects into a basic comma seperated list.
             </summary>
         </member>
         <member name="T:System.Text.RegularExpressions.TBXRegex">

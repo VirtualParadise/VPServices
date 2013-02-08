@@ -69,6 +69,11 @@
             Sets up a new console logger, automatically attaching to the Log.Logged event
             </summary>
         </member>
+        <member name="M:System.ConsoleLogger.Finalize">
+            <summary>
+            Automatic deregistration of logged event upon deconstruction
+            </summary>
+        </member>
         <member name="M:System.ConsoleLogger.OnLog(System.LogLevels,System.String,System.String,System.Object[])">
             <summary>
             Prints log messages to console with appropriate color or queues messages
@@ -112,6 +117,11 @@
             <summary>
             Creates a file logger that appends to the specified relative or absolute
             path. To begin logging, set the Paused property to false.
+            </summary>
+        </member>
+        <member name="M:System.Loggers.FileLogger.Finalize">
+            <summary>
+            Automatic pause and deregistration of logged event upon deconstruction
             </summary>
         </member>
         <member name="M:System.Loggers.FileLogger.OnLog(System.LogLevels,System.String,System.String,System.Object[])">

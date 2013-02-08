@@ -19,10 +19,13 @@ namespace VPServ.Services
             app.Commands.AddRange(new[] {
                 new Command("Set home", "^sethome$", cmdSetHome,
                 @"Sets the requester's home position, where they will be teleported to every time they enter the world", 30),
+
                 new Command("Go home", "^h(ome)?$", cmdGoHome,
                 @"Teleports the requester to their home position, or ground zero if unset"),
+
                 new Command("Clear home", "^clearhome$", cmdClearHome,
                 @"Clears the requester's home position"),
+
                 new Command("Bounce", "^bounce$", cmdBounce,
                 @"Disconnects and reconnects the requester to the world; useful for clearing the download queue and fixing some issues"),
             });
@@ -42,7 +45,7 @@ namespace VPServ.Services
                 var user = inst.GetUser(who.Session);
 
                 if (user == null) return;
-                else settings = inst.GetUserSettings(user);
+                else              settings = inst.GetUserSettings(user);
 
                 // Do not teleport home if bouncing
                 if (settings.Contains(SETTING_BOUNCE))
@@ -54,7 +57,11 @@ namespace VPServ.Services
 
         void cmdGoHome(VPServ serv, Avatar who, string data)
         {
-            var pos = new AvatarPosition(serv.GetUserSettings(who).Get(SETTING_HOME));
+            var home = serv.GetUserSettings(who).Get(SETTING_HOME);
+            var pos = (home == null)
+                ? new AvatarPosition(0, 0, 0, 0, 0)
+                : new AvatarPosition(home);
+
             serv.Bot.Avatars.Teleport(who.Session, "", pos);
             Log.Debug(Name, "Teleported {0} home at {1:f3}, {2:f3}, {3:f3}", who.Name, pos.X, pos.Y, pos.Z);
         }
@@ -72,7 +79,7 @@ namespace VPServ.Services
             if (!serv.GetUserSettings(who).Contains(SETTING_HOME)) return;
             else serv.GetUserSettings(who).Remove(SETTING_HOME);
 
-            serv.Bot.Say("{0}: Cleared; home assumed as 0,0,0");
+            serv.Bot.Say("{0}: Cleared; home assumed as 0,0,0", who.Name);
             Log.Info(Name, "Cleared home for {0}", who.Name);
         }
 
