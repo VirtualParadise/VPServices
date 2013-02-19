@@ -87,7 +87,12 @@
         </member>
         <member name="M:System.TBXString.ToCSV(System.Collections.Generic.IEnumerable{System.Object})">
             <summary>
-            Joins an array of objects into a basic comma seperated list.
+            Joins an array of objects into a basic comma seperated list
+            </summary>
+        </member>
+        <member name="M:System.TBXString.PartsToCSV(System.Object[])">
+            <summary>
+            Joins parameters of objects into a basic comma seperated list
             </summary>
         </member>
         <member name="T:System.Text.RegularExpressions.TBXRegex">

@@ -17,8 +17,6 @@ namespace VPServ.Services
             app.Commands.AddRange(new[] {
                 new Command("Help", "^(help|commands)$", (s,a,d) => { s.Bot.Say(s.PublicUrl + "help"); },
                 @"Prints the URL to this documentation to chat", 60),
-                new Command("Seed", "^(seed|spawn)$", cmdSeed,
-                @"Moves the bot to the requester's position so the bot's avatar can be duplicated", 5),
                 new Command("Position", "^(my)?(coord(s|inates)?|pos(ition)?)$", cmdCoords,
                 @"Prints the requester's position to chat, including coordinates, pitch and yaw", 5),
                 new Command("Crash", "^(crash|exception)$", cmdCrash,
@@ -48,12 +46,6 @@ namespace VPServ.Services
         void cmdCoords(VPServ serv, Avatar who, string data)
         {
             serv.Bot.Say("{0}: {1:f4}, {2:f4}, {3:f4}, facing {4:f0}, pitch {5:f0}", who.Name, who.X, who.Y, who.Z, who.Yaw, who.Pitch);
-        }
-
-        void cmdSeed(VPServ serv, Avatar who, string data)
-        {
-            serv.Bot.GoTo(who.X, who.Y, who.Z);
-            serv.Bot.Say("At your location; right click me to duplicate my avatar into a new object");
         }
 
         void cmdOffsetAlt(VPServ serv, Avatar who, string data)

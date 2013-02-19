@@ -64,7 +64,11 @@ namespace VPServ
         /// </summary>
         public IConfig GetUserSettings(Avatar av)
         {
-            return UserSettings.Configs[av.Name] ?? UserSettings.AddConfig(av.Name);
+            var sanitized = av.Name
+                .Replace("]", "__")
+                .Replace("[", "__");
+
+            return UserSettings.Configs[sanitized] ?? UserSettings.AddConfig(sanitized);
         }
 
         /// <summary>
@@ -72,7 +76,11 @@ namespace VPServ
         /// </summary>
         public IConfig GetUserSettings(string name)
         {
-            return UserSettings.Configs[name] ?? UserSettings.AddConfig(name);
+            var sanitized = name
+                .Replace("]", "__")
+                .Replace("[", "__");
+
+            return UserSettings.Configs[sanitized] ?? UserSettings.AddConfig(sanitized);
         }
 
         void onAvatarAdd(Instance sender, Avatar avatar)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Text.RegularExpressions;
 using VP;
 
@@ -69,6 +70,7 @@ namespace VPServ.Services
             foreach (var tg in storedTelegrams)
                 if (!tg.Sent && chat.Name.ToLower() == tg.To.ToLower())
                 {
+                    Thread.Sleep(500); //TEMP: fix for VP crash
                     bot.Say("{0}: You have a telegram from {1}: {2}", chat.Name, tg.From, tg.Message);
                     tg.Sent = true;
                     sentOne = true;
