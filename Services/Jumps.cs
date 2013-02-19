@@ -23,10 +23,10 @@ namespace VPServ.Services
 
             app.Commands.AddRange(new[] {
                 new Command("Add jump", "^(addjump|aj)$", cmdAddJump,
-
                 @"Adds a jump of the specified name at the requester's position in the format: `!addjump *name*`"),
+
                 new Command("Delete jump", "^(deljump|dj)$", cmdDelJump,
-                @"Deletes a jump of the specified name in the format: `!addjump *name*`"),
+                @"Deletes a jump of the specified name in the format: `!deljump *name*`"),
 
                 new Command("List jumps", "^(listjumps?|lj|jumps?list)$", (s,a,d) => { s.Bot.Say(s.PublicUrl + "jumps"); },
                 @"Prints the URL to a listing of jumps to chat", 60),

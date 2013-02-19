@@ -19,9 +19,9 @@ namespace VPServ.Services
                 @"Sends a join request to target user in the format: `!join *who*`"),
                 new Command("Invite", "^inv(ite)?$", (s, w, d) => { onRequest(s, w, d, true); },
                 @"Sends an invite request to the target user in the format: `!invite *who*`"),
-                new Command("Accept", "^(yes|accept)$", (s, w, d) => { onResponse(s, w, true); },
+                new Command("Accept join/invite", "^(yes|accept)$", (s, w, d) => { onResponse(s, w, true); },
                 @"Accepts a pending join or invite request"),
-                new Command("Reject", "^(no|reject|deny)$", (s, w, d) => { onResponse(s, w, true); },
+                new Command("Reject join/invite", "^(no|reject|deny)$", (s, w, d) => { onResponse(s, w, true); },
                 @"Rejects a pending join or invite request"),
             });
         }
@@ -134,9 +134,9 @@ namespace VPServ.Services
     {
         public static JoinInvite Nobody = new JoinInvite();
 
-        public string Who;
-        public int By;
-        public bool Invite;
+        public string   Who;
+        public int      By;
+        public bool     Invite;
         public DateTime When;
     }
 }

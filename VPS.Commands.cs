@@ -40,9 +40,6 @@ namespace VPServ
                 ? intercept[1].Trim()
                 : "";
 
-            // Reject bots
-            if (user.IsBot) return;
-
             // Iterate through commands, rejecting invokes if time limited
             foreach (var cmd in Commands)
                 if (TBXRegex.IsMatch(targetCommand, cmd.Regex))
