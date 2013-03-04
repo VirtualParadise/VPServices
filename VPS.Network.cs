@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using VP;
 
 namespace VPServ
@@ -21,10 +22,14 @@ namespace VPServ
             {
                 try
                 {
-                    Bot.Login(userName, password);
+                    var loginTask = new Task(() => { Bot.Login(userName, password); });
+
+                    loginTask.Start();
+                    if (!loginTask.Wait(5000))
+                        throw new TimeoutException("Login took too long");
 
                     // Disconnect events
-                    Bot.WorldDisconnect += onWorldDisconnect;
+                    Bot.WorldDisconnect    += onWorldDisconnect;
                     Bot.UniverseDisconnect += onUniverseDisconnect;
                     return;
                 }

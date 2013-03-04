@@ -85,7 +85,7 @@ namespace VPServ
 
         void onAvatarAdd(Instance sender, Avatar avatar)
         {
-            Log.Info("Users", "User {0} has entered", avatar.Name);
+            TBXConsole.WriteLineColored(ConsoleColor.Cyan, "*** {0} enters", avatar.Name);
             Users.Add(avatar);
 
             // Do not load settings for bots else only add to unique user counts if name
@@ -96,7 +96,7 @@ namespace VPServ
 
         void onAvatarDelete(Instance sender, Avatar avatar)
         {
-            Log.Info("Users", "User {0} has exited", avatar.Name);
+            TBXConsole.WriteLineColored(ConsoleColor.Cyan, "*** {0} leaves", avatar.Name);
 
             var user = GetUser(avatar.Session);
             if (user == null) return;

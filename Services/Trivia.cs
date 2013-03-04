@@ -1,14 +1,14 @@
-﻿using System;
+﻿using CsvHelper;
+using CsvHelper.Configuration;
+using Nini.Config;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using VP;
-using CsvHelper;
-using CsvHelper.TypeConversion;
-using CsvHelper.Configuration;
 
 namespace VPServ.Services
 {
@@ -31,8 +31,14 @@ namespace VPServ.Services
         public void Init(VPServ app, Instance bot)
         {
             this.app = app;
-            app.Commands.Add(new Command("Trivia",          "^trivia$",     cmdBeginTrivia,  @"Outputs a trivia question with optional category filter: `!trivia *category*`"));
+            app.Commands.Add(new Command("Trivia",          "^trivia$",     cmdBeginTrivia,  @"Outputs a trivia question with optional category filter: `!trivia *category*`", 5));
             app.Commands.Add(new Command("(Re)load trivia", "^loadtrivia$", cmdReloadTrivia, @"Loads or reloads the trivia database"));
+        
+            app.Commands.Add(new Command("Trivia scores", "^scores?$", (s,a,d) => { s.Bot.Say(s.PublicUrl + "scores"); },
+                @"Prints the URL to a listing of trivia scores", 60));
+
+            app.Routes.Add(new WebRoute("Scores", "^(trivia)scores?$", webListScores,
+                @"Provides a rundown of user scores from trivia"));
         }
 
         public void Dispose() {
@@ -49,12 +55,9 @@ namespace VPServ.Services
         {
             if ( entries == null ) loadTrivia();
 
+            // Skip question
             if ( inProgress )
             {
-                serv.Bot.Say("Skipping question...");
-                serv.Bot.Wait(2000);
-                Thread.Sleep(2000); // TEMP: fix for VP crash
-                
                 if (task != null) {
                     endTrivia();
                     task.Wait();
@@ -129,10 +132,17 @@ namespace VPServ.Services
 
                     endTrivia();
 
+                    var welldones = new[]
+                    {
+                        "well done", "good show", "GG", "nice one", "not bad,", "jolly good", "keep going"
+                    };
+
+                    var welldone = welldones.Skip(VPServ.Rand.Next(welldones.Length)).Take(1).Single();
+
                     if ( match[0].Equals(currentEntry.CanonicalAnswer, StringComparison.CurrentCultureIgnoreCase) )
-                        bot.Say("Ding! The answer was {0}, well done {1}", currentEntry.CanonicalAnswer, chat.Name);
+                        bot.Say("Ding! The answer was {0}, {1} {2}", currentEntry.CanonicalAnswer, welldone ,chat.Name);
                     else
-                        bot.Say("Ding! The answer was {0} (accepted from {1}), well done {2}", currentEntry.CanonicalAnswer, match[0], chat.Name);
+                        bot.Say("Ding! The answer was {0} (accepted from {1}), {2} {3}", currentEntry.CanonicalAnswer, match[0], welldone, chat.Name);
 
                     Log.Debug(tag, "Correct answer '{0}' by {1}", match[0], chat.Name);
                     awardPoint(chat.Name);
@@ -147,14 +157,6 @@ namespace VPServ.Services
             
             points++;
             config.Set(keyTriviaPoints, points);
-
-            if ( points % 10 == 0 )
-            {
-                app.Bot.Wait(2000); // TEMP: fix for vp crash
-                Thread.Sleep(2000);
-                app.Bot.Say("{0} is climbing the scoreboard at {1} points", who, points);
-            }
-
             Log.Fine(tag, "{0} is now up to {1} points", who, points);
         }
 
@@ -199,6 +201,25 @@ namespace VPServ.Services
             inProgress    = false;
             app.Bot.Chat -= onChat;
             Log.Fine(tag, "Trivia has ended");
+        }
+
+        string webListScores(VPServ serv, string data)
+        {
+            string listing = "# Trivia scores:\n";
+            var    scores  = from IConfig c in serv.UserSettings.Configs
+                             where c.Contains(keyTriviaPoints) && c.GetInt(keyTriviaPoints) > 0
+                             orderby c.GetInt(keyTriviaPoints) descending
+                             select new Tuple<int, string>(c.GetInt(keyTriviaPoints), c.Name);
+
+            foreach (var score in scores)
+            {
+                listing += string.Format(
+@"* **{0}** : {1} point(s)
+
+", score.Item2, score.Item1);
+            }
+
+            return serv.MarkdownParser.Transform(listing);
         }
     }
 
