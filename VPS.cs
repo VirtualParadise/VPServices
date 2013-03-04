@@ -39,7 +39,7 @@ namespace VPServ
         public void Setup()
         {
             // Load instance
-            Bot = new Instance("Services");
+            Bot      = new Instance("Services");
             SetupSettings();
             userName = NetworkSettings.Get("Username");
             password = NetworkSettings.Get("Password");
@@ -50,12 +50,15 @@ namespace VPServ
             Log.Info("Network", "Connected to universe");
 
             // Set up global events
-            SetupWeb();
-            SetupCommands();
+            SetupWeb         ();
+            SetupCommands    ();
             SetupUserSettings();
-            LoadServices();
-            ConnectToWorld();
+            LoadServices     ();
+            ConnectToWorld   ();
             Log.Info("Network", "Connected to {0}", World);
+
+            // Set up console
+            Console.BufferWidth = Console.LargestWindowWidth;
         }
 
         /// <summary>

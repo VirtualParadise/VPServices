@@ -20,7 +20,7 @@ namespace VPServ
             Bot.Chat += parseCommand;
             Bot.Chat += (s, c) =>
             {
-                Log.Debug(c.Name, c.Message.Replace('{','[').Replace('}',']'));
+                TBXConsole.WriteLineColored(ConsoleColor.White, " {0} | {1}", c.Name.PadRight(16), c.Message);
             };
         }
 
@@ -61,17 +61,17 @@ namespace VPServ
                         }
                     }
 
-                    Log.Fine("Commands", "Command {0} took {1} seconds to process", cmd.Name, DateTime.Now.Subtract(beginTime).TotalSeconds);
+                    Log.Fine("Commands", "Command {0} took {1} seconds to process", cmd.Name, beginTime.SecondsToNow());
                     return;
                 }
 
             Log.Debug("Commands", "Unknown: {0}", targetCommand);
-            Log.Fine("Commands", "Took {0} seconds to process",DateTime.Now.Subtract(beginTime).TotalSeconds);
+            Log.Fine ("Commands", "Took {0} seconds to process", beginTime.SecondsToNow());
             return;
         }
     }
 
-    public delegate void CommandHandler(VPServ serv, Avatar who, string data);
+    public delegate void CommandHandler(VPServ app, Avatar who, string data);
 
     /// <summary>
     /// Defines a text command, fired by !(regex)

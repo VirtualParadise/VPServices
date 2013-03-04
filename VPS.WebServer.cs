@@ -108,10 +108,14 @@ namespace VPServ
 
             using (var outStream = new StreamWriter(ctx.Response.OutputStream))
             {
-                outStream.Write(response);
-                outStream.Flush();
-                ctx.Response.AddHeader("Content-Type", "Content-Type:text/html; charset=utf-8");
-                ctx.Response.Close();
+                try
+                {
+                    outStream.Write(response);
+                    outStream.Flush();
+                    ctx.Response.AddHeader("Content-Type", "Content-Type:text/html; charset=utf-8");
+                    ctx.Response.Close();
+                }
+                catch { Log.Info("Web server", "Discarding response for closed connection {0}", ctx.Request.RemoteEndPoint); }
             }
         }
 
