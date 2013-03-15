@@ -9,16 +9,15 @@ namespace VPServ.Services
 {
     public class Jumps : IService
     {
-        public const string FILE_JUMPS = "Jumps.dat";
-
-        List<Jump> storedJumps = new List<Jump>();
+        public const string FileJumps   = "Jumps.dat";
+        List<Jump>          storedJumps = new List<Jump>();
 
         public string Name { get { return "Jumps"; } }
-        public void Init(VPServ app, Instance bot)
+        public void   Init (VPServ app, Instance bot)
         {
             // Load all saved jumps
-            if (File.Exists(FILE_JUMPS))
-                foreach (var jump in File.ReadAllLines(FILE_JUMPS))
+            if (File.Exists(FileJumps))
+                foreach (var jump in File.ReadAllLines(FileJumps))
                     storedJumps.Add(new Jump(jump));
 
             app.Commands.AddRange(new[] {
@@ -47,7 +46,7 @@ namespace VPServ.Services
 
         void saveJumps()
         {
-            File.WriteAllLines(FILE_JUMPS,
+            File.WriteAllLines(FileJumps,
                 from t in storedJumps
                 select t.ToString(), Encoding.UTF8);
         }
@@ -64,9 +63,9 @@ namespace VPServ.Services
                 return;
             }
 
-            var x = (float)Math.Round(who.X, 3);
-            var y = (float)Math.Round(who.Y, 3);
-            var z = (float)Math.Round(who.Z, 3);
+            var x = (float) Math.Round(who.X, 3);
+            var y = (float) Math.Round(who.Y, 3);
+            var z = (float) Math.Round(who.Z, 3);
             storedJumps.Add(new Jump { Name = name, X = x, Y = y, Z = z, Yaw = who.Yaw, Pitch = who.Pitch });
             saveJumps();
 
