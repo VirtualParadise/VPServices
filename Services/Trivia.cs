@@ -31,7 +31,7 @@ namespace VPServ.Services
         public void Init(VPServ app, Instance bot)
         {
             this.app = app;
-            app.Commands.Add(new Command("Trivia",          "^trivia$",     cmdBeginTrivia,  @"Outputs a trivia question with optional category filter: `!trivia *category*`", 5));
+            app.Commands.Add(new Command("Trivia",          "^trivia$",     cmdBeginTrivia,  @"Outputs a trivia question with optional category filter: `!trivia *category*`", 1));
             app.Commands.Add(new Command("(Re)load trivia", "^loadtrivia$", cmdReloadTrivia, @"Loads or reloads the trivia database"));
         
             app.Commands.Add(new Command("Trivia scores", "^scores?$", (s,a,d) => { s.Bot.Say(s.PublicUrl + "scores"); },
