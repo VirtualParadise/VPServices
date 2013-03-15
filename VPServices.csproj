@@ -45,6 +45,10 @@
     <Reference Include="CsvHelper">
       <HintPath>packages\CsvHelper.1.14.0\lib\net40-client\CsvHelper.dll</HintPath>
     </Reference>
+    <Reference Include="IrcDotNet, Version=0.4.1.28293, Culture=neutral, PublicKeyToken=44f6d157e750246b, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Build\IrcDotNet.dll</HintPath>
+    </Reference>
     <Reference Include="MarkdownSharp">
       <HintPath>..\Markdown\Build\MarkdownSharp.dll</HintPath>
     </Reference>
@@ -64,6 +68,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Services\IRC.cs" />
     <Compile Include="Services\Ideas.cs" />
     <Compile Include="Services\Trivia.cs" />
     <Compile Include="VPS.Settings.cs" />
