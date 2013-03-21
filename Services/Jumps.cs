@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -154,11 +155,11 @@ namespace VPServ.Services
 
             var parts = csv.Split(new[] { "," }, StringSplitOptions.None);
             Name = parts[0];
-            X = float.Parse(parts[1]);
-            Y = float.Parse(parts[2]);
-            Z = float.Parse(parts[3]);
-            Yaw = float.Parse(parts[4]);
-            Pitch = float.Parse(parts[5]);
+			X = float.Parse(parts[1], CultureInfo.InvariantCulture);
+			Y = float.Parse(parts[2], CultureInfo.InvariantCulture);
+			Z = float.Parse(parts[3], CultureInfo.InvariantCulture);
+			Yaw = float.Parse(parts[4], CultureInfo.InvariantCulture);
+			Pitch = float.Parse(parts[5], CultureInfo.InvariantCulture);
         }
 
         /// <summary>
@@ -166,7 +167,9 @@ namespace VPServ.Services
         /// </summary>
         public override string ToString()
         {
-            return string.Join(",", Name, X, Y, Z, Yaw, Pitch);
+			return string.Format(CultureInfo.InvariantCulture, 
+			                     "{0},{1},{2},{3},{4},{5}", 
+			                     Name, X, Y, Z, Yaw, Pitch);
         }
 
         public int CompareTo(Jump other) { return this.Name.CompareTo(other.Name); }
