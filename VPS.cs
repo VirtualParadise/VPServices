@@ -14,7 +14,6 @@ namespace VPServ
         static void Main(string[] args)
         {
             // Set up logger
-            Log.LogLevel = LogLevels.All;
             new ConsoleLogger();
 
             // Handle crashes by restarting bot instance
@@ -59,6 +58,11 @@ namespace VPServ
 
             // Set up console
             Console.BufferWidth = Console.LargestWindowWidth;
+
+            // Set logging level
+            LogLevels logLevel;
+            Enum.TryParse<LogLevels>( CoreSettings.Get("LogLevel", "Production"), out logLevel );
+            Log.LogLevel = logLevel;
         }
 
         /// <summary>

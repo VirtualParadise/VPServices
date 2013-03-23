@@ -39,8 +39,12 @@ namespace VPServ.Services
 
         void cmdCrash(VPServ serv, Avatar who, string data)
         {
-            if (!who.Name.Equals(serv.NetworkSettings.Get("Username"), StringComparison.CurrentCultureIgnoreCase)) return;
-            throw new Exception("Forced crash");
+            var owner = serv.NetworkSettings.Get("Username");
+
+            if ( !who.Name.Equals(owner, StringComparison.CurrentCultureIgnoreCase) )
+                return;
+            else
+                throw new Exception("Forced crash");
         }
 
         void cmdCoords(VPServ serv, Avatar who, string data)

@@ -31,8 +31,8 @@ namespace VPServ.Services
         public void Init(VPServ app, Instance bot)
         {
             this.app = app;
-            app.Commands.Add(new Command("Trivia",          "^trivia$",     cmdBeginTrivia,  @"Outputs a trivia question with optional category filter: `!trivia *category*`", 1));
-            app.Commands.Add(new Command("(Re)load trivia", "^loadtrivia$", cmdReloadTrivia, @"Loads or reloads the trivia database"));
+            app.Commands.Add(new Command("Trivia",          "^trivia$",          cmdBeginTrivia,  @"Outputs a trivia question with optional category filter: `!trivia *category*`", 1));
+            app.Commands.Add(new Command("(Re)load trivia", "^(re)?loadtrivia$", cmdReloadTrivia, @"Loads or reloads the trivia database"));
         
             app.Commands.Add(new Command("Trivia scores", "^scores?$", (s,a,d) => { s.Bot.Say(s.PublicUrl + "scores"); },
                 @"Prints the URL to a listing of trivia scores", 60));
@@ -41,7 +41,8 @@ namespace VPServ.Services
                 @"Provides a rundown of user scores from trivia"));
         }
 
-        public void Dispose() {
+        public void Dispose()
+        {
             lock ( mutex ) { endTrivia(); }
         }
 
@@ -49,6 +50,7 @@ namespace VPServ.Services
         {
             entries = null;
             loadTrivia();
+            serv.Bot.Say("The trivia database has been reloaded, with {0} entries", entries.Length);
         }
 
         void cmdBeginTrivia(VPServ serv, Avatar who, string data)

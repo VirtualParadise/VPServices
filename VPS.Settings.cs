@@ -13,6 +13,7 @@ namespace VPServ
         /// </summary>
         public IniConfigSource Settings = new IniConfigSource { AutoSave = true };
 
+        public IConfig CoreSettings;
         public IConfig NetworkSettings;
         public IConfig WebSettings;
 
@@ -21,13 +22,15 @@ namespace VPServ
             if (File.Exists(FILE_SETTINGS))
             {
                 Settings.Load(FILE_SETTINGS);
+                CoreSettings    = Settings.Configs["Core"];
                 NetworkSettings = Settings.Configs["Network"];
-                WebSettings = Settings.Configs["Web"];
+                WebSettings     = Settings.Configs["Web"];
             }
             else
             {
+                CoreSettings    = Settings.Configs.Add("Core");
                 NetworkSettings = Settings.Configs.Add("Network");
-                WebSettings = Settings.Configs.Add("Web");
+                WebSettings     = Settings.Configs.Add("Web");
                 Settings.Save(FILE_SETTINGS);
             }
         }
