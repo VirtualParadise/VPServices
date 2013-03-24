@@ -85,7 +85,7 @@ namespace VPServ
         /// </summary>
         public void UpdateLoop()
         {
-            Bot.Wait(-1);
+            Bot.Wait(0);
             Thread.Sleep(100);
         }
     }
