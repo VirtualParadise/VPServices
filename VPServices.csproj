@@ -68,9 +68,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Services\Trivia\Trivia.Commands.cs" />
+    <Compile Include="Services\Trivia\Trivia.Web.cs" />
     <Compile Include="Services\IRC.cs" />
     <Compile Include="Services\Ideas.cs" />
-    <Compile Include="Services\Trivia.cs" />
+    <Compile Include="Services\Trivia\Trivia.Core.cs" />
+    <Compile Include="Services\Trivia\Trivia.Entries.cs" />
     <Compile Include="VPS.Settings.cs" />
     <Compile Include="Services\Home.cs" />
     <Compile Include="Services\GeneralCommands.cs" />
