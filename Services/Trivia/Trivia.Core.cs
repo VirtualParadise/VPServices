@@ -1,9 +1,4 @@
-﻿using CsvHelper;
-using CsvHelper.Configuration;
-using Nini.Config;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -56,7 +51,7 @@ namespace VPServ.Services
             entryInPlay       = entry;
             entryInPlay.Used  = true;
 
-            Log.Debug("Beginning game with question:\n\t[{0}] {1}\n\tAnswer: {2}",
+            Log.Debug(tag, "Beginning game with question:\n\t[{0}] {1}\n\tAnswer: {2}",
                 entryInPlay.Category, entryInPlay.Question, entryInPlay.Answer);
 
             task = new Task(gameTimeout);
@@ -95,9 +90,9 @@ namespace VPServ.Services
                 string[] match;
                 string[] wrongMatch;
 
-                if ( TBXRegex.TryMatch(chat.Message, entryInPlay.Answer, out match) )
+                if ( TRegex.TryMatch(chat.Message, entryInPlay.Answer, out match) )
                 {
-                    if ( entryInPlay.Wrong != null && TBXRegex.TryMatch(chat.Message, entryInPlay.Wrong, out wrongMatch) )
+                    if ( entryInPlay.Wrong != null && TRegex.TryMatch(chat.Message, entryInPlay.Wrong, out wrongMatch) )
                     {
                         Log.Debug(tag, "Given answer '{0}' by {1} matched, but turned out to be wrong; rejecting", wrongMatch[0], chat.Name);
                         return;
@@ -112,7 +107,7 @@ namespace VPServ.Services
 
                     var welldone = welldones.Skip(VPServ.Rand.Next(welldones.Length)).Take(1).Single();
 
-                    if ( match[0].Equals(entryInPlay.CanonicalAnswer, StringComparison.CurrentCultureIgnoreCase) )
+                    if ( match[0].IEquals(entryInPlay.CanonicalAnswer) )
                         bot.Say("Ding! The answer was {0}, {1} {2}", entryInPlay.CanonicalAnswer, welldone ,chat.Name);
                     else
                         bot.Say("Ding! The answer was {0} (accepted from {1}), {2} {3}", entryInPlay.CanonicalAnswer, match[0], welldone, chat.Name);
@@ -132,9 +127,5 @@ namespace VPServ.Services
             config.Set(keyTriviaPoints, points);
             Log.Fine(tag, "{0} is now up to {1} points", who, points);
         }
-
-        
-
-        
     }   
 }

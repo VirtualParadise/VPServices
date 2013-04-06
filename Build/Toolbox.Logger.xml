@@ -64,6 +64,38 @@
             messages get dropped.
             </summary>
         </member>
+        <member name="F:System.ConsoleLogger.TagPadding">
+            <summary>
+            If more than zero, will pad the tag names of log entries with spaces for
+            readability
+            </summary>
+        </member>
+        <member name="F:System.ConsoleLogger.TagFormat">
+            <summary>
+            Gets or sets the format of each log entry's tag. Must at least include {0}
+            for the tag name. This will get padded with spaces depending on TagPadding
+            </summary>
+            <example>Default is "[{0}]"</example>
+        </member>
+        <member name="F:System.ConsoleLogger.MessageFormat">
+            <summary>
+            Gets or sets the format of each log entry's message. Must at least include:
+            - {0} for the tag
+            - {1} for the message
+            </summary>
+            <example>Default is "{0} {1}"</example>
+        </member>
+        <member name="F:System.ConsoleLogger.GroupSimilar">
+            <summary>
+            If true, successive messages from the same tag are visually grouped
+            </summary>
+        </member>
+        <member name="M:System.ConsoleLogger.printBacklog">
+            <summary>
+            Goes through the backlog buffer and logs every entry, clearing the buffer
+            as it does
+            </summary>
+        </member>
         <member name="M:System.ConsoleLogger.#ctor">
             <summary>
             Sets up a new console logger, automatically attaching to the Log.Logged event
@@ -225,6 +257,12 @@
         <member name="E:System.Log.Logged">
             <summary>
             Fires when a log is made but only if the current logging level allows for it
+            </summary>
+        </member>
+        <member name="T:System.LogLevels">
+            <summary>
+            Flag enum that contains both specific levels and meta levels that enable multiple
+            types of logging
             </summary>
         </member>
         <member name="F:System.LogLevels.None">

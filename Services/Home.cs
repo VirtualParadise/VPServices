@@ -10,7 +10,7 @@ namespace VPServ.Services
     /// </summary>
     public class Home : IService
     {
-        public const string SETTING_HOME = "Home";
+        public const string SETTING_HOME   = "Home";
         public const string SETTING_BOUNCE = "bounce";
 
         public string Name { get { return "Home"; } }

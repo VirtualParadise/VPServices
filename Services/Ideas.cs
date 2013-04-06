@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using VP;
 
 namespace VPServ.Services
@@ -182,7 +181,7 @@ namespace VPServ.Services
         /// </summary>
         public override string ToString()
         {
-            return TBXString.PartsToCSV(Who, What, When, Done);
+            return VPServExtensions.PartsToCSV(Who, What, When, Done);
         }
     }
 }

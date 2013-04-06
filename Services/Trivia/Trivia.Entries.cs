@@ -111,6 +111,7 @@ namespace VPServ.Services
                 // repeat search
                 markEntriesUnused(category);
                 Log.Debug(tag, "No more unused trivia entries for category '{0}'; marking all as unused", category);
+                VPServ.Instance.Bot.Say("Out of entries for that query; marking all entries as unused and starting over");
                 goto pickEntry;
             }
 
@@ -120,7 +121,6 @@ namespace VPServ.Services
 
     class TriviaEntry
     {
-        [CsvField(Ignore = true)]
         public bool   Used;
 
         [CsvField(Name = "Category")]

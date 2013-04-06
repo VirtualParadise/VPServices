@@ -20,7 +20,7 @@ namespace VPServ
             Bot.Chat += parseCommand;
             Bot.Chat += (s, c) =>
             {
-                TBXConsole.WriteLineColored(ConsoleColor.White, " {0} | {1}", c.Name.PadRight(16), c.Message);
+                TConsole.WriteLineColored(ConsoleColor.White, " {0} | {1}", c.Name.PadRight(16), c.Message);
             };
         }
 
@@ -42,7 +42,7 @@ namespace VPServ
 
             // Iterate through commands, rejecting invokes if time limited
             foreach (var cmd in Commands)
-                if (TBXRegex.IsMatch(targetCommand, cmd.Regex))
+                if (TRegex.IsMatch(targetCommand, cmd.Regex))
                 {
                     if (DateTime.Now.Subtract(cmd.LastInvoked).TotalSeconds < cmd.TimeLimit)
                         Log.Info("Commands", "User {0} tried to invoke {1} too soon", user.Name, cmd.Name);

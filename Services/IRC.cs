@@ -110,14 +110,14 @@ namespace VPServ.Services
 
             if (e.Message.Parameters[0] == channel)
             {
-                if      ( e.Message.Command.Equals("PRIVMSG", StringComparison.CurrentCultureIgnoreCase) )
+                if      ( e.Message.Command.IEquals("PRIVMSG") )
                     VPServ.Instance.Bot.Say("/me {0}:\t{1}", e.Message.Source.Name, e.Message.Parameters[1]);
-                else if ( e.Message.Command.Equals("JOIN", StringComparison.CurrentCultureIgnoreCase) )
+                else if ( e.Message.Command.IEquals("JOIN") )
                     VPServ.Instance.Bot.Say("/me *** {0} has joined {1}", e.Message.Source.Name, channel);
-                else if ( e.Message.Command.Equals("PART", StringComparison.CurrentCultureIgnoreCase) )
+                else if ( e.Message.Command.IEquals("PART") )
                     VPServ.Instance.Bot.Say("/me *** {0} has left {1}", e.Message.Source.Name, channel);
             }
-            else if ( e.Message.Command.Equals("QUIT", StringComparison.CurrentCultureIgnoreCase) )
+            else if ( e.Message.Command.IEquals("QUIT") )
                 VPServ.Instance.Bot.Say("/me *** {0} has quit ({1})", e.Message.Source.Name, e.Message.Parameters[0]);
             
         }

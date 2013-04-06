@@ -82,7 +82,7 @@ namespace VPServ
             } else {
                 // Search for route
                 foreach (var rt in Routes)
-                    if (TBXRegex.IsMatch(targetRoute, rt.Regex) || rt.Name.Equals(targetRoute, StringComparison.CurrentCultureIgnoreCase))
+                    if (TRegex.IsMatch(targetRoute, rt.Regex) || rt.Name.Equals(targetRoute, StringComparison.CurrentCultureIgnoreCase))
                     {
                         Log.Debug("Web server", "Routing to {0}", rt.Name);
                         response = string.Format(HTML_WHOLE,
