@@ -56,9 +56,6 @@ namespace VPServ
             ConnectToWorld   ();
             Log.Info("Network", "Connected to {0}", World);
 
-            // Set up console
-            Console.BufferWidth = Console.LargestWindowWidth;
-
             // Set logging level
             LogLevels logLevel;
             Enum.TryParse<LogLevels>( CoreSettings.Get("LogLevel", "Production"), out logLevel );
