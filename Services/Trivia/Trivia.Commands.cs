@@ -8,7 +8,7 @@ namespace VPServ.Services
         void addCommands()
         {
             app.Commands.Add(new Command("Trivia",          "^trivia$",                     cmdBeginTrivia, 
-                @"Outputs a trivia question with optional category filter: `!trivia *category*`"));
+                @"Outputs a trivia question with optional category filter: `!trivia *category*`", 3));
 
             app.Commands.Add(new Command("(Re)load trivia", "^(re)?loadtrivia$",            cmdReloadTrivia,
                 @"Loads or reloads the trivia database"));
