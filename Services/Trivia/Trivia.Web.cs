@@ -2,7 +2,7 @@
 using System;
 using System.Linq;
 
-namespace VPServ.Services
+namespace VPServices.Services
 {
     public partial class Trivia : IService
     {
@@ -15,7 +15,7 @@ namespace VPServ.Services
         /// <summary>
         /// Web route that lists scores of trivia players
         /// </summary>
-        string webListScores(VPServ app, string data)
+        string webListScores(VPServices app, string data)
         {
             string listing = "# Trivia scores:\n";
             var    scores  = from IConfig c in app.UserSettings.Configs

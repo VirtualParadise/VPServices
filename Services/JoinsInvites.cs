@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using VP;
 
-namespace VPServ.Services
+namespace VPServices.Services
 {
     /// <summary>
     /// Handles joins and invites between users
@@ -12,7 +12,7 @@ namespace VPServ.Services
         List<JoinInvite> requests = new List<JoinInvite>();
 
         public string Name { get { return "Joins & invites"; } }
-        public void Init(VPServ app, Instance bot)
+        public void Init(VPServices app, Instance bot)
         {
             app.Commands.AddRange(new[] {
                 new Command("Join", "^jo(in)?$", (s, w, d) => { onRequest(s, w, d, false); },
@@ -28,7 +28,7 @@ namespace VPServ.Services
 
         public void Dispose() { }
 
-        void onRequest(VPServ serv, Avatar who, string forWhom, bool invite)
+        void onRequest(VPServices serv, Avatar who, string forWhom, bool invite)
         {
             // Ignore if self
             if (who.Name.Equals(forWhom, StringComparison.CurrentCultureIgnoreCase))
@@ -71,7 +71,7 @@ namespace VPServ.Services
             });
         }
 
-        void onResponse(VPServ serv, Avatar from, bool yes)
+        void onResponse(VPServices serv, Avatar from, bool yes)
         {
             var req = isRequested(from.Name);
             // Reject non-requested

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace VPServ.Services
+namespace VPServices.Services
 {
     public partial class Trivia : IService
     {
@@ -60,7 +60,7 @@ namespace VPServ.Services
 
             while (list.Count > 0)
             {
-                var listIdx = VPServ.Rand.Next(list.Count);
+                var listIdx = VPServices.Rand.Next(list.Count);
                 var item    = list[listIdx];
                 arr[idx]    = item;
 
@@ -111,7 +111,7 @@ namespace VPServ.Services
                 // repeat search
                 markEntriesUnused(category);
                 Log.Debug(tag, "No more unused trivia entries for category '{0}'; marking all as unused", category);
-                VPServ.Instance.Bot.Say("Out of entries for that query; marking all entries as unused and starting over");
+                VPServices.App.Bot.Say("Out of entries for that query; marking all entries as unused and starting over");
                 goto pickEntry;
             }
 

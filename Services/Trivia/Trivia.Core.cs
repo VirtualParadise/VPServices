@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using VP;
 
-namespace VPServ.Services
+namespace VPServices.Services
 {
     public partial class Trivia : IService
     {
@@ -18,10 +18,10 @@ namespace VPServ.Services
         bool     inProgress    = false;
         Task     task;
         DateTime progressSince;
-        VPServ   app;
+        VPServices   app;
 
         public string Name { get { return "Trivia"; } }
-        public void Init(VPServ app, Instance bot)
+        public void Init(VPServices app, Instance bot)
         {
             this.app = app;
             addCommands ();
@@ -83,7 +83,7 @@ namespace VPServ.Services
             Log.Fine(tag, "Game has ended");
         }
 
-        void onChat(Instance bot, Chat chat)
+        void onChat(Instance bot, ChatMessage chat)
         {
             lock ( mutex )
             {
@@ -105,7 +105,7 @@ namespace VPServ.Services
                         "well done", "good show", "GG", "nice one", "not bad,", "jolly good", "keep going"
                     };
 
-                    var welldone = welldones.Skip(VPServ.Rand.Next(welldones.Length)).Take(1).Single();
+                    var welldone = welldones.Skip(VPServices.Rand.Next(welldones.Length)).Take(1).Single();
 
                     if ( match[0].IEquals(entryInPlay.CanonicalAnswer) )
                         bot.Say("Ding! The answer was {0}, {1} {2}", entryInPlay.CanonicalAnswer, welldone ,chat.Name);

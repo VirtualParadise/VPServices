@@ -3,9 +3,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using VP;
 
-namespace VPServ
+namespace VPServices
 {
-    public partial class VPServ : IDisposable
+    public partial class VPServices : IDisposable
     {
         public DateTime StartUpTime;
         public string World;

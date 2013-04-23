@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using VP;
 
-namespace VPServ.Services
+namespace VPServices.Services
 {
     public class SwordFight : IService
     {
@@ -13,11 +13,11 @@ namespace VPServ.Services
         const string keyDeath      = "SwordFightLastDeath";
         const string keyMode       = "SwordFight";
 
-        VPServ         app;
+        VPServices         app;
         List<VPObject> spawned = new List<VPObject>();
 
         public string Name { get { return "Sword fight"; } }
-        public void Init(VPServ app, Instance bot)
+        public void Init(VPServices app, Instance bot)
         {
             this.app = app;
 
@@ -30,7 +30,7 @@ namespace VPServ.Services
 
         public void Dispose() { }
 
-        void cmdTogglePVP(VPServ serv, Avatar who, string data)
+        void cmdTogglePVP(VPServices serv, Avatar who, string data)
         {
             var config = serv.GetUserSettings(who);
 
@@ -56,19 +56,19 @@ namespace VPServ.Services
             serv.Bot.Say("PVP mode has been {0} for {1}", newMode ? "enabled" : "disabled", who.Name);
         }
 
-        void cmdPunchbag(VPServ serv, Avatar who, string data)
+        void cmdPunchbag(VPServices serv, Avatar who, string data)
         {
             serv.Bot.GoTo(who.X, who.Y, who.Z);
             serv.Bot.Say("At your location; spam me with clicks to attack");
         }
 
-        void onClick(Instance bot, int sourceSession, int targetSession)
+        void onClick(Instance bot, AvatarClick click)
         {
-            if ( targetSession == 0 )
+            if ( click.TargetSession == 0 )
                 return;
 
-            var source       = app.GetUser(sourceSession);
-            var target       = app.GetUser(targetSession);
+            var source = app.GetUser(click.SourceSession);
+            var target = app.GetUser(click.TargetSession);
 
             if ( target == null )
             {
@@ -96,8 +96,8 @@ namespace VPServ.Services
             }
 
             var targetHealth = targetConfig.GetInt(keyHealth, 100);
-            var critical     = VPServ.Rand.Next(100) <= 10;
-            var damage       = VPServ.Rand.Next(5, 25) * (critical ? 3 : 1);
+            var critical     = VPServices.Rand.Next(100) <= 10;
+            var damage       = VPServices.Rand.Next(5, 25) * (critical ? 3 : 1);
 
             createHoverText(target.Position, damage, critical);
             createBloodSplat(target.Position);
@@ -113,7 +113,7 @@ namespace VPServ.Services
                 targetConfig.Set(keyDeath,  DateTime.Now);
                 targetConfig.Set(keyHealth, 100);
                 sourceConfig.Set(keyHealth, sourceConfig.GetInt(keyHealth) + 5);
-                bot.Avatars.Teleport(targetSession, AvatarPosition.GroundZero);
+                bot.Avatars.Teleport(click.TargetSession, AvatarPosition.GroundZero);
             }
             else
                 targetConfig.Set(keyHealth, targetHealth - damage);
@@ -121,8 +121,8 @@ namespace VPServ.Services
 
         void hitBot(Avatar source)
         {
-            var critical = VPServ.Rand.Next(100) <= 10;
-            var damage   = VPServ.Rand.Next(5, 25) * ( critical ? 3 : 1 );
+            var critical = VPServices.Rand.Next(100) <= 10;
+            var damage   = VPServices.Rand.Next(5, 25) * ( critical ? 3 : 1 );
 
             createHoverText(app.Bot.Position, damage, critical);
             createBloodSplat(app.Bot.Position);
@@ -136,8 +136,8 @@ namespace VPServ.Services
 
             DateTime death;
             var      config = app.GetUserSettings(who);
-            
-            if (config.Contains(keyDeath))
+
+            if ( config.Contains(keyDeath) )
                 death = DateTime.Parse( config.Get(keyDeath) );
             else
                 death = DateTime.Now.AddSeconds(-6);
@@ -150,8 +150,8 @@ namespace VPServ.Services
 
         void createHoverText(AvatarPosition pos, int damage, bool critical)
         {
-            var offsetX     = ((float) VPServ.Rand.Next(-100, 100)) / 2000;
-            var offsetZ     = ((float) VPServ.Rand.Next(-100, 100)) / 2000;
+            var offsetX     = ((float) VPServices.Rand.Next(-100, 100)) / 2000;
+            var offsetZ     = ((float) VPServices.Rand.Next(-100, 100)) / 2000;
             var description = string.Format("{0}{1}", 0 - damage, critical ? " !!!" : "");
             var color       = damage == 0 ? "blue" : "red";
             var hover       = new VPObject
@@ -169,10 +169,10 @@ namespace VPServ.Services
 
         void createBloodSplat(AvatarPosition pos)
         {
-            var offsetX     = ( (float) VPServ.Rand.Next(-100, 100) ) / 2000;
-            var offsetY     = ( (float) VPServ.Rand.Next(0, 100)    ) / 5000;
-            var offsetZ     = ( (float) VPServ.Rand.Next(-100, 100) ) / 2000;
-            var size        = VPServ.Rand.Next(80, 200);
+            var offsetX     = ( (float) VPServices.Rand.Next(-100, 100) ) / 2000;
+            var offsetY     = ( (float) VPServices.Rand.Next(0, 100)    ) / 5000;
+            var offsetZ     = ( (float) VPServices.Rand.Next(-100, 100) ) / 2000;
+            var size        = VPServices.Rand.Next(80, 200);
 
             var hover       = new VPObject
             {

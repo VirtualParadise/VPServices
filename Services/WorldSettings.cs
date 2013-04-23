@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using VP;
 
-namespace VPServ.Services
+namespace VPServices.Services
 {
     /// <summary>
     /// Stores and log world settings
@@ -12,7 +12,7 @@ namespace VPServ.Services
         public Dictionary<string, string> Data = new Dictionary<string, string>();
 
         public string Name { get { return "World Settings"; } }
-        public void   Init (VPServ app, Instance bot)
+        public void   Init (VPServices app, Instance bot)
         {
             bot.Data.GetWorldSetting += onWorldSetting;
 
@@ -31,7 +31,7 @@ namespace VPServ.Services
             Data[key] = value;
         }
 
-        string webWorldSettings(VPServ app, string data)
+        string webWorldSettings(VPServices app, string data)
         {
             string listing = string.Format("# Settings for world '{0}':\n", app.World);
 

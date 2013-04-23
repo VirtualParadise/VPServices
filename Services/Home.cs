@@ -3,18 +3,18 @@ using System;
 using System.Collections.Generic;
 using VP;
 
-namespace VPServ.Services
+namespace VPServices.Services
 {
     /// <summary>
     /// Handles home setting / teleport and bouncing
     /// </summary>
     public class Home : IService
     {
-        public const string SETTING_HOME   = "Home";
-        public const string SETTING_BOUNCE = "bounce";
+        const string settingHome   = "Home";
+        const string settingBounce = "Bounce";
 
         public string Name { get { return "Home"; } }
-        public void Init(VPServ app, Instance bot)
+        public void Init(VPServices app, Instance bot)
         {
             app.Commands.AddRange(new[] {
                 new Command("Set home", "^sethome$", cmdSetHome,
@@ -37,55 +37,64 @@ namespace VPServ.Services
 
         void onEnter(Instance sender, Avatar who)
         {
-            // Teleport home or prev position on bounce, but not on 10 seconds of initial connection
-            if (DateTime.Now.Subtract(VPServ.Instance.StartUpTime).TotalSeconds > 10)
-            {
-                IConfig settings;
-                var inst = VPServ.Instance;
-                var user = inst.GetUser(who.Session);
+            // Do not teleport users home within 10 seconds of bot's startup
+            if (VPServices.App.StartUpTime.SecondsToNow() < 10)
+                return;
+            
+            IConfig settings;
+            var inst = VPServices.App;
+            var user = inst.GetUser(who.Session);
 
-                if (user == null) return;
-                else              settings = inst.GetUserSettings(user);
+            if (user == null)
+                return;
+            else             
+                settings = inst.GetUserSettings(user);
 
-                // Do not teleport home if bouncing
-                if (settings.Contains(SETTING_BOUNCE))
-                    settings.Remove(SETTING_BOUNCE);
-                else if (settings.Contains(SETTING_HOME))
-                    cmdGoHome(inst, user, null);
-            }
+            // Do not teleport home if bouncing
+            if      ( settings.Contains(settingBounce) )
+                settings.Remove(settingBounce);
+            else if ( settings.Contains(settingHome) )
+                cmdGoHome(inst, user, null);
+            
         }
 
-        void cmdGoHome(VPServ serv, Avatar who, string data)
+        void cmdGoHome(VPServices serv, Avatar who, string data)
         {
-            var home = serv.GetUserSettings(who).Get(SETTING_HOME);
-            var pos = (home == null)
-                ? new AvatarPosition(0, 0, 0, 0, 0)
+            var home   = serv.GetUserSettings(who).Get(settingHome);
+            var pos    = (home == null)
+                ? AvatarPosition.GroundZero
                 : new AvatarPosition(home);
 
             serv.Bot.Avatars.Teleport(who.Session, "", pos);
             Log.Debug(Name, "Teleported {0} home at {1:f3}, {2:f3}, {3:f3}", who.Name, pos.X, pos.Y, pos.Z);
         }
 
-        void cmdSetHome(VPServ serv, Avatar who, string data)
+        void cmdSetHome(VPServices serv, Avatar who, string data)
         {
-            serv.GetUserSettings(who).Set(SETTING_HOME, who.Position.ToString());
+            serv.GetUserSettings(who)
+                .Set( settingHome, who.Position.ToString() );
 
             serv.Bot.Say("{0}: Set your home to {1:f3}, {2:f3}, {3:f3}", who.Name, who.X, who.Y, who.Z);
             Log.Info(Name, "Set home for {0} at {1:f3}, {2:f3}, {3:f3}", who.Name, who.X, who.Y, who.Z);
         }
 
-        void cmdClearHome(VPServ serv, Avatar who, string data)
+        void cmdClearHome(VPServices serv, Avatar who, string data)
         {
-            if (!serv.GetUserSettings(who).Contains(SETTING_HOME)) return;
-            else serv.GetUserSettings(who).Remove(SETTING_HOME);
+            var  config = serv.GetUserSettings(who);
+            if ( !config.Contains(settingHome) )
+                return;
+            else
+                config.Remove(settingHome);
 
             serv.Bot.Say("{0}: Cleared; home assumed as 0,0,0", who.Name);
             Log.Info(Name, "Cleared home for {0}", who.Name);
         }
 
-        void cmdBounce(VPServ serv, Avatar who, string data)
+        void cmdBounce(VPServices serv, Avatar who, string data)
         {
-            serv.GetUserSettings(who).Set(SETTING_BOUNCE, true);
+            serv.GetUserSettings(who)
+                .Set(settingBounce, true);
+
             serv.Bot.Avatars.Teleport(who.Session, serv.World, who.Position);
             Log.Info(Name, "Bounced user {0}", who.Name);
         }

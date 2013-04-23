@@ -4,7 +4,7 @@ using VP;
 using IrcDotNet;
 using Nini.Config;
 
-namespace VPServ.Services
+namespace VPServices.Services
 {
     /// <summary>
     /// Provides a VP <> IRC bridge
@@ -18,7 +18,7 @@ namespace VPServ.Services
         int       port;
         
         public string Name { get { return "IRC"; } }
-        public void   Init (VPServ app, Instance bot)
+        public void   Init (VPServices app, Instance bot)
         {
             app.Commands.Add(new Command("IRC connect", "^irc(start|connect)?$", (s,a,d) => { connect(); },
                 @"Starts the IRC-VP bridge", 60));
@@ -83,7 +83,7 @@ namespace VPServ.Services
             irc = null;
         }
 
-        void onWorldChat(Instance sender, Chat chat)
+        void onWorldChat(Instance sender, ChatMessage chat)
         {
             if (irc == null || !irc.IsConnected)
                 return;
@@ -111,14 +111,14 @@ namespace VPServ.Services
             if (e.Message.Parameters[0] == channel)
             {
                 if      ( e.Message.Command.IEquals("PRIVMSG") )
-                    VPServ.Instance.Bot.Say("/me {0}:\t{1}", e.Message.Source.Name, e.Message.Parameters[1]);
+                    VPServices.App.Bot.Say("/me {0}:\t{1}", e.Message.Source.Name, e.Message.Parameters[1]);
                 else if ( e.Message.Command.IEquals("JOIN") )
-                    VPServ.Instance.Bot.Say("/me *** {0} has joined {1}", e.Message.Source.Name, channel);
+                    VPServices.App.Bot.Say("/me *** {0} has joined {1}", e.Message.Source.Name, channel);
                 else if ( e.Message.Command.IEquals("PART") )
-                    VPServ.Instance.Bot.Say("/me *** {0} has left {1}", e.Message.Source.Name, channel);
+                    VPServices.App.Bot.Say("/me *** {0} has left {1}", e.Message.Source.Name, channel);
             }
             else if ( e.Message.Command.IEquals("QUIT") )
-                VPServ.Instance.Bot.Say("/me *** {0} has quit ({1})", e.Message.Source.Name, e.Message.Parameters[0]);
+                VPServices.App.Bot.Say("/me *** {0} has quit ({1})", e.Message.Source.Name, e.Message.Parameters[0]);
             
         }
 

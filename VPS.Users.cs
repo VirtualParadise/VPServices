@@ -2,13 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using VP;
 
-namespace VPServ
+namespace VPServices
 {
-    public partial class VPServ
+    public partial class VPServices
     {
-        public const string FILE_USERSETTINGS = "UserSettings.ini";
+        const string defaultFileUserSettings = "UserSettings.ini";
 
         /// <summary>
         /// User settings INI
@@ -21,18 +22,33 @@ namespace VPServ
         public List<Avatar> Users = new List<Avatar>();
 
         public int UniqueUsers = 0;
-        public int Bots = 0;
+        public int Bots        = 0;
 
         public void SetupUserSettings()
         {
-            Bot.Avatars.Enter += onAvatarAdd;
-            Bot.Avatars.Leave += onAvatarDelete;
+            Bot.Avatars.Enter  += onAvatarAdd;
+            Bot.Avatars.Leave  += onAvatarDelete;
             Bot.Avatars.Change += onAvatarsChange;
 
-            if (File.Exists(FILE_USERSETTINGS))
-                UserSettings.Load(FILE_USERSETTINGS);
+            if ( File.Exists(defaultFileUserSettings) )
+                UserSettings.Load(defaultFileUserSettings);
             else
-                UserSettings.Save(FILE_USERSETTINGS);
+                UserSettings.Save(defaultFileUserSettings);
+
+            migrate();
+        }
+
+        /// <summary>
+        /// Applies any migrational changes from older to newer versions
+        /// </summary>
+        void migrate()
+        {
+            var newConfigSource = new IniConfigSource();
+            newConfigSource.Merge(UserSettings);
+
+            // For when user setting names were forced to lowercase
+            foreach (IConfig config in newConfigSource.Configs)
+                UserSettings.Configs[config.Name].Name = config.Name.ToLower();
         }
 
         /// <summary>
@@ -60,27 +76,24 @@ namespace VPServ
         }
 
         /// <summary>
-        /// Gets user settings for a given user
-        /// </summary>
-        public IConfig GetUserSettings(Avatar av)
-        {
-            var sanitized = av.Name
-                .Replace("]", "__")
-                .Replace("[", "__");
-
-            return UserSettings.Configs[sanitized] ?? UserSettings.AddConfig(sanitized);
-        }
-
-        /// <summary>
-        /// Gets user settings for a given user name
+        /// Gets or creates user settings for a given user name
         /// </summary>
         public IConfig GetUserSettings(string name)
         {
             var sanitized = name
                 .Replace("]", "__")
-                .Replace("[", "__");
+                .Replace("[", "__")
+                .ToLower();
 
             return UserSettings.Configs[sanitized] ?? UserSettings.AddConfig(sanitized);
+        }
+
+        /// <summary>
+        /// Gets or creates user settings for a given user
+        /// </summary>
+        public IConfig GetUserSettings(Avatar av)
+        {
+            return GetUserSettings(av.Name);
         }
 
         void onAvatarAdd(Instance sender, Avatar avatar)
@@ -90,8 +103,10 @@ namespace VPServ
 
             // Do not load settings for bots else only add to unique user counts if name
             // is not present
-            if (avatar.IsBot) Bots++;
-            else if (GetUser(avatar.Name) != null) UniqueUsers++;
+            if      (avatar.IsBot)
+                Bots++;
+            else if ( GetUser(avatar.Name) != null )
+                UniqueUsers++;
         }
 
         void onAvatarDelete(Instance sender, Avatar avatar)
@@ -99,17 +114,22 @@ namespace VPServ
             TConsole.WriteLineColored(ConsoleColor.Cyan, "*** {0} leaves", avatar.Name);
 
             var user = GetUser(avatar.Session);
-            if (user == null) return;
-            else Users.Remove(user);
+            if (user == null)
+                return;
+            else
+                Users.Remove(user);
 
-            if (avatar.IsBot) Bots--;
-            else if (GetUser(avatar.Name) == null) UniqueUsers--;
+            if (avatar.IsBot)
+                Bots--;
+            else if ( GetUser(avatar.Name) == null )
+                UniqueUsers--;
         }
 
         void onAvatarsChange(Instance sender, Avatar avatar)
         {
             var user = GetUser(avatar.Session);
-            if (user == null) return;
+            if (user == null)
+                return;
             else
                 user.Position = avatar.Position;
         }

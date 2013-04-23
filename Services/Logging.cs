@@ -2,7 +2,7 @@
 using System.IO;
 using VP;
 
-namespace VPServ.Services
+namespace VPServices.Services
 {
     /// <summary>
     /// Logs user and build events to file
@@ -21,7 +21,7 @@ namespace VPServ.Services
 
         public string Name { get { return "Logging"; } }
 
-        public void Init(VPServ app, Instance bot)
+        public void Init(VPServices app, Instance bot)
         {
             bot.Property.ObjectCreate += onObjChange;
             bot.Property.ObjectChange += onObjChange;

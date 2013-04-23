@@ -6,9 +6,9 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace VPServ
+namespace VPServices
 {
-    public partial class VPServ : IDisposable
+    public partial class VPServices : IDisposable
     {
         public HttpListener Server = new HttpListener();
         public Markdown MarkdownParser = new Markdown();
@@ -141,7 +141,7 @@ namespace VPServ
         }
     }
 
-    public delegate string WebHandler(VPServ serv, string data);
+    public delegate string WebHandler(VPServices serv, string data);
 
     /// <summary>
     /// Defines a web route

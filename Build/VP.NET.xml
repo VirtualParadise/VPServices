@@ -74,6 +74,50 @@
             Sends a formatted chat message to current world
             </summary>
         </member>
+        <member name="M:VP.Instance.ConsoleMessage(System.Int32,VP.ChatTextEffect,VP.Color,System.String,System.String)">
+            <summary>
+            Sends a broadcast-like message with custom styling to a specific session
+            </summary>
+        </member>
+        <member name="M:VP.Instance.ConsoleMessage(System.Int32,VP.ChatTextEffect,VP.Color,System.String,System.String,System.Object[])">
+            <summary>
+            Sends a formatted broadcast-like message with custom styling to a specific
+            session
+            </summary>
+        </member>
+        <member name="M:VP.Instance.ConsoleBroadcast(VP.ChatTextEffect,VP.Color,System.String,System.String)">
+            <summary>
+            Sends a broadcast-like message with custom styling to everybody in-world
+            </summary>
+        </member>
+        <member name="M:VP.Instance.ConsoleBroadcast(VP.ChatTextEffect,VP.Color,System.String,System.String,System.Object[])">
+            <summary>
+            Sends a formatted broadcast-like message with custom styling to everybody
+            in-world
+            </summary>
+        </member>
+        <member name="M:VP.Instance.ConsoleMessage(System.Int32,System.String,System.String)">
+            <summary>
+            Sends a broadcast-like message with default styling to a specific session
+            </summary>
+        </member>
+        <member name="M:VP.Instance.ConsoleMessage(System.Int32,System.String,System.String,System.Object[])">
+            <summary>
+            Sends a formatted broadcast-like message with default styling to a specific
+            session
+            </summary>
+        </member>
+        <member name="M:VP.Instance.ConsoleBroadcast(System.String,System.String)">
+            <summary>
+            Sends a broadcast-like message with default styling to everybody in-world
+            </summary>
+        </member>
+        <member name="M:VP.Instance.ConsoleBroadcast(System.String,System.String,System.Object[])">
+            <summary>
+            Sends a formatted broadcast-like message with default styling to everybody
+            in-world
+            </summary>
+        </member>
         <member name="F:VP.Instance.Data">
             <summary>
             Methods, events and properties related to metadata collection
@@ -224,6 +268,16 @@
             Gets or sets the position of this avatar as an AvatarPosition
             </summary>
         </member>
+        <member name="M:VP.ChatMessage.#ctor(System.IntPtr)">
+            <summary>
+            Creates a Chat from a native instance's attributes
+            </summary>
+        </member>
+        <member name="M:VP.ConsoleMessage.#ctor(System.IntPtr)">
+            <summary>
+            Creates a ConsoleMessage from a native instance's attributes
+            </summary>
+        </member>
         <member name="M:VP.AvatarPosition.#ctor(System.String)">
             <summary>
             Creates an avatar position from a comma-seperated list
@@ -231,12 +285,27 @@
         </member>
         <member name="M:VP.AvatarPosition.ToString">
             <summary>
-            Formats the position to a comma-seperated list
+            Formats the position to a pretty formatted comma-seperated list
             </summary>
         </member>
         <member name="P:VP.AvatarPosition.Coordinates">
             <summary>
             Gets or sets a Vector3 value for coordinates
+            </summary>
+        </member>
+        <member name="M:VP.Color.#ctor(System.IntPtr)">
+            <summary>
+            Creates a Color from a native instance's attributes
+            </summary>
+        </member>
+        <member name="M:VP.ObjectClick.#ctor(System.IntPtr)">
+            <summary>
+            Creates a click from a native instance's attributes
+            </summary>
+        </member>
+        <member name="M:VP.AvatarClick.#ctor(System.IntPtr)">
+            <summary>
+            Creates a click from a native instance's attributes
             </summary>
         </member>
         <member name="F:VP.TerrainPosition.GlobalCellX">
@@ -527,6 +596,11 @@
         <member name="F:VP.Native.ReasonCode.NotInUniverse">
             <summary>
             Currently not in universe
+            </summary>
+        </member>
+        <member name="F:VP.Native.ReasonCode.InvalidArguments">
+            <summary>
+            Invalid arguments provided
             </summary>
         </member>
         <member name="M:VP.Native.Utf8StringToManaged.CleanUpNativeData(System.IntPtr)">

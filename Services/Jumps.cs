@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using VP;
 
-namespace VPServ.Services
+namespace VPServices.Services
 {
     public class Jumps : IService
     {
@@ -14,7 +14,7 @@ namespace VPServ.Services
         List<Jump>          storedJumps = new List<Jump>();
 
         public string Name { get { return "Jumps"; } }
-        public void   Init (VPServ app, Instance bot)
+        public void   Init (VPServices app, Instance bot)
         {
             // Load all saved jumps
             if (File.Exists(FileJumps))
@@ -52,7 +52,7 @@ namespace VPServ.Services
                 select t.ToString(), Encoding.UTF8);
         }
 
-        void cmdAddJump(VPServ serv, Avatar who, string data)
+        void cmdAddJump(VPServices serv, Avatar who, string data)
         {
             var name = data.Trim().ToLower();
             if (name == "" || name == "random") return;
@@ -74,7 +74,7 @@ namespace VPServ.Services
             Log.Info(Name, "Saved a jump for {0} at {1}, {2}, {3} for {4}", who.Name, who.X, who.Y, who.Z, name);
         }
 
-        void cmdDelJump(VPServ serv, Avatar who, string data)
+        void cmdDelJump(VPServices serv, Avatar who, string data)
         {
             var name = data.Trim().ToLower();
             if (name == "" || name == "random") return;
@@ -93,7 +93,7 @@ namespace VPServ.Services
             Log.Info(Name, "Deleted {0} jump for {1}", name, who.Name);
         }
 
-        void cmdJump(VPServ serv, Avatar who, string data)
+        void cmdJump(VPServices serv, Avatar who, string data)
         {
             var name = data.Trim().ToLower();
             if (name == "") return;
@@ -115,7 +115,7 @@ namespace VPServ.Services
             return Jump.Empty;
         }
 
-        string webListJumps(VPServ serv, string data)
+        string webListJumps(VPServices serv, string data)
         {
             string listing = "# Jump points available:\n";
             storedJumps.Sort();

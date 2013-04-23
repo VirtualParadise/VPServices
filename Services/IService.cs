@@ -1,11 +1,11 @@
 ﻿using System;
 using VP;
 
-namespace VPServ.Services
+namespace VPServices.Services
 {
     public interface IService : IDisposable
     {
         string Name { get; }
-        void Init(VPServ app, Instance bot);
+        void Init(VPServices app, Instance bot);
     }
 }

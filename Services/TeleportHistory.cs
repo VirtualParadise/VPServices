@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using VP;
 
-namespace VPServ.Services
+namespace VPServices.Services
 {
     class TeleportHistory : IService
     {
@@ -11,7 +11,7 @@ namespace VPServ.Services
         Dictionary<int, History> histories = new Dictionary<int, History>();
 
         public string Name { get { return "Teleport history"; } }
-        public void Init(VPServ app, Instance bot)
+        public void Init(VPServices app, Instance bot)
         {
             app.Commands.AddRange(new[] {
                 new Command("Go back", "^(ba?ck|prev)$", cmdGoBack,
@@ -70,7 +70,7 @@ namespace VPServ.Services
         /// <summary>
         /// Handles the !back command
         /// </summary>
-        public void cmdGoBack(VPServ serv, Avatar user, string data)
+        public void cmdGoBack(VPServices serv, Avatar user, string data)
         {
             var history = histories[user.Session];
             if (history.Back.Count == 0)
@@ -86,7 +86,7 @@ namespace VPServ.Services
             history.IgnoreNextChange = true;
         }
 
-        public void cmdGoForward(VPServ serv, Avatar user, string data)
+        public void cmdGoForward(VPServices serv, Avatar user, string data)
         {
             var history = histories[user.Session];
             if (history.Forward.Count == 0)

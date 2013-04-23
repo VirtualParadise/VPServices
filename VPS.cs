@@ -2,12 +2,13 @@
 using System.Threading;
 using VP;
 
-namespace VPServ
+namespace VPServices
 {
-    public partial class VPServ : IDisposable
+    public partial class VPServices : IDisposable
     {
-        public static VPServ Instance;
-        public static Random Rand = new Random();
+        public static VPServices App;
+        public static Random     Rand      = new Random();
+        public static Color      ColorInfo = new Color(50,50,100);
 
         public Instance Bot;
 
@@ -20,14 +21,17 @@ namespace VPServ
         init:
             try
             {
-                Instance = new VPServ();
-                Instance.Setup();
-                while (true) { Instance.UpdateLoop(); }
+                App = new VPServices();
+                App.SetupSettings(args);
+                App.Setup();
+
+                while (true)
+                    App.UpdateLoop();
             }
             catch (Exception e)
             {
                 e.LogFullStackTrace();
-                Instance.Dispose();
+                App.Dispose();
                 goto init;
             }
         }
@@ -37,9 +41,13 @@ namespace VPServ
         /// </summary>
         public void Setup()
         {
+            // Set logging level
+            LogLevels logLevel;
+            Enum.TryParse<LogLevels>( CoreSettings.Get("LogLevel", "Production"), out logLevel );
+            Log.LogLevel = logLevel;
+
             // Load instance
-            Bot      = new Instance("Services");
-            SetupSettings();
+            Bot      = new Instance( CoreSettings.Get("Name", defaultName) );
             userName = NetworkSettings.Get("Username");
             password = NetworkSettings.Get("Password");
             World    = NetworkSettings.Get("World");
@@ -49,17 +57,14 @@ namespace VPServ
             Log.Info("Network", "Connected to universe");
 
             // Set up global events
-            SetupWeb         ();
-            SetupCommands    ();
+            SetupWeb();
+            SetupCommands();
             SetupUserSettings();
-            LoadServices     ();
-            ConnectToWorld   ();
+            LoadServices();
+            ConnectToWorld();
             Log.Info("Network", "Connected to {0}", World);
 
-            // Set logging level
-            LogLevels logLevel;
-            Enum.TryParse<LogLevels>( CoreSettings.Get("LogLevel", "Production"), out logLevel );
-            Log.LogLevel = logLevel;
+            Bot.ConsoleBroadcast(ChatTextEffect.None, ColorInfo,"", "Services is now online; say !help for information");
         }
 
         /// <summary>

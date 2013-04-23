@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using VP;
 
-namespace VPServ
+namespace VPServices
 {
-    public partial class VPServ : IDisposable
+    public partial class VPServices : IDisposable
     {
         /// <summary>
         /// Global list of all commands registered
@@ -24,7 +24,7 @@ namespace VPServ
             };
         }
 
-        void parseCommand(Instance sender, Chat chat)
+        void parseCommand(Instance sender, ChatMessage chat)
         {
             var beginTime = DateTime.Now;
             // Accept only commands
@@ -71,7 +71,7 @@ namespace VPServ
         }
     }
 
-    public delegate void CommandHandler(VPServ app, Avatar who, string data);
+    public delegate void CommandHandler(VPServices app, Avatar who, string data);
 
     /// <summary>
     /// Defines a text command, fired by !(regex)

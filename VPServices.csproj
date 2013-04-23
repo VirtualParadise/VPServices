@@ -7,7 +7,7 @@
     <ProjectGuid>{185C1F00-9F11-4986-A49C-0CB97E0BDE37}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>VPServ</RootNamespace>
+    <RootNamespace>VPServices</RootNamespace>
     <AssemblyName>VPServices</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -68,6 +68,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Services\Greetings.cs" />
     <Compile Include="VPS.Extensions.cs" />
     <Compile Include="Services\Trivia\Trivia.Commands.cs" />
     <Compile Include="Services\Trivia\Trivia.Web.cs" />
@@ -95,13 +96,13 @@
     <Compile Include="VPS.WebServer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\VPNet\VPNet\VPNet.csproj">
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\VP.NET\VPNet\VPNet.csproj">
       <Project>{dbe501a7-0176-473f-b2e8-f4ada721917f}</Project>
       <Name>VPNet</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

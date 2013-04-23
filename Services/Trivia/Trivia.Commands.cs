@@ -1,7 +1,7 @@
 ﻿using VP;
 using System;
 
-namespace VPServ.Services
+namespace VPServices.Services
 {
     public partial class Trivia : IService
     {
@@ -17,7 +17,7 @@ namespace VPServ.Services
                 @"Prints the URL to a listing of trivia scores", 60));
         }
 
-        void cmdBeginTrivia(VPServ app, Avatar who, string data)
+        void cmdBeginTrivia(VPServices app, Avatar who, string data)
         {
             if ( entries == null )
             {
@@ -40,14 +40,14 @@ namespace VPServ.Services
                 gameBegin(entry);
         }
 
-        void cmdReloadTrivia(VPServ app, Avatar who, string data)
+        void cmdReloadTrivia(VPServices app, Avatar who, string data)
         {
             entries = null;
             loadTrivia();
             app.Bot.Say("The trivia database has been reloaded, with {0} entries", entries.Length);
         }
 
-        void cmdShowUrl(VPServ app, Avatar who, string data)
+        void cmdShowUrl(VPServices app, Avatar who, string data)
         {
             app.Bot.Say(app.PublicUrl + "scores");
         }

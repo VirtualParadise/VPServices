@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using VP;
 
-namespace VPServ.Services
+namespace VPServices.Services
 {
     /// <summary>
     /// Handles general utility commands
@@ -12,7 +12,7 @@ namespace VPServ.Services
         public const string SETTING_BOUNCE = "bounce";
 
         public string Name { get { return "General commands"; } }
-        public void Init(VPServ app, Instance bot)
+        public void Init(VPServices app, Instance bot)
         {
             app.Commands.AddRange(new[] {
                 new Command("Help", "^(help|commands)$", (s,a,d) => { s.Bot.Say(s.PublicUrl + "help"); },
@@ -37,7 +37,7 @@ namespace VPServ.Services
 
         public void Dispose() { }
 
-        void cmdCrash(VPServ serv, Avatar who, string data)
+        void cmdCrash(VPServices serv, Avatar who, string data)
         {
             var owner = serv.NetworkSettings.Get("Username");
 
@@ -47,40 +47,40 @@ namespace VPServ.Services
                 throw new Exception("Forced crash");
         }
 
-        void cmdCoords(VPServ serv, Avatar who, string data)
+        void cmdCoords(VPServices serv, Avatar who, string data)
         {
             serv.Bot.Say("{0}: {1:f4}, {2:f4}, {3:f4}, facing {4:f0}, pitch {5:f0}", who.Name, who.X, who.Y, who.Z, who.Yaw, who.Pitch);
         }
 
-        void cmdOffsetAlt(VPServ serv, Avatar who, string data)
+        void cmdOffsetAlt(VPServices serv, Avatar who, string data)
         {
             float x;
             if (float.TryParse(data, out x))
                 serv.Bot.Avatars.Teleport(who.Session, "", new Vector3(who.X, who.Y + x, who.Z), who.Yaw, who.Pitch);
         }
 
-        void cmdOffsetX(VPServ serv, Avatar who, string data)
+        void cmdOffsetX(VPServices serv, Avatar who, string data)
         {
             float x;
             if (float.TryParse(data, out x))
                 serv.Bot.Avatars.Teleport(who.Session, "", new Vector3(who.X + x, who.Y, who.Z), who.Yaw, who.Pitch);
         }
 
-        void cmdOffsetZ(VPServ serv, Avatar who, string data)
+        void cmdOffsetZ(VPServices serv, Avatar who, string data)
         {
             float x;
             if (float.TryParse(data, out x))
                 serv.Bot.Avatars.Teleport(who.Session, "", new Vector3(who.X, who.Y, who.Z + x), who.Yaw, who.Pitch);
         }
 
-        void cmdRandomPos(VPServ serv, Avatar who, string data)
+        void cmdRandomPos(VPServices serv, Avatar who, string data)
         {
             serv.Bot.Avatars.Teleport(who.Session, "",
-                new Vector3(VPServ.Rand.Next(-32750, 32750), 0, VPServ.Rand.Next(-32750, 32750))
+                new Vector3(VPServices.Rand.Next(-32750, 32750), 0, VPServices.Rand.Next(-32750, 32750))
                 , who.Yaw, who.Pitch);
         }
 
-        string webHelp(VPServ serv, string data)
+        string webHelp(VPServices serv, string data)
         {
             string listing = "# Bot commands available:\n";
 

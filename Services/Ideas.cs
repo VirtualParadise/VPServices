@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using VP;
 
-namespace VPServ.Services
+namespace VPServices.Services
 {
     public class Ideas : IService
     {
@@ -14,7 +14,7 @@ namespace VPServ.Services
         List<Idea> storedIdeas = new List<Idea>();
 
         public string Name { get { return "Ideas"; } }
-        public void Init(VPServ app, Instance bot)
+        public void Init(VPServices app, Instance bot)
         {
             // Load all saved Ideas
             if (File.Exists(FileIdeas))
@@ -52,7 +52,7 @@ namespace VPServ.Services
                 select t.ToString(), Encoding.UTF8);
         }
 
-        void cmdAddIdea(VPServ serv, Avatar who, string data)
+        void cmdAddIdea(VPServices serv, Avatar who, string data)
         {
             var what = data.Trim();
 
@@ -63,7 +63,7 @@ namespace VPServ.Services
             Log.Info(Name, "Saved a idea for {0}: {1}", who.Name, what);
         }
 
-        void cmdDoneIdea(VPServ serv, Avatar who, string data)
+        void cmdDoneIdea(VPServices serv, Avatar who, string data)
         {
             uint id;
             if ( !uint.TryParse(data, out id) )
@@ -85,7 +85,7 @@ namespace VPServ.Services
             Log.Info(Name, "Marked {0} idea as done for {1}", id, who.Name);
         }
 
-        void cmdIdea(VPServ serv, Avatar who, string data)
+        void cmdIdea(VPServices serv, Avatar who, string data)
         {
             try
             {
@@ -94,7 +94,7 @@ namespace VPServ.Services
                              select i;
 
                 var random = idea
-                    .Skip(VPServ.Rand.Next(0, storedIdeas.Count))
+                    .Skip(VPServices.Rand.Next(0, storedIdeas.Count))
                     .Take(1)
                     .Single();
 
@@ -114,7 +114,7 @@ namespace VPServ.Services
             return null;
         }
 
-        string webListIdeas(VPServ serv, string data)
+        string webListIdeas(VPServices serv, string data)
         {
             string listing = "# Ideas available:\n";
 

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using VPServ.Services;
+using VPServices.Services;
 
-namespace VPServ
+namespace VPServices
 {
     /// <summary>
     /// TODO: Get rid of this and use SQLite

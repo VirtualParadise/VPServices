@@ -2,11 +2,12 @@
 using System;
 using System.IO;
 
-namespace VPServ
+namespace VPServices
 {
-    public partial class VPServ : IDisposable
+    public partial class VPServices : IDisposable
     {
-        public const string FILE_SETTINGS = "Settings.ini";
+        const string defaultFileSettings = "Settings.ini";
+        const string defaultName         = "Services";
 
         /// <summary>
         /// Bot settings INI
@@ -17,11 +18,16 @@ namespace VPServ
         public IConfig NetworkSettings;
         public IConfig WebSettings;
 
-        public void SetupSettings()
+        public void SetupSettings(string[] args)
         {
-            if (File.Exists(FILE_SETTINGS))
+            var argConfig = new ArgvConfigSource(args);
+            argConfig.AddSwitch("Args", "ini", "i");
+
+            var file = argConfig.Configs["Args"].Get("ini", defaultFileSettings);
+
+            if ( File.Exists(file) )
             {
-                Settings.Load(FILE_SETTINGS);
+                Settings.Load(file);
                 CoreSettings    = Settings.Configs["Core"];
                 NetworkSettings = Settings.Configs["Network"];
                 WebSettings     = Settings.Configs["Web"];
@@ -31,7 +37,7 @@ namespace VPServ
                 CoreSettings    = Settings.Configs.Add("Core");
                 NetworkSettings = Settings.Configs.Add("Network");
                 WebSettings     = Settings.Configs.Add("Web");
-                Settings.Save(FILE_SETTINGS);
+                Settings.Save(file);
             }
         }
     }
