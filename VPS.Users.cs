@@ -52,7 +52,7 @@ namespace VPServices
         }
 
         /// <summary>
-        /// Gets case-insensitive user by name or returns null
+        /// Gets case-insensitive user by name or returns null  (e.g. phantom users/bots)
         /// </summary>
         public Avatar GetUser(string name)
         {
@@ -64,7 +64,7 @@ namespace VPServices
         }
 
         /// <summary>
-        /// Gets user by session number or returns null
+        /// Gets user by session number or returns null (e.g. phantom users/bots)
         /// </summary>
         public Avatar GetUser(int session)
         {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using VP;
 
 namespace VPServices.Services
@@ -9,26 +10,80 @@ namespace VPServices.Services
     /// </summary>
     public class GeneralCommands : IService
     {
-        public const string SETTING_BOUNCE = "bounce";
+        enum offsetBy
+        {
+            X, Y, Z
+        }
+
+        public const string SettingBounce = "bounce";
+
+        const string msgCommandTitle   = "*** {0}";
+        const string msgCommandRgx     = "Regex: {0}";
+        const string msgCommandDesc    = "Description: {0}";
+        const string msgCommandExample = "Example: {0}";
 
         public string Name { get { return "General commands"; } }
         public void Init(VPServices app, Instance bot)
         {
             app.Commands.AddRange(new[] {
-                new Command("Help", "^(help|commands)$", (s,a,d) => { s.Bot.Say(s.PublicUrl + "help"); },
-                @"Prints the URL to this documentation to chat", 60),
-                new Command("Position", "^(my)?(coord(s|inates)?|pos(ition)?)$", cmdCoords,
-                @"Prints the requester's position to chat, including coordinates, pitch and yaw", 5),
-                new Command("Crash", "^(crash|exception)$", cmdCrash,
-                @"Crashes the bot for debugging purposes; owner only"),
-                new Command("Offset altitude", "^alt$", cmdOffsetAlt,
-                @"Offsets the requester's altitude by *x* number of meters in the format: `!alt x`"),
-                new Command("Offset X", "^x$", cmdOffsetX,
-                @"Offsets the requester's X coordinate by *x* number of meters in the format: `!x x`"),
-                new Command("Offset Z", "^z$", cmdOffsetZ,
-                @"Offsets the requester's Z coordinate by *x* number of meters in the format: `!z x`"),
-                new Command("Random position", "^rand(om)?$", cmdRandomPos,
-                @"Teleports the requester to a random X,Z coordinate within the 32560 / -32560 range at ground level"),
+                new Command
+                (
+                    "Services: Help", @"^(help|commands|\?)$", cmdHelp,
+                    @"Prints the URL to this documentation to chat or explains a specific command",
+                    @"!help `[command]`", 5
+                ),
+
+                new Command
+                (
+                    "Info: Position", "^(my)?(coord(s|inates)?|pos(ition)?)$", cmdCoords,
+                    @"Prints user's position to chat, including coordinates, pitch and yaw",
+                    @"!pos", 5
+                ),
+
+                new Command
+                (
+                    "Teleport: Offset X", "^x$",
+                    (s,a,d) => { return cmdOffset(a, d, offsetBy.X); },
+                    @"Offsets user's X coordinate by *x* number of meters",
+                    @"!x `x`"
+                ),
+
+                new Command
+                (
+                    "Teleport: Offset altitude", "^(alt|y)$",
+                    (s,a,d) => { return cmdOffset(a, d, offsetBy.Y); },
+                    @"Offsets user's altitude by *x* number of meters",
+                    @"!alt `x`"
+                ),
+
+                new Command
+                (
+                    "Teleport: Offset Z", "^z$",
+                    (s,a,d) => { return cmdOffset(a, d, offsetBy.Z); },
+                    @"Offsets user's Z coordinate by *x* number of meters",
+                    @"!z `z`"
+                ),
+
+                new Command
+                (
+                    "Teleport: Random", "^rand(om)?$", cmdRandomPos,
+                    @"Teleports user to a random X,Z coordinate within the 65535 / -65535 range at ground level",
+                    @"!rand"
+                ),
+
+                new Command
+                (
+                    "Debug: Crash", "^(crash|exception)$", cmdCrash,
+                    @"Crashes the bot for debugging purposes; owner only",
+                    @"!crash"
+                ),
+
+                new Command
+                (
+                    "Debug: Hang", "^hang$", cmdHang,
+                    @"Hangs the bot for debugging purposes; owner only",
+                    @"!hang"
+                ),
             });
 
             app.Routes.Add(new WebRoute("Help", "^(help|commands)$", webHelp,
@@ -37,47 +92,98 @@ namespace VPServices.Services
 
         public void Dispose() { }
 
-        void cmdCrash(VPServices serv, Avatar who, string data)
+        bool cmdHelp(VPServices app, Avatar who, string data)
+        {
+            var helpUrl = app.PublicUrl + "help";
+
+            if (data != "")
+            {
+                // If given data, try to find specific command and print help in console for
+                // that user
+                foreach (var cmd in app.Commands)
+                    if ( TRegex.IsMatch(data, cmd.Regex) )
+                    {
+                        app.Bot.ConsoleMessage(who.Session, ChatTextEffect.Italic, VPServices.ColorInfo, "", msgCommandTitle, cmd.Name);
+                        app.Bot.ConsoleMessage(who.Session, ChatTextEffect.Italic, VPServices.ColorInfo, "", msgCommandRgx, cmd.Regex);
+                        app.Bot.ConsoleMessage(who.Session, ChatTextEffect.Italic, VPServices.ColorInfo, "", msgCommandDesc, cmd.Help);
+                        app.Bot.ConsoleMessage(who.Session, ChatTextEffect.Italic, VPServices.ColorInfo, "", msgCommandExample, cmd.Example);
+
+                        return true;
+                    }
+
+                app.Warn(who.Session, "Could not match any command for '{0}'; try {1}", data, helpUrl);
+                return true;
+            }
+            else
+            {
+                // Broadcast help URL for everybody
+                app.NotifyAll("Command help can be found at {0}", helpUrl);
+                return true;
+            }
+        }
+
+        bool cmdCrash(VPServices serv, Avatar who, string data)
         {
             var owner = serv.NetworkSettings.Get("Username");
 
-            if ( !who.Name.Equals(owner, StringComparison.CurrentCultureIgnoreCase) )
-                return;
+            if ( !who.Name.IEquals(owner) )
+                return false;
             else
                 throw new Exception("Forced crash");
         }
 
-        void cmdCoords(VPServices serv, Avatar who, string data)
+        bool cmdHang(VPServices serv, Avatar who, string data)
         {
-            serv.Bot.Say("{0}: {1:f4}, {2:f4}, {3:f4}, facing {4:f0}, pitch {5:f0}", who.Name, who.X, who.Y, who.Z, who.Yaw, who.Pitch);
+            var owner = serv.NetworkSettings.Get("Username");
+
+            if ( !who.Name.IEquals(owner) )
+                return false;
+            else
+            {
+                var test = 0;
+                while (true) test++;
+            }
         }
 
-        void cmdOffsetAlt(VPServices serv, Avatar who, string data)
+        bool cmdCoords(VPServices serv, Avatar who, string data)
         {
-            float x;
-            if (float.TryParse(data, out x))
-                serv.Bot.Avatars.Teleport(who.Session, "", new Vector3(who.X, who.Y + x, who.Z), who.Yaw, who.Pitch);
+            serv.Notify(who.Session, "You are at {0:f4}, {1:f4}, {2:f4}, facing {3:f0}, pitch {4:f0}", who.Name, who.X, who.Y, who.Z, who.Yaw, who.Pitch);
+            return true;
         }
 
-        void cmdOffsetX(VPServices serv, Avatar who, string data)
+        bool cmdOffset(Avatar who, string data, offsetBy offsetBy)
         {
-            float x;
-            if (float.TryParse(data, out x))
-                serv.Bot.Avatars.Teleport(who.Session, "", new Vector3(who.X + x, who.Y, who.Z), who.Yaw, who.Pitch);
+            float   by;
+            Vector3 location;
+            if ( !float.TryParse(data, out by) )
+                return false;
+
+            switch (offsetBy)
+            {
+                default:
+                case offsetBy.X:
+                    location = new Vector3(who.X + by, who.Y, who.Z);
+                    break;
+                case offsetBy.Y:
+                    location = new Vector3(who.X, who.Y + by, who.Z);
+                    break;
+                case offsetBy.Z:
+                    location = new Vector3(who.X, who.Y, who.Z + by);
+                    break;
+            }
+            
+            VPServices.App.Bot.Avatars.Teleport(who.Session, "", location, who.Yaw, who.Pitch);
+            return true;
         }
 
-        void cmdOffsetZ(VPServices serv, Avatar who, string data)
+        bool cmdRandomPos(VPServices serv, Avatar who, string data)
         {
-            float x;
-            if (float.TryParse(data, out x))
-                serv.Bot.Avatars.Teleport(who.Session, "", new Vector3(who.X, who.Y, who.Z + x), who.Yaw, who.Pitch);
-        }
+            var randX = VPServices.Rand.Next(-65535, 65535);
+            var randZ = VPServices.Rand.Next(-65535, 65535);
 
-        void cmdRandomPos(VPServices serv, Avatar who, string data)
-        {
-            serv.Bot.Avatars.Teleport(who.Session, "",
-                new Vector3(VPServices.Rand.Next(-32750, 32750), 0, VPServices.Rand.Next(-32750, 32750))
-                , who.Yaw, who.Pitch);
+            serv.Notify(who.Session, "Teleporting to {0}, 0, {1}", randX, randZ);
+            serv.Bot.Avatars.Teleport(who.Session, "", new Vector3(randX, 0, randZ), who.Yaw, who.Pitch);
+            return true;
         }
 
         string webHelp(VPServices serv, string data)
@@ -86,14 +192,15 @@ namespace VPServices.Services
 
             foreach (var command in serv.Commands)
             {
-                listing += string.Format(
+                listing +=
 @"## {0}
 
 * **Regex:** {1}
-* **Time limit:** {2}
-* *{3}*
+* **Example:** {2}
+* **Time limit:** {3}
+* *{4}*
 
-", command.Name, command.Regex, command.TimeLimit, command.Help);
+".LFormat(command.Name, command.Regex, command.Example, command.TimeLimit, command.Help);
             }
 
             return serv.MarkdownParser.Transform(listing);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using System.Threading;
 using VP;
 
@@ -8,17 +9,19 @@ namespace VPServices
     {
         public static VPServices App;
         public static Random     Rand      = new Random();
-        public static Color      ColorInfo = new Color(50,50,100);
+
+        public static Color ColorInfo  = new Color(50,50,100);
+        public static Color ColorWarn  = new Color(100,50,20);
+        public static Color ColorAlert = new Color(255,0,0);
 
         public Instance Bot;
 
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             // Set up logger
             new ConsoleLogger();
 
-            // Handle crashes by restarting bot instance
-        init:
+            init:
             try
             {
                 App = new VPServices();
@@ -68,6 +71,15 @@ namespace VPServices
         }
 
         /// <summary>
+        /// Pumps bot events
+        /// </summary>
+        public void UpdateLoop()
+        {
+            Bot.Wait(0);
+            Thread.Sleep(100);
+        }
+
+        /// <summary>
         /// Disposes of application by clearing all loaded service and disposing of bot
         /// </summary>
         public void Dispose()
@@ -82,13 +94,55 @@ namespace VPServices
             Bot.Dispose();
         }
 
-        /// <summary>
-        /// Pumps bot events
-        /// </summary>
-        public void UpdateLoop()
+        #region Helper functions
+        public static bool TryParseBool(string msg, out bool value)
         {
-            Bot.Wait(0);
-            Thread.Sleep(100);
+            if ( TRegex.IsMatch(msg, "^(true|1|yes|on)$") )
+            {
+                value = true;
+                return true;
+            }
+            else if ( TRegex.IsMatch(msg, "^(false|0|no|off)$") )
+            {
+                value = false;
+                return true;
+            }
+            else
+            {
+                value = false;
+                return false;
+            }
         }
+
+        public void Notify(int session, string msg, params object[] parts)
+        {
+            Bot.ConsoleMessage(session, ChatTextEffect.Italic, ColorInfo, Bot.Name, msg, parts);
+        }
+
+        public void NotifyAll(string msg, params object[] parts)
+        {
+            Notify(0, msg, parts);
+        }
+
+        public void Alert(int session, string msg, params object[] parts)
+        {
+            Bot.ConsoleMessage(session, ChatTextEffect.Bold, ColorAlert, Bot.Name, msg, parts);
+        }
+
+        public void AlertAll(string msg, params object[] parts)
+        {
+            Alert(0, msg, parts);
+        }
+
+        public void Warn(int session, string msg, params object[] parts)
+        {
+            Bot.ConsoleMessage(session, ChatTextEffect.Italic, ColorWarn, Bot.Name, msg, parts);
+        }
+
+        public void WarnAll(string msg, params object[] parts)
+        {
+            Warn(0, msg, parts);
+        }
+        #endregion
     }
 }

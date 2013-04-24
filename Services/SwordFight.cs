@@ -70,7 +70,10 @@ namespace VPServices.Services
             var source = app.GetUser(click.SourceSession);
             var target = app.GetUser(click.TargetSession);
 
-            if ( target == null )
+            if (source == null)
+                return;
+
+            if (target == null)
             {
                 hitBot(source);
                 return;

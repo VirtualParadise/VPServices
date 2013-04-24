@@ -22,12 +22,8 @@ namespace VPServices
             {
                 try
                 {
-                    var loginTask = new Task(() => { Bot.Login(userName, password); });
-
-                    loginTask.Start();
-                    if (!loginTask.Wait(5000))
-                        throw new TimeoutException("Login took too long");
-
+                    Bot.Login(userName, password);
+                    
                     // Disconnect events
                     Bot.WorldDisconnect    += onWorldDisconnect;
                     Bot.UniverseDisconnect += onUniverseDisconnect;

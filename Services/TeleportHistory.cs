@@ -15,9 +15,9 @@ namespace VPServices.Services
         {
             app.Commands.AddRange(new[] {
                 new Command("Go back", "^(ba?ck|prev)$", cmdGoBack,
-                @"Teleports the requester to their previous position in their teleport history"),
+                @"Teleports user to their previous position in their teleport history"),
                 new Command("Go forward", "^(forward|fwd)$", cmdGoForward,
-                @"Teleports the requester forward through their teleport history"),
+                @"Teleports user forward through their teleport history"),
             });
 
             bot.Avatars.Enter += onEnter;

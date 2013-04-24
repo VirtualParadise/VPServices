@@ -100,7 +100,6 @@ namespace VPServices.Services
 
         void checkTelegrams(Instance bot, int session, string name)
         {
-            var user  = VPServices.App.GetUser(session);
             var grams = from   tg in storedTelegrams
                         where  !tg.Aware && tg.To.IEquals(name)
                         select tg;

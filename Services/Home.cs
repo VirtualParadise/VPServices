@@ -11,23 +11,22 @@ namespace VPServices.Services
     public class Home : IService
     {
         const string settingHome   = "Home";
-        const string settingBounce = "Bounce";
 
         public string Name { get { return "Home"; } }
         public void Init(VPServices app, Instance bot)
         {
             app.Commands.AddRange(new[] {
                 new Command("Set home", "^sethome$", cmdSetHome,
-                @"Sets the requester's home position, where they will be teleported to every time they enter the world", 30),
+                @"Sets user's home position, where they will be teleported to every time they enter the world", 30),
 
                 new Command("Go home", "^h(ome)?$", cmdGoHome,
-                @"Teleports the requester to their home position, or ground zero if unset"),
+                @"Teleports user to their home position, or ground zero if unset"),
 
                 new Command("Clear home", "^clearhome$", cmdClearHome,
-                @"Clears the requester's home position"),
+                @"Clears user's home position"),
 
                 new Command("Bounce", "^bounce$", cmdBounce,
-                @"Disconnects and reconnects the requester to the world; useful for clearing the download queue and fixing some issues"),
+                @"Disconnects and reconnects user to the world; useful for clearing the download queue and fixing some issues"),
             });
 
             bot.Avatars.Enter += onEnter;
@@ -51,8 +50,8 @@ namespace VPServices.Services
                 settings = inst.GetUserSettings(user);
 
             // Do not teleport home if bouncing
-            if      ( settings.Contains(settingBounce) )
-                settings.Remove(settingBounce);
+            if      ( settings.Contains(GeneralCommands.SettingBounce) )
+                settings.Remove(GeneralCommands.SettingBounce);
             else if ( settings.Contains(settingHome) )
                 cmdGoHome(inst, user, null);
             

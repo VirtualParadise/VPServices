@@ -106,7 +106,8 @@ namespace VPServices.Services
 
         void onIRCMessage(object sender, IrcRawMessageEventArgs e)
         {
-            Log.Fine(Name, "Protocol message: {0}", e.RawContent);
+            if ( config.GetBoolean("DebugProtocol", false) )
+                Log.Fine(Name, "Protocol message: {0}", e.RawContent);
 
             if (e.Message.Parameters[0] == channel)
             {

@@ -24,38 +24,59 @@ namespace VPServices
             };
         }
 
+        /// <summary>
+        /// Parses incoming chat for a command and runs it
+        /// </summary>
         void parseCommand(Instance sender, ChatMessage chat)
         {
-            var beginTime = DateTime.Now;
             // Accept only commands
-            if (!chat.Message.StartsWith("!")) return;
+            if ( !chat.Message.StartsWith("!") )
+                return;
 
             var intercept = chat.Message
                 .Trim()
                 .Split(new[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries);
 
-            var user = GetUser(chat.Session);
+            var beginTime     = DateTime.Now;
+            var user          = GetUser(chat.Session);
             var targetCommand = intercept[0].Substring(1).ToLower();
-            var data = intercept.Length == 2
+            var data          =
+                intercept.Length == 2
                 ? intercept[1].Trim()
                 : "";
 
+            if (user == null)
+                return;
+
             // Iterate through commands, rejecting invokes if time limited
             foreach (var cmd in Commands)
-                if (TRegex.IsMatch(targetCommand, cmd.Regex))
+                if ( TRegex.IsMatch(targetCommand, cmd.Regex) )
                 {
-                    if (DateTime.Now.Subtract(cmd.LastInvoked).TotalSeconds < cmd.TimeLimit)
+                    var timeSpan = cmd.LastInvoked.SecondsToNow();
+                    if (timeSpan < cmd.TimeLimit)
+                    {
+                        App.Warn(chat.Session, "That command was used too recently; try again in {0} seconds.", cmd.TimeLimit - timeSpan);
                         Log.Info("Commands", "User {0} tried to invoke {1} too soon", user.Name, cmd.Name);
+                    }
                     else
                     {
                         try
                         {
                             Log.Fine("Commands", "User {0} firing command {1}", user.Name, cmd.Name);
                             cmd.LastInvoked = DateTime.Now;
-                            cmd.Handler(this, user, data);
+                            
+                            var success = cmd.Handler(this, user, data);
+                            if (!success)
+                            {
+                                App.Warn(chat.Session, "Invalid command use; please see example:");
+                                Bot.ConsoleBroadcast(ChatTextEffect.Italic, ColorWarn, "", cmd.Example);
+                            }
                         }
                         catch (Exception e)
                         {
+                            App.Alert(chat.Session, "Sorry, I ran into an issue executing that command. Please notify the host.");
+                            App.Alert(chat.Session, "Error: {0}", e.Message);
+
                             Log.Severe("Commands", "Exception firing command {0}", cmd.Name);
                             e.LogFullStackTrace();
                         }
@@ -65,13 +86,13 @@ namespace VPServices
                     return;
                 }
 
+            App.Warn(chat.Session, "Invalid command; try !help");
             Log.Debug("Commands", "Unknown: {0}", targetCommand);
-            Log.Fine ("Commands", "Took {0} seconds to process", beginTime.SecondsToNow());
             return;
         }
     }
 
-    public delegate void CommandHandler(VPServices app, Avatar who, string data);
+    public delegate bool CommandHandler(VPServices app, Avatar who, string data);
 
     /// <summary>
     /// Defines a text command, fired by !(regex)
@@ -95,6 +116,10 @@ namespace VPServices
         /// </summary>
         public string Help;
         /// <summary>
+        /// Example string for this command
+        /// </summary>
+        public string Example;
+        /// <summary>
         /// How many seconds after invoking is this command disabled
         /// </summary>
         public int TimeLimit;
@@ -103,12 +128,13 @@ namespace VPServices
         /// </summary>
         public DateTime LastInvoked = DateTime.MinValue;
 
-        public Command(string name, string rgx, CommandHandler handler, string help, int timeLimit = 0)
+        public Command(string name, string rgx, CommandHandler handler, string help, string example = "", int timeLimit = 0)
         {
-            Name = name;
-            Regex = rgx;
-            Handler = handler;
-            Help = help;
+            Name      = name;
+            Regex     = rgx;
+            Handler   = handler;
+            Help      = help;
+            Example   = example;
             TimeLimit = timeLimit;
         }
 

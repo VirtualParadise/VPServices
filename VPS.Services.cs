@@ -40,6 +40,7 @@ namespace VPServices
             {
                 Services.Add(plugin);
                 plugin.Init(this, Bot);
+
                 Log.Fine("Services", "Loaded service {0}", plugin.Name);
             }
         }

@@ -1,6 +1,4 @@
-﻿using Nini.Config;
-using System;
-using System.Linq;
+﻿using System;
 using System.Collections.Generic;
 using VP;
 
@@ -11,25 +9,32 @@ namespace VPServices.Services
     /// </summary>
     public class Greetings : IService
     {
-        const  string settingGreetMe    = "GreetMe";
-        const  string settingShowGreets = "GreetShow";
-        const  string msgEntry          = "*** {0} has entered";
-        const  string msgExit           = "*** {0} has left";
-        const  string msgShowGreets     = "Entry/exit messages will now be shown";
-        const  string msgHideGreets     = "Entry/exit messages will no longer be shown";
-        const  string msgGreetMe        = "You will now be announced on entry/exit";
-        const  string msgGreetMeNot     = "You will no longer be announced on entry/exit";
-        static Color  colorGreet        = VPServices.ColorInfo;
+        enum GreetToggle
+        {
+            GreetShowHide,
+            GreetMe
+        }
+
+        const string settingGreetMe    = "GreetMe";
+        const string settingShowGreets = "GreetShow";
+        const string msgEntry          = "*** {0} has entered";
+        const string msgExit           = "*** {0} has left";
+        const string msgShowGreets     = "Entry/exit messages will now be shown to you";
+        const string msgHideGreets     = "Entry/exit messages will no longer be shown to you";
+        const string msgGreetMe        = "You will now be announced on entry/exit";
+        const string msgGreetMeNot     = "You will no longer be announced on entry/exit";
 
         public string Name { get { return "Greetings"; } }
         public void Init(VPServices app, Instance bot)
         {
             app.Commands.AddRange(new[] {
-                new Command("Greets show/hide", "^greet(ing)?s?$", cmdToggleGreets,
-                @"Toggles whether or not the bot sends you user entry/exit messages"),
+                new Command("Greetings: Show/hide", "^greet(ing)?s?$", (o,e,a) => { return cmdToggle(o,e,a, settingShowGreets); },
+                @"Toggles whether or not the bot sends you user entry/exit messages",
+                @"!greets `[true|false]`"),
 
-                new Command("Greets stealth", "^greetme$", cmdToggleGreetMe,
-                @"Toggles whether or not the bot should announce your entry and exit to other users"),
+                new Command("Greetings: Greet me", "^greetme$", (o,e,a) => { return cmdToggle(o,e,a, settingGreetMe); },
+                @"Toggles whether or not the bot should announce your entry and exit to other users",
+                @"!greetme `[true|false]`"),
             });
 
             bot.Avatars.Enter += (b,a) => { doGreet(b, a, true);  };
@@ -38,10 +43,41 @@ namespace VPServices.Services
 
         public void Dispose() { }
 
+        #region Command handlers
+        bool cmdToggle(VPServices app, Avatar who, string data, string key)
+        {
+            var    config = app.GetUserSettings(who);
+            string msg    = null;
+            bool   toggle = false;
+
+            // Try to parse user given boolean; silently ignore on failure
+            if ( data != "" )
+            if ( !bool.TryParse(data, out toggle) )
+                return false;
+
+            config.Set(key, toggle);
+            switch (key)
+            {
+                case settingGreetMe:
+                    msg = toggle ? msgGreetMe : msgGreetMeNot;
+                    break;
+
+                case settingShowGreets:
+                    msg = toggle ? msgShowGreets : msgHideGreets;
+                    break;
+            }
+
+            app.Notify(who.Session, msg);
+            return Log.Debug(Name, "Toggled greet-me for {0} to {1}", who.Name, toggle);
+        }
+        #endregion
+
+        #region Event handlers
         void doGreet(Instance bot, Avatar who, bool entering)
         {
-            // No greetings within 10 seconds of bot load
-            if (VPServices.App.StartUpTime.SecondsToNow() < 10)
+            // No greetings within 10 seconds of bot load, to prevent flooding of entries
+            // on initial user list load
+            if ( VPServices.App.StartUpTime.SecondsToNow() < 10 )
                 return;
 
             var app      = VPServices.App;
@@ -50,41 +86,22 @@ namespace VPServices.Services
             // Do not greet if GreetMe is false
             if ( !settings.GetBoolean(settingGreetMe, true) )
                 return;
-            
-            foreach (var target in app.Users)
+
+            foreach ( var target in app.Users )
             {
-                if (target.IsBot || target.Session == who.Session)
+                // Do not send greet to bots or to the entering user themselves
+                if ( target.IsBot || target.Session == who.Session )
                     continue;
 
+                // Only send greet if target wants them
                 var targetSettings = app.GetUserSettings(target);
                 if ( targetSettings.GetBoolean(settingShowGreets, true) )
                 {
                     var msg = entering ? msgEntry : msgExit;
-                    bot.ConsoleMessage(target.Session, ChatTextEffect.Italic, colorGreet, "", msg, who.Name);
+                    bot.ConsoleMessage(target.Session, ChatTextEffect.Italic, VPServices.ColorInfo, "", msg, who.Name);
                 }
             }
-        }
-
-        void cmdToggleGreets(VPServices app, Avatar who, string data)
-        {
-            var config = app.GetUserSettings(who);
-            var toggle = !config.GetBoolean(settingShowGreets, true);
-            var msg    = toggle ? msgShowGreets : msgHideGreets;
-            config.Set(settingShowGreets, toggle);
-
-            app.Bot.ConsoleMessage(who.Session, ChatTextEffect.Italic, colorGreet, "", msg);
-            Log.Debug(Name, "Toggled greetings messages for {0} to {1}", who.Name, toggle);
-        }
-
-        void cmdToggleGreetMe(VPServices app, Avatar who, string data)
-        {
-            var config = app.GetUserSettings(who);
-            var toggle = !config.GetBoolean(settingGreetMe, true);
-            var msg    = toggle ? msgGreetMe : msgGreetMeNot;
-            config.Set(settingGreetMe, toggle);
-
-            app.Bot.ConsoleMessage(who.Session, ChatTextEffect.Italic, colorGreet, "", msg);
-            Log.Debug(Name, "Toggled greet-me for {0} to {1}", who.Name, toggle);
-        }
+        } 
+        #endregion
     }
 }

@@ -81,7 +81,7 @@ namespace VPServices.Services
             if (!yes) return;
 
             var who = serv.GetUser(from.Session);
-            var by = serv.GetUser(req.By);
+            var by  = serv.GetUser(req.By);
 
             if (by == null) return;
             if (who == null)

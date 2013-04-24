@@ -10,8 +10,8 @@ namespace VPServices
 {
     public partial class VPServices : IDisposable
     {
-        public HttpListener Server = new HttpListener();
-        public Markdown MarkdownParser = new Markdown();
+        public HttpListener Server         = new HttpListener();
+        public Markdown     MarkdownParser = new Markdown();
         public string PublicUrl;
 
         /// <summary>
@@ -50,8 +50,15 @@ namespace VPServices
             {
                 while (Server.IsListening)
                 {
-                    try { processContext(Server.GetContext()); }
-                    catch (Exception e) { e.LogFullStackTrace(); }
+                    try
+                    {
+                        var ctx = Server.GetContext();
+                        processContext(ctx);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Severe("Web server", "General error: {0}", e.Message);
+                    }
                 }
             });
 
