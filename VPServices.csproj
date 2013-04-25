@@ -85,7 +85,7 @@
     <Compile Include="Services\Logging.cs" />
     <Compile Include="Services\SwordFight.cs" />
     <Compile Include="Services\JoinsInvites.cs" />
-    <None Include="Services\TeleportHistory.cs" />
+    <Compile Include="Services\TeleportHistory.cs" />
     <Compile Include="Services\Jumps.cs" />
     <Compile Include="Services\Telegrams.cs" />
     <None Include="Services\WorldSettings.cs" />

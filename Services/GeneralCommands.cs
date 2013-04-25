@@ -206,7 +206,7 @@ namespace VPServices.Services
         {
             string listing = "# Bot commands available:\n";
 
-            foreach (var command in serv.Commands)
+            foreach (var command in app.Commands)
             {
                 listing +=
 @"## {0}
