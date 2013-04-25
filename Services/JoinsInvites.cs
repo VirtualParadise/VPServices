@@ -9,103 +9,161 @@ namespace VPServices.Services
     /// </summary>
     public class JoinsInvites : IService
     {
+        const string msgRequest          = "{0} would like to {1} you; please respond with !yes or !no";
+        const string msgRequestSent      = "Request sent; waiting for {0} to accept...";
+        const string msgRequestRejected  = "Your request has been rejected";
+        const string msgNoRequests       = "You have no requests to respond to (perhaps it has timed out?)";
+        const string msgJoined           = "You are being joined by {0}";
+        const string msgInvited          = "You are being invited by {0}";
+        const string msgSelf             = "You cannot request a join or invite to yourself";
+        const string msgNotPresent       = "Requester is no longer present";
+        const string msgPendingRequester = "You already have a pending request";
+        const string msgPendingRequestee = "That user already has a pending request";
+
         List<JoinInvite> requests = new List<JoinInvite>();
 
         public string Name { get { return "Joins & invites"; } }
         public void Init(VPServices app, Instance bot)
         {
             app.Commands.AddRange(new[] {
-                new Command("Join", "^jo(in)?$", (s, w, d) => { onRequest(s, w, d, false); },
-                @"Sends a join request to target user in the format: `!join *who*`"),
-                new Command("Invite", "^inv(ite)?$", (s, w, d) => { onRequest(s, w, d, true); },
-                @"Sends an invite request to the target user in the format: `!invite *who*`"),
-                new Command("Accept join/invite", "^(yes|accept)$", (s, w, d) => { onResponse(s, w, true); },
-                @"Accepts a pending join or invite request"),
-                new Command("Reject join/invite", "^(no|reject|deny)$", (s, w, d) => { onResponse(s, w, true); },
-                @"Rejects a pending join or invite request"),
+                new Command
+                (
+                    "Request: Join", "^jo(in)?$",
+                    (s, w, d) => { return onRequest(s, w, d, false); },
+                    @"Sends a join request to target user",
+                    @"!join `target`"
+                ),
+
+                new Command
+                (
+                    "Invite", "^inv(ite)?$",
+                    (s, w, d) => { return onRequest(s, w, d, true); },
+                    @"Sends an invite request to the target user",
+                    @"!invite `target`"
+                ),
+
+                new Command
+                (
+                    "Accept join/invite", "^(yes|accept)$",
+                    (s, w, d) => { return onResponse(s, w, true); },
+                    @"Accepts a pending join or invite request",
+                    @"!yes"
+                ),
+
+                new Command
+                (
+                    "Reject join/invite", "^(no|reject|deny)$",
+                    (s, w, d) => { return onResponse(s, w, true); },
+                    @"Rejects a pending join or invite request",
+                    @"!no"
+                ),
             });
         }
 
         public void Dispose() { }
 
-        void onRequest(VPServices serv, Avatar who, string forWhom, bool invite)
+        #region Command handlers
+        bool onRequest(VPServices app, Avatar source, string targetName, bool invite)
         {
             // Ignore if self
-            if (who.Name.Equals(forWhom, StringComparison.CurrentCultureIgnoreCase))
-                return;
+            if ( source.Name.IEquals(targetName) )
+            {
+                app.Warn(source.Session, msgSelf);
+                return true;
+            }
 
             // Ignore if not nearby
-            var whomUser = serv.GetUser(forWhom);
-            if (whomUser == null) return;
+            var target = app.GetUser(targetName);
+            if ( target == null )
+            {
+                app.Warn(source.Session, msgNotPresent);
+                return true;
+            }
 
             // Ignore if bot
-            if (whomUser.IsBot) return;
+            if ( target.IsBot )
+                return false;
 
-            // Reject if requestee is pending
-            if (!isRequestee(who.Session).Equals(JoinInvite.Nobody))
+            // Reject if source has request
+            if ( !isRequestee(source.Session).Equals(JoinInvite.Nobody) )
             {
-                serv.Bot.Say("{0}: You already have a pending request", who);
-                Log.Info(Name, "Rejecting request by {0} as they already have one pending", who);
-                return;
+                app.Warn(source.Session, msgPendingRequester);
+                return Log.Info(Name, "Rejecting request by {0} as they already have one pending", source);
             }
 
-            // Reject if requester is pending
-            if (!isRequested(forWhom).Equals(JoinInvite.Nobody))
+            // Reject if target has request
+            if ( !isRequested(targetName).Equals(JoinInvite.Nobody) )
             {
-                serv.Bot.Say("{0}: That person already has a pending request", who);
-                Log.Info(Name, "Rejecting request for {0} as they already have one pending", forWhom);
-                return;
+                app.Warn(source.Session, msgPendingRequestee);
+                return Log.Info(Name, "Rejecting request by {0} as they already have one pending", source);
             }
 
-            serv.Bot.Say("{0}: {1} would like to {2} you; respond with !yes or !no",
-                whomUser.Name,
-                who.Name,
-                invite ? "invite" : "join");
+            var action = invite ? "invite" : "join";
+            app.Notify(source.Session, msgRequestSent, target.Name);
+            app.Notify(target.Session, msgRequest, source.Name, action);
 
             requests.Add(new JoinInvite
             {
-                By = who.Session,
-                Who = forWhom.ToLower(),
+                By = source.Session,
+                Who = targetName.ToLower(),
                 When = DateTime.Now,
                 Invite = invite
             });
+
+            return true;
         }
 
-        void onResponse(VPServices serv, Avatar from, bool yes)
+        bool onResponse(VPServices app, Avatar targetAv, bool yes)
         {
-            var req = isRequested(from.Name);
+            var sourceReq = isRequested(targetAv.Name);
+
             // Reject non-requested
-            if (req.Equals(JoinInvite.Nobody)) return;
-
-            requests.Remove(req);
-            if (!yes) return;
-
-            var who = serv.GetUser(from.Session);
-            var by  = serv.GetUser(req.By);
-
-            if (by == null) return;
-            if (who == null)
+            if ( sourceReq.Equals(JoinInvite.Nobody) )
             {
-                serv.Bot.Say("{0}: That person is no longer here", by.Name);
-                Log.Info(Name, "Rejecting response for {0} as they have left", by.Name);
-                return;
+                app.Warn(targetAv.Session, msgNoRequests);
+                return true;
             }
 
-            var target = req.Invite ? by.Position : who.Position;
-            serv.Bot.Avatars.Teleport(
-                req.Invite ? who.Session : by.Session,
-                "", new Vector3(target.X, target.Y, target.Z),
-                0, 0);
-        }
+            requests.Remove(sourceReq);
+            // Rejected requests
+            if ( !yes )
+            {
+                app.Notify(sourceReq.By, msgRequestRejected);
+                return true;
+            }
 
+            var target = app.GetUser(targetAv.Session);
+            var source = app.GetUser(sourceReq.By);
+
+            // Reject phantom users
+            if ( target == null )
+                return true;
+
+            // Reject if source has gone away
+            if ( source == null )
+            {
+                app.Warn(targetAv.Session, msgNotPresent);
+                return Log.Info(Name, "Rejecting response by {0} as they have left", source.Name);
+            }
+
+            var targetPos     = sourceReq.Invite ? source.Position : target.Position;
+            var targetSession = sourceReq.Invite ? target.Session : source.Session;
+            var targetMsg     = sourceReq.Invite ? msgInvited : msgJoined;
+            app.Notify(targetSession, targetMsg, source.Name);
+            app.Bot.Avatars.Teleport(targetSession, "", new Vector3(targetPos.X, targetPos.Y, targetPos.Z), 0, 0);
+            return true;
+        } 
+        #endregion
+
+        #region Request checking logic
         /// <summary>
         /// Check if given name has been requested somewhere
         /// </summary>
         JoinInvite isRequested(string who)
         {
             requests.RemoveAll(timedOut);
-            foreach (var req in requests)
-                if (req.Who == who.ToLower())
+            foreach ( var req in requests )
+                if ( req.Who == who.ToLower() )
                     return req;
 
             return JoinInvite.Nobody;
@@ -117,8 +175,8 @@ namespace VPServices.Services
         JoinInvite isRequestee(int who)
         {
             requests.RemoveAll(timedOut);
-            foreach (var req in requests)
-                if (req.By == who)
+            foreach ( var req in requests )
+                if ( req.By == who )
                     return req;
 
             return JoinInvite.Nobody;
@@ -127,7 +185,8 @@ namespace VPServices.Services
         /// <summary>
         /// Predicate for checking timed out entries
         /// </summary>
-        bool timedOut(JoinInvite i) { return DateTime.Now.Subtract(i.When).TotalSeconds > 60; }
+        bool timedOut(JoinInvite i) { return DateTime.Now.Subtract(i.When).TotalSeconds > 60; } 
+        #endregion
     }
 
     public struct JoinInvite

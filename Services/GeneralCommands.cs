@@ -15,8 +15,6 @@ namespace VPServices.Services
             X, Y, Z
         }
 
-        public const string SettingBounce = "bounce";
-
         const string msgCommandTitle   = "*** {0}";
         const string msgCommandRgx     = "Regex: {0}";
         const string msgCommandDesc    = "Description: {0}";
@@ -73,6 +71,13 @@ namespace VPServices.Services
 
                 new Command
                 (
+                    "Teleport: Ground zero", "^g(round)?z(ero)?$", cmdGroundZero,
+                    @"Teleports user to ground zero (0,0,0)",
+                    @"!gz"
+                ),
+
+                new Command
+                (
                     "Debug: Crash", "^(crash|exception)$", cmdCrash,
                     @"Crashes the bot for debugging purposes; owner only",
                     @"!crash"
@@ -103,10 +108,10 @@ namespace VPServices.Services
                 foreach (var cmd in app.Commands)
                     if ( TRegex.IsMatch(data, cmd.Regex) )
                     {
-                        app.Bot.ConsoleMessage(who.Session, ChatTextEffect.Italic, VPServices.ColorInfo, "", msgCommandTitle, cmd.Name);
-                        app.Bot.ConsoleMessage(who.Session, ChatTextEffect.Italic, VPServices.ColorInfo, "", msgCommandRgx, cmd.Regex);
-                        app.Bot.ConsoleMessage(who.Session, ChatTextEffect.Italic, VPServices.ColorInfo, "", msgCommandDesc, cmd.Help);
-                        app.Bot.ConsoleMessage(who.Session, ChatTextEffect.Italic, VPServices.ColorInfo, "", msgCommandExample, cmd.Example);
+                        app.Bot.ConsoleMessage(who.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msgCommandTitle, cmd.Name);
+                        app.Bot.ConsoleMessage(who.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msgCommandRgx, cmd.Regex);
+                        app.Bot.ConsoleMessage(who.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msgCommandDesc, cmd.Help);
+                        app.Bot.ConsoleMessage(who.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msgCommandExample, cmd.Example);
 
                         return true;
                     }
@@ -122,9 +127,10 @@ namespace VPServices.Services
             }
         }
 
-        bool cmdCrash(VPServices serv, Avatar who, string data)
+        #region Debug commands
+        bool cmdCrash(VPServices app, Avatar who, string data)
         {
-            var owner = serv.NetworkSettings.Get("Username");
+            var owner = app.NetworkSettings.Get("Username");
 
             if ( !who.Name.IEquals(owner) )
                 return false;
@@ -132,9 +138,9 @@ namespace VPServices.Services
                 throw new Exception("Forced crash");
         }
 
-        bool cmdHang(VPServices serv, Avatar who, string data)
+        bool cmdHang(VPServices app, Avatar who, string data)
         {
-            var owner = serv.NetworkSettings.Get("Username");
+            var owner = app.NetworkSettings.Get("Username");
 
             if ( !who.Name.IEquals(owner) )
                 return false;
@@ -144,10 +150,12 @@ namespace VPServices.Services
                 while (true) test++;
             }
         }
+        #endregion
 
-        bool cmdCoords(VPServices serv, Avatar who, string data)
+        #region Teleport commands
+        bool cmdCoords(VPServices app, Avatar who, string data)
         {
-            serv.Notify(who.Session, "You are at {0:f4}, {1:f4}, {2:f4}, facing {3:f0}, pitch {4:f0}", who.Name, who.X, who.Y, who.Z, who.Yaw, who.Pitch);
+            app.Notify(who.Session, "You are at {0:f4}, {1:f4}, {2:f4}, facing {3:f0}, pitch {4:f0}", who.Name, who.X, who.Y, who.Z, who.Yaw, who.Pitch);
             return true;
         }
 
@@ -171,22 +179,30 @@ namespace VPServices.Services
                     location = new Vector3(who.X, who.Y, who.Z + by);
                     break;
             }
-            
+
             VPServices.App.Bot.Avatars.Teleport(who.Session, "", location, who.Yaw, who.Pitch);
             return true;
         }
 
-        bool cmdRandomPos(VPServices serv, Avatar who, string data)
+        bool cmdRandomPos(VPServices app, Avatar who, string data)
         {
             var randX = VPServices.Rand.Next(-65535, 65535);
             var randZ = VPServices.Rand.Next(-65535, 65535);
 
-            serv.Notify(who.Session, "Teleporting to {0}, 0, {1}", randX, randZ);
-            serv.Bot.Avatars.Teleport(who.Session, "", new Vector3(randX, 0, randZ), who.Yaw, who.Pitch);
+            app.Notify(who.Session, "Teleporting to {0}, 0, {1}", randX, randZ);
+            app.Bot.Avatars.Teleport(who.Session, "", new Vector3(randX, 0, randZ), who.Yaw, who.Pitch);
             return true;
-        }
+        } 
 
-        string webHelp(VPServices serv, string data)
+        bool cmdGroundZero(VPServices app, Avatar who, string data)
+        {
+            app.Bot.Avatars.Teleport(who.Session, "", AvatarPosition.GroundZero);
+            return true;
+        } 
+        #endregion
+
+        #region Web routes
+        string webHelp(VPServices app, string data)
         {
             string listing = "# Bot commands available:\n";
 
@@ -203,7 +219,8 @@ namespace VPServices.Services
 ".LFormat(command.Name, command.Regex, command.Example, command.TimeLimit, command.Help);
             }
 
-            return serv.MarkdownParser.Transform(listing);
+            return app.MarkdownParser.Transform(listing);
         }
+        #endregion
     }
 }

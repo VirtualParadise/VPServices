@@ -11,7 +11,7 @@ namespace VPServices
         public static Random     Rand      = new Random();
 
         public static Color ColorInfo  = new Color(50,50,100);
-        public static Color ColorWarn  = new Color(100,50,20);
+        public static Color ColorWarn  = new Color(220,80,20);
         public static Color ColorAlert = new Color(255,0,0);
 
         public Instance Bot;
@@ -63,11 +63,11 @@ namespace VPServices
             SetupWeb();
             SetupCommands();
             SetupUserSettings();
-            LoadServices();
             ConnectToWorld();
+            LoadServices();
             Log.Info("Network", "Connected to {0}", World);
 
-            Bot.ConsoleBroadcast(ChatTextEffect.None, ColorInfo,"", "Services is now online; say !help for information");
+            Bot.ConsoleBroadcast(ChatEffect.None, ColorInfo,"", "Services is now online; say !help for information");
         }
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace VPServices
 
         public void Notify(int session, string msg, params object[] parts)
         {
-            Bot.ConsoleMessage(session, ChatTextEffect.Italic, ColorInfo, Bot.Name, msg, parts);
+            Bot.ConsoleMessage(session, ChatEffect.Italic, ColorInfo, Bot.Name, msg, parts);
         }
 
         public void NotifyAll(string msg, params object[] parts)
@@ -126,7 +126,7 @@ namespace VPServices
 
         public void Alert(int session, string msg, params object[] parts)
         {
-            Bot.ConsoleMessage(session, ChatTextEffect.Bold, ColorAlert, Bot.Name, msg, parts);
+            Bot.ConsoleMessage(session, ChatEffect.Bold, ColorAlert, Bot.Name, msg, parts);
         }
 
         public void AlertAll(string msg, params object[] parts)
@@ -136,7 +136,7 @@ namespace VPServices
 
         public void Warn(int session, string msg, params object[] parts)
         {
-            Bot.ConsoleMessage(session, ChatTextEffect.Italic, ColorWarn, Bot.Name, msg, parts);
+            Bot.ConsoleMessage(session, ChatEffect.Italic, ColorWarn, Bot.Name, msg, parts);
         }
 
         public void WarnAll(string msg, params object[] parts)

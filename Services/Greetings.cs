@@ -9,16 +9,10 @@ namespace VPServices.Services
     /// </summary>
     public class Greetings : IService
     {
-        enum GreetToggle
-        {
-            GreetShowHide,
-            GreetMe
-        }
-
         const string settingGreetMe    = "GreetMe";
         const string settingShowGreets = "GreetShow";
-        const string msgEntry          = "*** {0} has entered";
-        const string msgExit           = "*** {0} has left";
+        const string msgEntry          = "*** {0} has entered {1}";
+        const string msgExit           = "*** {0} has left {1}";
         const string msgShowGreets     = "Entry/exit messages will now be shown to you";
         const string msgHideGreets     = "Entry/exit messages will no longer be shown to you";
         const string msgGreetMe        = "You will now be announced on entry/exit";
@@ -28,13 +22,19 @@ namespace VPServices.Services
         public void Init(VPServices app, Instance bot)
         {
             app.Commands.AddRange(new[] {
-                new Command("Greetings: Show/hide", "^greet(ing)?s?$", (o,e,a) => { return cmdToggle(o,e,a, settingShowGreets); },
-                @"Toggles whether or not the bot sends you user entry/exit messages",
-                @"!greets `[true|false]`"),
+                new Command
+                (
+                    "Greetings: Show/hide", "^greet(ing)?s?$", (o,e,a) => { return cmdToggle(o,e,a, settingShowGreets); },
+                    @"Toggles or sets whether or not the bot sends you user entry/exit messages",
+                    @"!greets `[true|false]`"
+                ),
 
-                new Command("Greetings: Greet me", "^greetme$", (o,e,a) => { return cmdToggle(o,e,a, settingGreetMe); },
-                @"Toggles whether or not the bot should announce your entry and exit to other users",
-                @"!greetme `[true|false]`"),
+                new Command
+                (
+                    "Greetings: Greet me", "^greetme$", (o,e,a) => { return cmdToggle(o,e,a, settingGreetMe); },
+                    @"Toggles or sets whether or not the bot should announce your entry and exit to other users",
+                    @"!greetme `[true|false]`"
+                ),
             });
 
             bot.Avatars.Enter += (b,a) => { doGreet(b, a, true);  };
@@ -52,7 +52,7 @@ namespace VPServices.Services
 
             // Try to parse user given boolean; silently ignore on failure
             if ( data != "" )
-            if ( !bool.TryParse(data, out toggle) )
+            if ( !VPServices.TryParseBool(data, out toggle) )
                 return false;
 
             config.Set(key, toggle);
@@ -98,7 +98,7 @@ namespace VPServices.Services
                 if ( targetSettings.GetBoolean(settingShowGreets, true) )
                 {
                     var msg = entering ? msgEntry : msgExit;
-                    bot.ConsoleMessage(target.Session, ChatTextEffect.Italic, VPServices.ColorInfo, "", msg, who.Name);
+                    bot.ConsoleMessage(target.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msg, who.Name, app.World);
                 }
             }
         } 

@@ -37,6 +37,7 @@ namespace VPServices.Services
             userStream.Close();
         }
 
+        //TODO: unix epoch constant
         void onObjChange(Instance sender, int sessionId, VPObject o)
         {
             buildStream.WriteLine("{0},{1},{2},{3}",

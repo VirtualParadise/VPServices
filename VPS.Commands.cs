@@ -22,6 +22,11 @@ namespace VPServices
             {
                 TConsole.WriteLineColored(ConsoleColor.White, " {0} | {1}", c.Name.PadRight(16), c.Message);
             };
+
+            Bot.Console += (s, c) =>
+            {
+                TConsole.WriteLineColored(ConsoleColor.White, "CONSOLE: {0} {1}", c.Name, c.Message);
+            };
         }
 
         /// <summary>
@@ -69,7 +74,7 @@ namespace VPServices
                             if (!success)
                             {
                                 App.Warn(chat.Session, "Invalid command use; please see example:");
-                                Bot.ConsoleBroadcast(ChatTextEffect.Italic, ColorWarn, "", cmd.Example);
+                                Bot.ConsoleMessage(chat.Session, ChatEffect.Italic, ColorWarn, "", cmd.Example);
                             }
                         }
                         catch (Exception e)
@@ -126,7 +131,7 @@ namespace VPServices
         /// <summary>
         /// Timestamp command was last invoked
         /// </summary>
-        public DateTime LastInvoked = DateTime.MinValue;
+        public DateTime LastInvoked = DateTime.Now.AddSeconds(-60);
 
         public Command(string name, string rgx, CommandHandler handler, string help, string example = "", int timeLimit = 0)
         {

@@ -74,23 +74,23 @@
             Sends a formatted chat message to current world
             </summary>
         </member>
-        <member name="M:VP.Instance.ConsoleMessage(System.Int32,VP.ChatTextEffect,VP.Color,System.String,System.String)">
+        <member name="M:VP.Instance.ConsoleMessage(System.Int32,VP.ChatEffect,VP.Color,System.String,System.String)">
             <summary>
             Sends a broadcast-like message with custom styling to a specific session
             </summary>
         </member>
-        <member name="M:VP.Instance.ConsoleMessage(System.Int32,VP.ChatTextEffect,VP.Color,System.String,System.String,System.Object[])">
+        <member name="M:VP.Instance.ConsoleMessage(System.Int32,VP.ChatEffect,VP.Color,System.String,System.String,System.Object[])">
             <summary>
             Sends a formatted broadcast-like message with custom styling to a specific
             session
             </summary>
         </member>
-        <member name="M:VP.Instance.ConsoleBroadcast(VP.ChatTextEffect,VP.Color,System.String,System.String)">
+        <member name="M:VP.Instance.ConsoleBroadcast(VP.ChatEffect,VP.Color,System.String,System.String)">
             <summary>
             Sends a broadcast-like message with custom styling to everybody in-world
             </summary>
         </member>
-        <member name="M:VP.Instance.ConsoleBroadcast(VP.ChatTextEffect,VP.Color,System.String,System.String,System.Object[])">
+        <member name="M:VP.Instance.ConsoleBroadcast(VP.ChatEffect,VP.Color,System.String,System.String,System.Object[])">
             <summary>
             Sends a formatted broadcast-like message with custom styling to everybody
             in-world

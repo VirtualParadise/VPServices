@@ -1,8 +1,8 @@
-﻿using System;
+﻿using IrcDotNet;
+using Nini.Config;
+using System;
 using System.Collections.Generic;
 using VP;
-using IrcDotNet;
-using Nini.Config;
 
 namespace VPServices.Services
 {
@@ -11,23 +11,42 @@ namespace VPServices.Services
     /// </summary>
     class IRC : IService
     {
-        IrcClient irc;
-        IConfig   config;
-        string    channel;
-        string    host;
-        int       port;
+        static Color  colorChat = new Color(120,120,120);
+        const  string msgEntry  = "*** {0} has entered {1}";
+        const  string msgPart   = "*** {0} has left {1}";
+        const  string msgQuit   = "*** {0} has quit IRC ({1})";
+        const  char   ircAction = (char) 0x01;
+
+        VPServices app;
+        IrcClient  irc;
+        IConfig    config;
+        string     channel;
+        string     host;
+        int        port;
         
         public string Name { get { return "IRC"; } }
         public void   Init (VPServices app, Instance bot)
         {
-            app.Commands.Add(new Command("IRC connect", "^irc(start|connect)?$", (s,a,d) => { connect(); },
-                @"Starts the IRC-VP bridge", 60));
+            app.Commands.AddRange(new[] {
+                new Command
+                (
+                    "IRC: Connect", "^irc(start|connect)$",
+                    (s,a,d) => { return connect(); },
+                    @"Starts the IRC-VP bridge", "!ircstart", 60
+                ),
+                
+                new Command
+                (
+                    "IRC: Disconnect", "^irc(end|disconnect)$",
+                    (s,a,d) => { return disconnect(); },
+                    @"Stops the IRC-VP bridge", "!ircend", 60
+                )
+            });
 
-            app.Commands.Add(new Command("IRC disconnect", "^irc(end|disconnect)?$", (s,a,d) => { disconnect(); },
-                @"Stops the IRC-VP bridge", 60));
 
             config = app.Settings.Configs["IRC"] ?? app.Settings.Configs.Add("IRC");
 
+            this.app  = app;
             host      = config.Get("Server", "irc.ablivion.net");
             port      = config.GetInt("Port", 6667);
             channel   = config.Get("Channel", "#vp");
@@ -37,20 +56,27 @@ namespace VPServices.Services
                 connect();
         }
 
-        void connect()
+        public void Dispose()
         {
-            if (irc != null && irc.IsConnected)
+        }
+
+        #region Dis/connection logic
+        bool connect()
+        {
+            if ( irc != null && irc.IsConnected )
             {
+                app.WarnAll("IRC is already connected");
                 Log.Warn(Name, "Rejecting connection attempt; already connected");
-                return;
+                return true;
             }
-            
-            if (irc != null)
+
+            if ( irc != null )
                 disconnect();
 
+            app.NotifyAll("Establishing bridge between {0} and {1} on {2}", app.World, channel, host);
             Log.Info(Name, "Creating and establishing IRC bridge...");
 
-                irc = new IrcClient();
+            irc = new IrcClient();
             var reg = new IrcUserRegistrationInfo
             {
                 NickName = config.Get("Nickname", "VPBridgeBot"),
@@ -58,22 +84,24 @@ namespace VPServices.Services
                 UserName = config.Get("Username", "VPBridgeAdmin"),
             };
 
-            irc.Error                += (o,e) => { Log.Warn(Name, e.Error.ToString()); };
-            irc.ErrorMessageReceived += (o,e) => { Log.Warn(Name, "IRC error: {0}", e.Message); };
-            irc.ProtocolError        += (o,e) => { Log.Warn(Name, "Protocol error: {0} {1}", e.Code, e.Message); };
+            irc.Error                += (o, e) => { Log.Warn(Name, e.Error.ToString()); };
+            irc.ErrorMessageReceived += (o, e) => { Log.Warn(Name, "IRC error: {0}", e.Message); };
+            irc.ProtocolError        += (o, e) => { Log.Warn(Name, "Protocol error: {0} {1}", e.Code, e.Message); };
             irc.RawMessageReceived   += onIRCMessage;
 
             irc.Connect(host, port, false, reg);
             irc.Registered   += onIRCConnected;
             irc.Disconnected += onIRCDisconnected;
+            return true;
         }
 
-        void disconnect()
+        bool disconnect()
         {
-            if (irc == null || !irc.IsConnected)
+            if ( irc == null || !irc.IsConnected )
             {
+                app.WarnAll("No IRC connection to disconnect");
                 Log.Warn(Name, "Rejecting disconnect attempt; no IRC connection");
-                return;
+                return true;
             }
 
             Log.Info(Name, "Disconnecting and disposing IRC bridge...");
@@ -81,11 +109,14 @@ namespace VPServices.Services
             irc.Disconnect();
             irc.Dispose();
             irc = null;
-        }
+            return true;
+        } 
+        #endregion
 
+        #region Event handlers
         void onWorldChat(Instance sender, ChatMessage chat)
         {
-            if (irc == null || !irc.IsConnected)
+            if ( irc == null || !irc.IsConnected )
                 return;
 
             var msg = string.Format("PRIVMSG {2} :{0}: {1}", chat.Name, chat.Message, channel);
@@ -99,6 +130,7 @@ namespace VPServices.Services
 
         void onIRCDisconnected(object sender, EventArgs e)
         {
+            app.NotifyAll("IRC bridge has been disconnected");
             Log.Warn(Name, "Disconnected from server; reconnecting...");
             disconnect();
             connect();
@@ -109,23 +141,31 @@ namespace VPServices.Services
             if ( config.GetBoolean("DebugProtocol", false) )
                 Log.Fine(Name, "Protocol message: {0}", e.RawContent);
 
-            if (e.Message.Parameters[0] == channel)
+            var bot = app.Bot;
+            if ( e.Message.Parameters[0] == channel )
             {
-                if      ( e.Message.Command.IEquals("PRIVMSG") )
-                    VPServices.App.Bot.Say("/me {0}:\t{1}", e.Message.Source.Name, e.Message.Parameters[1]);
+                if ( e.Message.Command.IEquals("PRIVMSG") )
+                {
+                    var msg = e.Message.Parameters[1];
+
+                    if (msg[0] == ircAction)
+                    {
+                        msg = msg.Trim(ircAction);
+                        msg = msg.Remove(0, 7);
+                        bot.ConsoleBroadcast(ChatEffect.None, colorChat, "", "{0} {1}", e.Message.Source.Name, msg);
+                    }
+                    else
+                        bot.ConsoleBroadcast(ChatEffect.None, colorChat, e.Message.Source.Name, msg);
+                }
                 else if ( e.Message.Command.IEquals("JOIN") )
-                    VPServices.App.Bot.Say("/me *** {0} has joined {1}", e.Message.Source.Name, channel);
+                    bot.ConsoleBroadcast(ChatEffect.Italic, VPServices.ColorInfo, "", msgEntry, e.Message.Source.Name, channel);
                 else if ( e.Message.Command.IEquals("PART") )
-                    VPServices.App.Bot.Say("/me *** {0} has left {1}", e.Message.Source.Name, channel);
+                    bot.ConsoleBroadcast(ChatEffect.Italic, VPServices.ColorInfo, "", msgPart, e.Message.Source.Name, channel);
             }
             else if ( e.Message.Command.IEquals("QUIT") )
-                VPServices.App.Bot.Say("/me *** {0} has quit ({1})", e.Message.Source.Name, e.Message.Parameters[0]);
-            
-        }
+                bot.ConsoleBroadcast(ChatEffect.Italic, VPServices.ColorInfo, "", msgQuit, e.Message.Source.Name, e.Message.Parameters[0]);
+        } 
+        #endregion
 
-        public void Dispose()
-        {
-            
-        }
     }
 }
