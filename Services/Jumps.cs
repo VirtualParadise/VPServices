@@ -224,11 +224,11 @@ namespace VPServices.Services
     struct Jump : IComparable<Jump>
     {
         public string Name;
-        public float X;
-        public float Y;
-        public float Z;
-        public float Yaw;
-        public float Pitch;
+        public float  X;
+        public float  Y;
+        public float  Z;
+        public float  Yaw;
+        public float  Pitch;
         public static Jump Empty = new Jump { Name = "" };
 
         /// <summary>
@@ -240,12 +240,12 @@ namespace VPServices.Services
                 throw new ArgumentNullException();
 
             var parts = csv.Split(new[] { "," }, StringSplitOptions.None);
-            Name = parts[0];
-			X = float.Parse(parts[1], CultureInfo.InvariantCulture);
-			Y = float.Parse(parts[2], CultureInfo.InvariantCulture);
-			Z = float.Parse(parts[3], CultureInfo.InvariantCulture);
-			Yaw = float.Parse(parts[4], CultureInfo.InvariantCulture);
-			Pitch = float.Parse(parts[5], CultureInfo.InvariantCulture);
+            Name      = parts[0];
+			X         = float.Parse(parts[1], CultureInfo.InvariantCulture);
+			Y         = float.Parse(parts[2], CultureInfo.InvariantCulture);
+			Z         = float.Parse(parts[3], CultureInfo.InvariantCulture);
+			Yaw       = float.Parse(parts[4], CultureInfo.InvariantCulture);
+			Pitch     = float.Parse(parts[5], CultureInfo.InvariantCulture);
         }
 
         /// <summary>

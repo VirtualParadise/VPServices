@@ -131,7 +131,7 @@ namespace VPServices
         /// <summary>
         /// Timestamp command was last invoked
         /// </summary>
-        public DateTime LastInvoked = DateTime.Now.AddSeconds(-60);
+        public DateTime LastInvoked = DateTime.Now.AddSeconds(-9001);
 
         public Command(string name, string rgx, CommandHandler handler, string help, string example = "", int timeLimit = 0)
         {

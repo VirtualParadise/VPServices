@@ -111,7 +111,7 @@ namespace VPServices.Services
                 // repeat search
                 markEntriesUnused(category);
                 Log.Debug(tag, "No more unused trivia entries for category '{0}'; marking all as unused", category);
-                VPServices.App.Bot.Say("Out of entries for that query; marking all entries as unused and starting over");
+                app.WarnAll("Out of entries for that query; marking all entries as unused and starting over");
                 goto pickEntry;
             }
 

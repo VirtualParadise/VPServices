@@ -9,9 +9,16 @@ namespace VPServices.Services
 {
     public partial class Trivia : IService
     {
-        #region Settings strings
-        const string keyTriviaPoints = "TriviaPoints";
-        const string tag             = "Trivia";
+        #region Strings
+        const  string   msgAccepted     = "Ding! The answer was {0}, {1} {2}";
+        const  string   msgAcceptedFrom = "Ding! The answer was {0} (accepted from {1}), {2} {3}";
+        const  string   keyTriviaPoints = "TriviaPoints";
+        const  string   tag             = "Trivia";
+        static string[] welldones       = new[]
+        {
+            "well done", "good show", "GG", "nice one", "not bad,", "jolly good", "keep going",
+            "^5", "great stuff", "congraduration", "축하 해요", "祝う", "esprit intelligent"
+        };
         #endregion
         
         object   mutex         = new object();
@@ -33,18 +40,10 @@ namespace VPServices.Services
             lock ( mutex ) { gameEnd(); }
         }
 
-        void skipQuestion()
-        {
-            if (task == null) return;
-                
-            Log.Debug(tag, "Skipping question...");
-            gameEnd();
-            task.Wait();
-        }
-
+        #region Core game logic
         void gameBegin(TriviaEntry entry)
         {
-            app.Bot.Say("{0}: {1}", entry.Category, entry.Question);
+            app.Bot.ConsoleBroadcast(ChatEffect.Bold, VPServices.ColorInfo, entry.Category + ":", entry.Question);
             app.Bot.Chat     += onChat;
             inProgress        = true;
             progressSince     = DateTime.Now;
@@ -66,7 +65,7 @@ namespace VPServices.Services
                     lock ( mutex )
                     {
                         gameEnd();
-                        app.Bot.Say("Timeout! The answer was {0}.", entryInPlay.CanonicalAnswer);
+                        app.NotifyAll("Timeout! The answer was {0}.", entryInPlay.CanonicalAnswer);
                         Log.Debug(tag, "Question timed out");
                     }
 
@@ -81,8 +80,10 @@ namespace VPServices.Services
             inProgress    = false;
             app.Bot.Chat -= onChat;
             Log.Fine(tag, "Game has ended");
-        }
+        } 
+        #endregion
 
+        #region Event handlers
         void onChat(Instance bot, ChatMessage chat)
         {
             lock ( mutex )
@@ -90,42 +91,54 @@ namespace VPServices.Services
                 string[] match;
                 string[] wrongMatch;
 
-                if ( TRegex.TryMatch(chat.Message, entryInPlay.Answer, out match) )
+                if ( !TRegex.TryMatch(chat.Message, entryInPlay.Answer, out match) )
+                    return;
+
+                if ( entryInPlay.Wrong != null && TRegex.TryMatch(chat.Message, entryInPlay.Wrong, out wrongMatch) )
                 {
-                    if ( entryInPlay.Wrong != null && TRegex.TryMatch(chat.Message, entryInPlay.Wrong, out wrongMatch) )
-                    {
-                        Log.Debug(tag, "Given answer '{0}' by {1} matched, but turned out to be wrong; rejecting", wrongMatch[0], chat.Name);
-                        return;
-                    }
-
-                    gameEnd();
-
-                    var welldones = new[]
-                    {
-                        "well done", "good show", "GG", "nice one", "not bad,", "jolly good", "keep going"
-                    };
-
-                    var welldone = welldones.Skip(VPServices.Rand.Next(welldones.Length)).Take(1).Single();
-
-                    if ( match[0].IEquals(entryInPlay.CanonicalAnswer) )
-                        bot.Say("Ding! The answer was {0}, {1} {2}", entryInPlay.CanonicalAnswer, welldone ,chat.Name);
-                    else
-                        bot.Say("Ding! The answer was {0} (accepted from {1}), {2} {3}", entryInPlay.CanonicalAnswer, match[0], welldone, chat.Name);
-
-                    Log.Debug(tag, "Correct answer '{0}' by {1}", match[0], chat.Name);
-                    awardPoint(chat.Name);
+                    Log.Debug(tag, "Given answer '{0}' by {1} matched, but turned out to be wrong; rejecting", wrongMatch[0], chat.Name);
+                    return;
                 }
-            }
-        }
 
+                gameEnd();
+
+                var welldone = welldones.Skip(VPServices.Rand.Next(welldones.Length)).Take(1).Single();
+
+                if ( match[0].IEquals(entryInPlay.CanonicalAnswer) )
+                    app.Bot.ConsoleBroadcast(ChatEffect.Bold, VPServices.ColorInfo, "Triviamaster",
+                        msgAccepted, entryInPlay.CanonicalAnswer, welldone, chat.Name);
+                else
+                    app.Bot.ConsoleBroadcast(ChatEffect.Bold, VPServices.ColorInfo, "Triviamaster",
+                        msgAccepted, entryInPlay.CanonicalAnswer, match[0], welldone, chat.Name);
+
+                Log.Debug(tag, "Correct answer '{0}' by {1}", match[0], chat.Name);
+                awardPoint(chat.Name);
+            }
+        } 
+        #endregion
+
+        #region Misc logic
         void awardPoint(string who)
         {
             var config = app.GetUserSettings(who);
             var points = config.GetInt(keyTriviaPoints, 0);
-            
+
             points++;
             config.Set(keyTriviaPoints, points);
             Log.Fine(tag, "{0} is now up to {1} points", who, points);
+
+            if ( points % 10 == 0 )
+                app.NotifyAll("{0} is climbing the scoreboard with {1} points!", who, points);
         }
+
+        void skipQuestion()
+        {
+            if ( task == null ) return;
+
+            Log.Debug(tag, "Skipping question...");
+            gameEnd();
+            task.Wait();
+        } 
+        #endregion
     }   
 }

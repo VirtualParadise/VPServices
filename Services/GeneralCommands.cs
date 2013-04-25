@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using VP;
 
@@ -28,7 +30,14 @@ namespace VPServices.Services
                 (
                     "Services: Help", @"^(help|commands|\?)$", cmdHelp,
                     @"Prints the URL to this documentation to chat or explains a specific command",
-                    @"!help `[command]`", 5
+                    @"!help `[command]`"
+                ),
+
+                new Command
+                (
+                    "Services: Version", @"^version$", cmdVersion,
+                    @"Sends the version of this bot to the user",
+                    @"!version", 120
                 ),
 
                 new Command
@@ -97,18 +106,19 @@ namespace VPServices.Services
 
         public void Dispose() { }
 
+        #region Services commands
         bool cmdHelp(VPServices app, Avatar who, string data)
         {
             var helpUrl = app.PublicUrl + "help";
 
-            if (data != "")
+            if ( data != "" )
             {
                 // If given data, try to find specific command and print help in console for
                 // that user
-                foreach (var cmd in app.Commands)
+                foreach ( var cmd in app.Commands )
                     if ( TRegex.IsMatch(data, cmd.Regex) )
                     {
-                        app.Bot.ConsoleMessage(who.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msgCommandTitle, cmd.Name);
+                        app.Bot.ConsoleMessage(who.Session, ChatEffect.BoldItalic, VPServices.ColorInfo, "", msgCommandTitle, cmd.Name);
                         app.Bot.ConsoleMessage(who.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msgCommandRgx, cmd.Regex);
                         app.Bot.ConsoleMessage(who.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msgCommandDesc, cmd.Help);
                         app.Bot.ConsoleMessage(who.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msgCommandExample, cmd.Example);
@@ -126,6 +136,16 @@ namespace VPServices.Services
                 return true;
             }
         }
+
+        bool cmdVersion(VPServices app, Avatar who, string data)
+        {
+            var asm      = Assembly.GetExecutingAssembly().Location;
+            var fileDate = File.GetLastWriteTime(asm);
+
+            app.NotifyAll("I was built on {0}", fileDate);
+            return true;
+        } 
+        #endregion
 
         #region Debug commands
         bool cmdCrash(VPServices app, Avatar who, string data)

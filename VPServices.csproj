@@ -31,16 +31,6 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug - Test|x86'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>Build\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="CsvHelper">
       <HintPath>packages\CsvHelper.1.14.0\lib\net40-client\CsvHelper.dll</HintPath>
@@ -70,12 +60,12 @@
   <ItemGroup>
     <Compile Include="Services\Greetings.cs" />
     <Compile Include="VPS.Extensions.cs" />
-    <None Include="Services\Trivia\Trivia.Commands.cs" />
-    <None Include="Services\Trivia\Trivia.Web.cs" />
+    <Compile Include="Services\Trivia\Trivia.Commands.cs" />
+    <Compile Include="Services\Trivia\Trivia.Web.cs" />
     <Compile Include="Services\IRC.cs" />
     <None Include="Services\Ideas.cs" />
-    <None Include="Services\Trivia\Trivia.Core.cs" />
-    <None Include="Services\Trivia\Trivia.Entries.cs" />
+    <Compile Include="Services\Trivia\Trivia.Core.cs" />
+    <Compile Include="Services\Trivia\Trivia.Entries.cs" />
     <Compile Include="VPS.Settings.cs" />
     <Compile Include="Services\Home.cs" />
     <Compile Include="Services\GeneralCommands.cs" />
@@ -88,7 +78,7 @@
     <Compile Include="Services\TeleportHistory.cs" />
     <Compile Include="Services\Jumps.cs" />
     <Compile Include="Services\Telegrams.cs" />
-    <None Include="Services\WorldSettings.cs" />
+    <Compile Include="Services\WorldSettings.cs" />
     <Compile Include="VPS.Services.cs" />
     <Compile Include="VPS.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
