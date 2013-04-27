@@ -16,21 +16,21 @@ namespace VPServices.Services
             app.Commands.AddRange(new[] {
                 new Command
                 (
-                    "Trivia", "^trivia$", cmdBeginTrivia,
+                    "Trivia: Start", "^trivia$", cmdBeginTrivia,
                     @"Outputs a trivia question with optional category filter",
                     @"!trivia `[category]`", 3
                 ),
 
                 new Command
                 (
-                    "(Re)load trivia", "^(re)?loadtrivia$", cmdReloadTrivia,
+                    "Trivia: Load", "^(re)?loadtrivia$", cmdReloadTrivia,
                     @"Loads or reloads the trivia database",
                     @"!loadtrivia", 10
                 ),
 
                 new Command
                 (
-                    "Trivia scores", "^(trivia)?scores$", cmdShowUrl,
+                    "Trivia: Scores", "^(trivia)?scores$", cmdShowUrl,
                     @"Prints the URL to a listing of trivia scores to the user",
                     @"!scores"
                 )

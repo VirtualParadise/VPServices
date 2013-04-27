@@ -19,28 +19,28 @@ namespace VPServices.Services
             app.Commands.AddRange(new[] {
                 new Command
                 (
-                    "Set home", "^sethome$", cmdSetHome,
+                    "Home: Set", "^sethome$", cmdSetHome,
                     @"Sets user's home position, where they will be teleported to every time they enter the world",
                     @"!sethome"
                 ),
 
                 new Command
                 (
-                    "Go home", "^home$", cmdGoHome,
+                    "Home: Teleport", "^home$", cmdGoHome,
                     @"Teleports user to their home position, or ground zero if unset",
                     @"!home"
                 ),
 
                 new Command
                 (
-                    "Clear home", "^clearhome$", cmdClearHome,
+                    "Home: Clear", "^clearhome$", cmdClearHome,
                     @"Clears user's home position",
                     @"!clearhome"
                 ),
 
                 new Command
                 (
-                    "Bounce", "^bounce$", cmdBounce,
+                    "Teleport: Bounce", "^bounce$", cmdBounce,
                     @"Disconnects and reconnects user to the world; useful for clearing the download queue and fixing some issues",
                     @"!bounce"
                 ),

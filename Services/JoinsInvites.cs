@@ -36,7 +36,7 @@ namespace VPServices.Services
 
                 new Command
                 (
-                    "Invite", "^inv(ite)?$",
+                    "Request: Invite", "^inv(ite)?$",
                     (s, w, d) => { return onRequest(s, w, d, true); },
                     @"Sends an invite request to the target user",
                     @"!invite `target`"
@@ -44,7 +44,7 @@ namespace VPServices.Services
 
                 new Command
                 (
-                    "Accept join/invite", "^(yes|accept)$",
+                    "Request: Accept", "^(yes|accept)$",
                     (s, w, d) => { return onResponse(s, w, true); },
                     @"Accepts a pending join or invite request",
                     @"!yes"
@@ -52,7 +52,7 @@ namespace VPServices.Services
 
                 new Command
                 (
-                    "Reject join/invite", "^(no|reject|deny)$",
+                    "Request: Reject", "^(no|reject|deny)$",
                     (s, w, d) => { return onResponse(s, w, true); },
                     @"Rejects a pending join or invite request",
                     @"!no"
@@ -72,18 +72,6 @@ namespace VPServices.Services
                 return true;
             }
 
-            // Ignore if not nearby
-            var target = app.GetUser(targetName);
-            if ( target == null )
-            {
-                app.Warn(source.Session, msgNotPresent);
-                return true;
-            }
-
-            // Ignore if bot
-            if ( target.IsBot )
-                return false;
-
             // Reject if source has request
             if ( !isRequestee(source.Session).Equals(JoinInvite.Nobody) )
             {
@@ -98,15 +86,25 @@ namespace VPServices.Services
                 return Log.Info(Name, "Rejecting request by {0} as they already have one pending", source);
             }
 
-            var action = invite ? "invite" : "join";
-            app.Notify(source.Session, msgRequestSent, target.Name);
-            app.Notify(target.Session, msgRequest, source.Name, action);
+            // Ignore if no such users found
+            var action  = invite ? "invite" : "join";
+            var targets = app.GetUsers(targetName);
+            if ( targets.Length <= 0 )
+            {
+                app.Warn(source.Session, msgNotPresent);
+                return true;
+            }
 
+            // Request all sessions of given name
+            foreach (var target in targets)
+                app.Notify(target.Session, msgRequest, source.Name, action);
+
+            app.Notify(source.Session, msgRequestSent, targetName);
             requests.Add(new JoinInvite
             {
-                By = source.Session,
-                Who = targetName.ToLower(),
-                When = DateTime.Now,
+                By     = source.Session,
+                Who    = targetName.ToLower(),
+                When   = DateTime.Now,
                 Invite = invite
             });
 

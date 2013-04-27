@@ -87,6 +87,13 @@ namespace VPServices.Services
 
                 new Command
                 (
+                    "Debug: Say", "^say$", cmdSay,
+                    @"Makes the bot say a chat message as somebody else",
+                    @"!say `who: message`"
+                ),
+
+                new Command
+                (
                     "Debug: Crash", "^(crash|exception)$", cmdCrash,
                     @"Crashes the bot for debugging purposes; owner only",
                     @"!crash"
@@ -169,6 +176,18 @@ namespace VPServices.Services
                 var test = 0;
                 while (true) test++;
             }
+        }
+
+        bool cmdSay(VPServices app, Avatar who, string data)
+        {
+            var matches = Regex.Match(data, "^(.+?): (.+)$");
+            if ( !matches.Success )
+                return false;
+
+            var target = matches.Groups[1].Value.Trim();
+            var msg    = matches.Groups[2].Value.Trim();
+            app.Bot.ConsoleBroadcast(ChatEffect.None, new Color(128,128,128), "\"{0}\"".LFormat(target), msg);
+            return true;
         }
         #endregion
 

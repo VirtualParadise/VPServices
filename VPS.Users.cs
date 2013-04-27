@@ -1,5 +1,6 @@
 ﻿using Nini.Config;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using VP;
@@ -48,6 +49,18 @@ namespace VPServices
             // For when user setting names were forced to lowercase
             foreach (IConfig config in newConfigSource.Configs)
                 UserSettings.Configs[config.Name].Name = config.Name.ToLower();
+        }
+
+        /// <summary>
+        /// Gets all known sessions of a given case-insensitive user name
+        /// </summary>
+        public Avatar[] GetUsers(string name)
+        {
+            var query = from   u in Users
+                        where  u.Name.IEquals(name)
+                        select u;
+
+            return query.ToArray();
         }
 
         /// <summary>
