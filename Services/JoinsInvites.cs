@@ -147,7 +147,7 @@ namespace VPServices.Services
             var targetPos     = sourceReq.Invite ? source.Position : target.Position;
             var targetSession = sourceReq.Invite ? target.Session : source.Session;
             var targetMsg     = sourceReq.Invite ? msgInvited : msgJoined;
-            app.Notify(targetSession, targetMsg, source.Name);
+            app.Notify(target.Session, targetMsg, source.Name);
             app.Bot.Avatars.Teleport(targetSession, "", new Vector3(targetPos.X, targetPos.Y, targetPos.Z), 0, 0);
             return true;
         } 
