@@ -65,10 +65,10 @@ namespace VPServices.Services
 
         bool cmdSetHome(VPServices app, Avatar who, string data)
         {
-            app.GetUserSettings(who)
-                .Set(settingHome, who.Position.ToString());
+            var pos = who.Position.ToString();
+            app.GetUserSettings(who).Set(settingHome, pos);
 
-            app.Notify(who.Session, "Set your home to {0:f3}, {1:f3}, {2:f3}" , who.Name, who.X, who.Y, who.Z);
+            app.Notify(who.Session, "Set your home to {0:f3}, {1:f3}, {2:f3}" , who.X, who.Y, who.Z);
             return Log.Info(Name, "Set home for {0} at {1:f3}, {2:f3}, {3:f3}", who.Name, who.X, who.Y, who.Z);
         }
 
