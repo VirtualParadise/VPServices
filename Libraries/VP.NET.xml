@@ -247,6 +247,12 @@
             Converts terrain node data to a 2D TerrainCell array
             </summary>
         </member>
+        <member name="M:VP.Native.DLLHandler.Unpack">
+            <summary>
+            Unpacks the native VP SDK dll from the assembly upon first use
+            http://weblogs.asp.net/ralfw/archive/2007/02/04/single-assembly-deployment-of-managed-and-unmanaged-code.aspx
+            </summary>
+        </member>
         <member name="M:VP.Avatar.#ctor(System.IntPtr)">
             <summary>
             Creates an Avatar from a native instance's attributes

@@ -33,28 +33,31 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CsvHelper">
-      <HintPath>packages\CsvHelper.1.14.0\lib\net40-client\CsvHelper.dll</HintPath>
+      <HintPath>Libraries\CsvHelper.dll</HintPath>
     </Reference>
     <Reference Include="IrcDotNet, Version=0.4.1.28293, Culture=neutral, PublicKeyToken=44f6d157e750246b, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Build\IrcDotNet.dll</HintPath>
+      <HintPath>Libraries\IrcDotNet.dll</HintPath>
     </Reference>
     <Reference Include="MarkdownSharp">
-      <HintPath>..\Markdown\Build\MarkdownSharp.dll</HintPath>
+      <HintPath>Libraries\MarkdownSharp.dll</HintPath>
     </Reference>
     <Reference Include="Nini, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Nini\Bin\DotNet\4.0\Nini.dll</HintPath>
+      <HintPath>Libraries\Nini.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Toolbox.Extensions">
-      <HintPath>..\Toolbox\Build\Toolbox.Extensions.dll</HintPath>
+      <HintPath>Libraries\Toolbox.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="Toolbox.Logger">
-      <HintPath>..\Toolbox\Build\Toolbox.Logger.dll</HintPath>
+      <HintPath>Libraries\Toolbox.Logger.dll</HintPath>
+    </Reference>
+    <Reference Include="VP.NET">
+      <HintPath>Libraries\VP.NET.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -85,17 +88,8 @@
     <Compile Include="VPS.Network.cs" />
     <Compile Include="VPS.WebServer.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\VP.NET\VPNet\VPNet.csproj">
-      <Project>{dbe501a7-0176-473f-b2e8-f4ada721917f}</Project>
-      <Name>VPNet</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
