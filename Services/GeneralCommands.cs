@@ -42,9 +42,9 @@ namespace VPServices.Services
 
                 new Command
                 (
-                    "Info: Position", "^(my)?(coord(s|inates)?|pos(ition)?)$", cmdCoords,
-                    @"Prints user's position to chat, including coordinates, pitch and yaw",
-                    @"!pos", 5
+                    "Info: Position", "^(my)?(coord(s|inates)?|pos(ition)?|compass)$", cmdCoords,
+                    @"Prints user's position to chat, including coordinates, pitch, yaw and compass",
+                    @"!pos"
                 ),
 
                 new Command
@@ -194,7 +194,21 @@ namespace VPServices.Services
         #region Teleport commands
         bool cmdCoords(VPServices app, Avatar who, string data)
         {
-            app.Notify(who.Session, "You are at {0:f4}, {1:f4}, {2:f4}, facing {3:f0}, pitch {4:f0}", who.Name, who.X, who.Y, who.Z, who.Yaw, who.Pitch);
+            // TODO: move this to the SDK
+            var compass = (who.Yaw % 360 + 360) % 360;
+            string compassPoint = "???";
+
+            if      ( compass <= 22.5 )            compassPoint = "south";
+            else if ( compass <= 22.5 + (45 * 1) ) compassPoint = "south-west";
+            else if ( compass <= 22.5 + (45 * 2) ) compassPoint = "west";
+            else if ( compass <= 22.5 + (45 * 3) ) compassPoint = "north-west";
+            else if ( compass <= 22.5 + (45 * 4) ) compassPoint = "north";
+            else if ( compass <= 22.5 + (45 * 5) ) compassPoint = "north-east";
+            else if ( compass <= 22.5 + (45 * 6) ) compassPoint = "east";
+            else if ( compass <= 22.5 + (45 * 7) ) compassPoint = "south-east";
+            else if ( compass <= 360 )             compassPoint = "south";
+
+            app.Notify(who.Session, "You are at {0:f4}, {1:f4}, {2:f4}, facing {3} ({4:f0}), pitch {5:f0}", who.X, who.Y, who.Z, compassPoint, who.Yaw, who.Pitch);
             return true;
         }
 
