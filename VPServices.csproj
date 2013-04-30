@@ -46,6 +46,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Libraries\Nini.dll</HintPath>
     </Reference>
+    <Reference Include="SQLite">
+      <HintPath>Libraries\SQLite.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http" />
@@ -61,6 +64,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="VPS.Data.cs" />
     <Compile Include="Services\Greetings.cs" />
     <Compile Include="VPS.Extensions.cs" />
     <Compile Include="Services\Trivia\Trivia.Commands.cs" />

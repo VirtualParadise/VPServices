@@ -9,6 +9,11 @@ namespace VPServices
     public partial class VPServices : IDisposable
     {
         /// <summary>
+        /// Latest version for migration
+        /// </summary>
+        const int Version = 1;
+
+        /// <summary>
         /// Global list of all loaded services
         /// </summary>
         public List<IService> Services = new List<IService>();
@@ -30,19 +35,43 @@ namespace VPServices
         public void LoadServices()
         {
             //http://stackoverflow.com/questions/699852/how-to-find-all-the-classes-which-implement-a-given-interface
-            var internalPlugins =
-                from t in Assembly.GetExecutingAssembly().GetTypes()
-                where t.GetInterfaces().Contains(typeof(IService))
-                    && t.GetConstructor(Type.EmptyTypes) != null
+            var type             = typeof(IService);
+            var internalServices =
+                from   t in Assembly.GetExecutingAssembly().GetTypes()
+                where  t.GetInterfaces().Contains(type)
+                       && !t.IsInterface
                 select Activator.CreateInstance(t) as IService;
 
-            foreach (var plugin in internalPlugins)
-            {
-                Services.Add(plugin);
-                plugin.Init(this, Bot);
+            Services.AddRange(internalServices);
+            migrateServices();
+            initServices();
+        }
 
-                Log.Fine("Services", "Loaded service {0}", plugin.Name);
+        void initServices()
+        {
+            foreach (var service in Services)
+            {
+                service.Init(this, Bot);
+                Log.Fine("Services", "Loaded service '{0}'", service.Name);
             }
+        }
+
+        void migrateServices()
+        {
+            var migration = CoreSettings.GetInt("Version", 0);
+
+            if ( migration >= Version )
+                return;
+
+            foreach (var service in Services)
+                for (var i = migration; i < Version; i++)
+                {
+                    service.Migrate(this, i + 1);
+                    Log.Fine("Services", "Migrated '{0}' to version {1}", i + 1);
+                }
+
+            CoreSettings.Set("Version", Version);
+            Log.Debug("Services", "All services migrated to version {0}", Version);
         }
     }
 }

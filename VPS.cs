@@ -8,7 +8,7 @@ namespace VPServices
     public partial class VPServices : IDisposable
     {
         public static VPServices App;
-        public static Random     Rand  = new Random();
+        public static Random     Rand    = new Random();
 
         public static Color ColorInfo  = new Color(50,50,100);
         public static Color ColorWarn  = new Color(220,80,20);
@@ -55,6 +55,8 @@ namespace VPServices
             password = NetworkSettings.Get("Password");
             World    = NetworkSettings.Get("World");
 
+            // Setup database
+
             // Connect to network
             ConnectToUniverse();
             Log.Info("Network", "Connected to universe");
@@ -92,6 +94,7 @@ namespace VPServices
             Commands.Clear();
             ClearServices();
             Bot.Dispose();
+            Connection.Close();
         }
 
         #region Helper functions
