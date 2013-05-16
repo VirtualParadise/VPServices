@@ -48,6 +48,8 @@ namespace VPServices.Services
             bot.Avatars.Leave += onLeave;
         }
 
+        public void Migrate(VPServices app, int target) {  }
+
         public void Dispose()
         {
             saveTelegrams();

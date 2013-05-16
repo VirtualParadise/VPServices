@@ -67,7 +67,7 @@ namespace VPServices
                 for (var i = migration; i < Version; i++)
                 {
                     service.Migrate(this, i + 1);
-                    Log.Fine("Services", "Migrated '{0}' to version {1}", i + 1);
+                    Log.Fine("Services", "Migrated '{0}' to version {1}", service.Name, i + 1);
                 }
 
             CoreSettings.Set("Version", Version);

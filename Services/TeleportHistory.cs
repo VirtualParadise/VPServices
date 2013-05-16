@@ -23,9 +23,9 @@ namespace VPServices.Services
             });
         }
 
-        public void Dispose()
-        {
-        }
+        public void Migrate(VPServices app, int target) {  }
+
+        public void Dispose() { }
 
         bool cmdDeprecated(VPServices app, Avatar who, string data)
         {

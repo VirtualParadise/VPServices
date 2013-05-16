@@ -126,9 +126,15 @@
             this DateTime value
             </summary>
         </member>
-        <member name="P:System.TDateTime.UnixTicks">
+        <member name="M:System.TDateTime.UnixSeconds(System.DateTime)">
             <summary>
-            Returns number of seconds since the unix epoch, typically known as a
+            Returns a long amount of seconds ticks between the UNIX epoch and this
+            DateTime value
+            </summary>
+        </member>
+        <member name="P:System.TDateTime.UnixTimestamp">
+            <summary>
+            Returns number of seconds since the UNIX epoch, typically known as a
             "timestamp" value
             </summary>
         </member>

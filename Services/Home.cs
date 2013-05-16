@@ -49,6 +49,9 @@ namespace VPServices.Services
             bot.Avatars.Enter += onEnter;
         }
 
+        public void Migrate(VPServices app, int target) {  }
+
+
         public void Dispose() { }
 
         #region Command handlers

@@ -16,3 +16,8 @@ Build/Settings - Test.ini
 Build/TriviaQuickfire.csv
 Build/VPServices.lnk
 Ideas.txt
+Build/*.bak
+Build/*.dat
+Build/*.dll
+Build/*.xml
+Build/*.db

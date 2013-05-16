@@ -34,6 +34,8 @@ namespace VPServices.Services
             addCommands ();
             addWebRoutes();
         }
+        
+        public void Migrate(VPServices app, int target) {  }
 
         public void Dispose()
         {

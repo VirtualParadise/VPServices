@@ -39,6 +39,8 @@ namespace VPServices.Services
                 @"Provides a list of ideas known by the system"));
         }
 
+        public void Migrate(VPServices app, int target) {  }
+
         public void Dispose()
         {
             saveIdeas();

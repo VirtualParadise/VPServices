@@ -111,6 +111,7 @@ namespace VPServices.Services
                 @"Provides documentation on using the bot in-world via chat"));
         }
 
+        public void Migrate(VPServices app, int target) {  }
         public void Dispose() { }
 
         #region Services commands

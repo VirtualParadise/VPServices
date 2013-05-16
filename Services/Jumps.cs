@@ -65,6 +65,8 @@ namespace VPServices.Services
                 @"Provides a list of jump points registered in the system"));
         }
 
+        public void Migrate(VPServices app, int target) {  }
+
         public void Dispose()
         {
             saveJumps();

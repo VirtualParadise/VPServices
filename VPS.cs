@@ -47,7 +47,7 @@ namespace VPServices
             // Set logging level
             LogLevels logLevel;
             Enum.TryParse<LogLevels>( CoreSettings.Get("LogLevel", "Production"), out logLevel );
-            Log.LogLevel = logLevel;
+            Log.Level = logLevel;
 
             // Load instance
             Bot      = new Instance( CoreSettings.Get("Name", defaultName) );
@@ -62,6 +62,7 @@ namespace VPServices
             Log.Info("Network", "Connected to universe");
 
             // Set up global events
+            SetupDatabase();
             SetupWeb();
             SetupCommands();
             SetupUserSettings();

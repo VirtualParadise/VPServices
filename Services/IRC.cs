@@ -56,9 +56,9 @@ namespace VPServices.Services
                 connect();
         }
 
-        public void Dispose()
-        {
-        }
+        public void Migrate(VPServices app, int target) {  }
+
+        public void Dispose() { }
 
         #region Dis/connection logic
         bool connect()

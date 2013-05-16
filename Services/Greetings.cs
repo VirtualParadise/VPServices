@@ -41,6 +41,8 @@ namespace VPServices.Services
             bot.Avatars.Leave += (b,a) => { doGreet(b, a, false); };
         }
 
+        public void Migrate(VPServices app, int target) {  }
+
         public void Dispose() { }
 
         #region Command handlers
