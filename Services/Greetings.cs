@@ -9,16 +9,11 @@ namespace VPServices.Services
     /// </summary>
     public class Greetings : IService
     {
-        const string settingGreetMe    = "GreetMe";
-        const string settingShowGreets = "GreetShow";
-        const string msgEntry          = "*** {0} has entered {1}";
-        const string msgExit           = "*** {0} has left {1}";
-        const string msgShowGreets     = "Entry/exit messages will now be shown to you";
-        const string msgHideGreets     = "Entry/exit messages will no longer be shown to you";
-        const string msgGreetMe        = "You will now be announced on entry/exit";
-        const string msgGreetMeNot     = "You will no longer be announced on entry/exit";
+        public string Name
+        {
+            get { return "Greetings"; }
+        }
 
-        public string Name { get { return "Greetings"; } }
         public void Init(VPServices app, Instance bot)
         {
             app.Commands.AddRange(new[] {
@@ -42,8 +37,17 @@ namespace VPServices.Services
         }
 
         public void Migrate(VPServices app, int target) {  }
-
         public void Dispose() { }
+
+        const string settingGreetMe    = "GreetMe";
+        const string settingShowGreets = "GreetShow";
+
+        const string msgEntry      = "*** {0} has entered {1}";
+        const string msgExit       = "*** {0} has left {1}";
+        const string msgShowGreets = "Entry/exit messages will now be shown to you";
+        const string msgHideGreets = "Entry/exit messages will no longer be shown to you";
+        const string msgGreetMe    = "You will now be announced on entry/exit";
+        const string msgGreetMeNot = "You will no longer be announced on entry/exit";
 
         #region Command handlers
         bool cmdToggle(VPServices app, Avatar who, string data, string key)

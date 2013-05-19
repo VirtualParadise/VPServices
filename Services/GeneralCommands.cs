@@ -12,16 +12,6 @@ namespace VPServices.Services
     /// </summary>
     public class GeneralCommands : IService
     {
-        enum offsetBy
-        {
-            X, Y, Z
-        }
-
-        const string msgCommandTitle   = "*** {0}";
-        const string msgCommandRgx     = "Regex: {0}";
-        const string msgCommandDesc    = "Description: {0}";
-        const string msgCommandExample = "Example: {0}";
-
         public string Name { get { return "General commands"; } }
         public void Init(VPServices app, Instance bot)
         {
@@ -113,6 +103,16 @@ namespace VPServices.Services
 
         public void Migrate(VPServices app, int target) {  }
         public void Dispose() { }
+
+        enum offsetBy
+        {
+            X, Y, Z
+        }
+
+        const string msgCommandTitle   = "*** {0}";
+        const string msgCommandRgx     = "Regex: {0}";
+        const string msgCommandDesc    = "Description: {0}";
+        const string msgCommandExample = "Example: {0}";
 
         #region Services commands
         bool cmdHelp(VPServices app, Avatar who, string data)
@@ -262,5 +262,6 @@ namespace VPServices.Services
             return app.MarkdownParser.Transform(listing);
         }
         #endregion
+
     }
 }

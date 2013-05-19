@@ -1,8 +1,8 @@
 ﻿using Nini.Config;
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using VP;
 
 namespace VPServices
@@ -26,10 +26,6 @@ namespace VPServices
 
         public void SetupUserSettings()
         {
-            Bot.Avatars.Enter  += onAvatarAdd;
-            Bot.Avatars.Leave  += onAvatarDelete;
-            Bot.Avatars.Change += onAvatarsChange;
-
             if ( File.Exists(defaultFileUserSettings) )
                 UserSettings.Load(defaultFileUserSettings);
             else
@@ -108,42 +104,6 @@ namespace VPServices
             return GetUserSettings(av.Name);
         }
 
-        void onAvatarAdd(Instance sender, Avatar avatar)
-        {
-            TConsole.WriteLineColored(ConsoleColor.Cyan, "*** {0} enters", avatar.Name);
-            Users.Add(avatar);
-
-            // Do not load settings for bots else only add to unique user counts if name
-            // is not present
-            if      (avatar.IsBot)
-                Bots++;
-            else if ( GetUser(avatar.Name) != null )
-                UniqueUsers++;
-        }
-
-        void onAvatarDelete(Instance sender, Avatar avatar)
-        {
-            TConsole.WriteLineColored(ConsoleColor.Cyan, "*** {0} leaves", avatar.Name);
-
-            var user = GetUser(avatar.Session);
-            if (user == null)
-                return;
-            else
-                Users.Remove(user);
-
-            if (avatar.IsBot)
-                Bots--;
-            else if ( GetUser(avatar.Name) == null )
-                UniqueUsers--;
-        }
-
-        void onAvatarsChange(Instance sender, Avatar avatar)
-        {
-            var user = GetUser(avatar.Session);
-            if (user == null)
-                return;
-            else
-                user.Position = avatar.Position;
-        }
+        
     }
 }

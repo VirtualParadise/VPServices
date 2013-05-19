@@ -66,6 +66,7 @@ namespace VPServices
             SetupWeb();
             SetupCommands();
             SetupUserSettings();
+            SetupEvents();
             ConnectToWorld();
             LoadServices();
             Log.Info("Network", "Connected to {0}", World);
@@ -93,6 +94,7 @@ namespace VPServices
             Server.Abort();
             Server.Close();
             Commands.Clear();
+            ClearEvents();
             ClearServices();
             Bot.Dispose();
             Connection.Close();

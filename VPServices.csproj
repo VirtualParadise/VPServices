@@ -63,6 +63,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="VPS.Events.cs" />
     <Compile Include="Services\Logging\Logging.Migrations.cs" />
     <Compile Include="VPS.Data.cs" />
     <Compile Include="Services\Greetings.cs" />

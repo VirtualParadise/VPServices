@@ -10,10 +10,11 @@ namespace VPServices.Services
     /// </summary>
     public class Home : IService
     {
-        const string settingBounce = "bounce";
-        const string settingHome   = "Home";
+        public string Name
+        { 
+            get { return "Home"; }
+        }
 
-        public string Name { get { return "Home"; } }
         public void Init(VPServices app, Instance bot)
         {
             app.Commands.AddRange(new[] {
@@ -47,12 +48,15 @@ namespace VPServices.Services
             });
 
             bot.Avatars.Enter += onEnter;
+            bot.Avatars.Leave += onLeave;
         }
 
         public void Migrate(VPServices app, int target) {  }
-
-
         public void Dispose() { }
+
+        const string settingLastExit = "LastExit";
+        const string settingBounce   = "Bounce";
+        const string settingHome     = "Home";
 
         #region Command handlers
         bool cmdGoHome(VPServices app, Avatar who, string data)
@@ -119,6 +123,18 @@ namespace VPServices.Services
                 settings.Remove(settingBounce);
             else if ( settings.Contains(settingHome) )
                 cmdGoHome(inst, user, null);
+        }
+
+        void onLeave(Instance sender, Avatar who)
+        {
+            IConfig settings;
+            var inst = VPServices.App;
+            var user = inst.GetUser(who.Session);
+
+            if ( user == null )
+                return;
+            else
+                settings = inst.GetUserSettings(user);
         }
         #endregion
     }
