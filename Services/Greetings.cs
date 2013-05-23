@@ -32,8 +32,8 @@ namespace VPServices.Services
                 ),
             });
 
-            bot.Avatars.Enter += (b,a) => { doGreet(b, a, true);  };
-            bot.Avatars.Leave += (b,a) => { doGreet(b, a, false); };
+            app.AvatarEnter += (b,a) => { doGreet(b, a, true);  };
+            app.AvatarLeave += (b,a) => { doGreet(b, a, false); };
         }
 
         public void Migrate(VPServices app, int target) {  }

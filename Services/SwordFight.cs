@@ -52,7 +52,7 @@ namespace VPServices.Services
 
             app.Bot.Property.CallbackObjectCreate += onCreate;
             app.Bot.Avatars.Clicked               += onClick;
-            app.Bot.Avatars.Enter += onEnter;
+            app.AvatarEnter                       += onEnter;
         }
 
         public void Migrate(VPServices app, int target) {  }

@@ -47,8 +47,8 @@ namespace VPServices.Services
                 ),
             });
 
-            bot.Avatars.Enter += onEnter;
-            bot.Avatars.Leave += onLeave;
+            app.AvatarEnter += onEnter;
+            app.AvatarLeave += onLeave;
         }
 
         public void Migrate(VPServices app, int target) {  }

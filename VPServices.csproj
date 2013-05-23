@@ -63,6 +63,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Services\Telegrams\Telegrams.Migrations.cs" />
     <Compile Include="VPS.Events.cs" />
     <Compile Include="Services\Logging\Logging.Migrations.cs" />
     <Compile Include="VPS.Data.cs" />
@@ -85,7 +86,7 @@
     <Compile Include="Services\JoinsInvites.cs" />
     <Compile Include="Services\TeleportHistory.cs" />
     <Compile Include="Services\Jumps.cs" />
-    <Compile Include="Services\Telegrams.cs" />
+    <Compile Include="Services\Telegrams\Telegrams.cs" />
     <Compile Include="Services\WorldSettings.cs" />
     <Compile Include="VPS.Services.cs" />
     <Compile Include="VPS.cs" />
@@ -95,7 +96,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Libraries\sqlite3.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

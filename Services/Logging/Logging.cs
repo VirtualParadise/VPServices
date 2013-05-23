@@ -8,6 +8,10 @@ namespace VPServices.Services
     /// <summary>
     /// Logs user and build events to file
     /// </summary>
+    /// <remarks>
+    /// Loggers use UNIX timestamps instead of DateTime values for future convinience
+    /// with logger tools, which are more likely to use timestamps
+    /// </remarks>
     partial class Logging : IService
     {
         public string Name
@@ -20,8 +24,8 @@ namespace VPServices.Services
             bot.Property.ObjectCreate += (s,i,o) => { objectEvent(o, sqlBuildType.Create); };
             bot.Property.ObjectChange += (s,i,o) => { objectEvent(o, sqlBuildType.Modify); };
             bot.Property.ObjectDelete += onObjDelete;
-            bot.Avatars.Enter         += (s,a) => { userEvent(a, sqlUserType.Enter); };
-            bot.Avatars.Leave         += (s,a) => { userEvent(a, sqlUserType.Leave); };
+            app.AvatarEnter           += (s,a) => { userEvent(a, sqlUserType.Enter); };
+            app.AvatarLeave           += (s,a) => { userEvent(a, sqlUserType.Leave); };
 
             this.connection = app.Connection;
         }

@@ -31,63 +31,67 @@ namespace VPServices.Services
         {
             var fileBuildHistory = "BuildHist.dat";
             var fileUserHistory  = "UserHist.dat";
+            string[] lines;
+            string   backup;
 
-            if ( File.Exists(fileBuildHistory) )
+            if ( !File.Exists(fileBuildHistory) )
+                goto userHistory;
+            
+            #region Build history transaction
+            connection.BeginTransaction();
+            lines = File.ReadAllLines(fileBuildHistory);
+
+            foreach ( var line in lines )
             {
-                #region Build history transaction
-                connection.BeginTransaction();
-                var lines = File.ReadAllLines(fileBuildHistory);
-
-                foreach ( var line in lines )
+                var parts = line.TerseSplit(',');
+                connection.Insert(new sqlBuildHistory
                 {
-                    var parts = line.TerseSplit(',');
-                    connection.Insert(new sqlBuildHistory
-                    {
-                        X    = float.Parse(parts[0]),
-                        Y    = float.Parse(parts[1]),
-                        Z    = float.Parse(parts[2]),
-                        When = long.Parse(parts[3]),
-                        ID   = 0,
-                        Type = sqlBuildType.Unknown
-                    });
-                }
-
-                connection.Commit(); 
-                #endregion
-
-                var backup = fileBuildHistory + ".bak";
-                File.Move(fileBuildHistory, backup);
-                Log.Fine(Name, "Migrated .dat build history log to SQLite; backed up to '{0}'", backup);
+                    X    = float.Parse(parts[0]),
+                    Y    = float.Parse(parts[1]),
+                    Z    = float.Parse(parts[2]),
+                    When = long.Parse(parts[3]),
+                    ID   = 0,
+                    Type = sqlBuildType.Unknown
+                });
             }
 
-            if ( File.Exists(fileUserHistory) )
+            connection.Commit(); 
+            #endregion
+
+            backup = fileBuildHistory + ".bak";
+            File.Move(fileBuildHistory, backup);
+            Log.Fine(Name, "Migrated .dat build history log to SQLite; backed up to '{0}'", backup);
+
+        userHistory:
+            if ( !File.Exists(fileUserHistory) )
+                return;
+
+            #region User history transaction
+            connection.BeginTransaction();
+            lines = File.ReadAllLines(fileUserHistory);
+
+            foreach ( var line in lines )
             {
-                #region User history transaction
-                connection.BeginTransaction();
-                var lines = File.ReadAllLines(fileUserHistory);
-
-                foreach ( var line in lines )
+                var parts = line.TerseSplit(',');
+                connection.Insert(new sqlUserHistory
                 {
-                    var parts = line.TerseSplit(',');
-                    connection.Insert(new sqlUserHistory
-                    {
-                        Type =
-                            parts[0] == "enter"
-                            ? sqlUserType.Enter
-                            : sqlUserType.Leave,
-                        Name = parts[1],
-                        When = long.Parse(parts[2]),
-                        ID   = 0
-                    });
-                }
-
-                connection.Commit(); 
-                #endregion
-
-                var backup = fileUserHistory + ".bak";
-                File.Move(fileUserHistory, backup);
-                Log.Fine(Name, "Migrated .dat user history log to SQLite; backed up to '{0}'", backup);
+                    Type =
+                        parts[0] == "enter"
+                        ? sqlUserType.Enter
+                        : sqlUserType.Leave,
+                    Name = parts[1],
+                    When = long.Parse(parts[2]),
+                    ID   = 0
+                });
             }
+
+            connection.Commit(); 
+            #endregion
+
+            backup = fileUserHistory + ".bak";
+            File.Move(fileUserHistory, backup);
+            Log.Fine(Name, "Migrated .dat user history log to SQLite; backed up to '{0}'", backup);
+            
         }
     }
 }
