@@ -53,7 +53,7 @@ namespace VPServices.Services
                 new Command
                 (
                     "Request: Reject", "^(no|reject|deny)$",
-                    (s, w, d) => { return onResponse(s, w, true); },
+                    (s, w, d) => { return onResponse(s, w, false); },
                     @"Rejects a pending join or invite request",
                     @"!no"
                 ),
