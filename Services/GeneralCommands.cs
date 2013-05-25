@@ -19,14 +19,14 @@ namespace VPServices.Services
                 new Command
                 (
                     "Services: Help", @"^(help|commands|\?)$", cmdHelp,
-                    @"Prints the URL to this documentation to chat or explains a specific command",
+                    @"Prints the URL to this documentation to all users or explains a specific command to you",
                     @"!help `[command]`"
                 ),
 
                 new Command
                 (
                     "Services: Version", @"^version$", cmdVersion,
-                    @"Sends the version of this bot to the user",
+                    @"Sends all users the version of this bot",
                     @"!version", 120
                 ),
 

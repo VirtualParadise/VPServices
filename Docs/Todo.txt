@@ -3,8 +3,9 @@
 - Command queueing
 - YouTube service
 - Facts service
-- !ground
 - Multi telegram targeting
 - Telegram history
 - Implement Cassini web server
 - MOTD
+- Chat logger with last 10 lines for entering users
+- Per user mute in IRC

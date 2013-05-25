@@ -202,6 +202,7 @@ namespace VPServices
         public int    UserID { get; set; }
         [Indexed]
         public string Name   { get; set; }
+        [MaxLength(int.MaxValue)]
         public string Value  { get; set; }
     }
 }

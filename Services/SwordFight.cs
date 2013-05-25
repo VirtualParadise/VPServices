@@ -31,7 +31,7 @@ namespace VPServices.Services
                 new Command
                 (
                     "Swordfight: Toggle", "^swordfight", cmdTogglePVP,
-                    @"Toggles or sets swordfighting (PVP) mode for user",
+                    @"Toggles or sets swordfighting (PVP) mode for you",
                     @"!swordfight `[true|false]`"
                 ),
 
