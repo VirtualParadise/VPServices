@@ -1,4 +1,3 @@
-- SQLite
 - Multi-bot architecture
 - Command queueing
 - YouTube service
@@ -8,4 +7,3 @@
 - Implement Cassini web server
 - MOTD
 - Chat logger with last 10 lines for entering users
-- Per user mute in IRC

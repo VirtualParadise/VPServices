@@ -45,7 +45,7 @@ namespace VPServices
                 BEFORE INSERT ON UserSettings 
                 FOR EACH ROW 
                 BEGIN 
-                DELETE FROM UserSettings WHERE UserID = new.UserID AND Name = new.Name
+                DELETE FROM UserSettings WHERE UserID = new.UserID AND Name = new.Name;
                 END");
 
             Log.Debug("Users", "Created SQLite tables for user settings");
@@ -79,12 +79,15 @@ namespace VPServices
 
                 Connection.BeginTransaction();
                 foreach ( var key in config.GetKeys() )
+                {
+                    Log.Fine("Users", "Migrating config key '{0}' for user '{1}'", key, id);
                     Connection.Insert( new sqlUserSettings
                     {
                         UserID = id,
-                        Name    = key,
+                        Name   = key,
                         Value  = config.Get(key)
                     });
+                }
                 Connection.Commit();
             }
 
@@ -202,7 +205,7 @@ namespace VPServices
         public int    UserID { get; set; }
         [Indexed]
         public string Name   { get; set; }
-        [MaxLength(int.MaxValue)]
+        [MaxLength(100000)]
         public string Value  { get; set; }
     }
 }

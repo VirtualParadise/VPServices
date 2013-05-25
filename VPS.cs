@@ -55,8 +55,6 @@ namespace VPServices
             password = NetworkSettings.Get("Password");
             World    = NetworkSettings.Get("World");
 
-            // Setup database
-
             // Connect to network
             ConnectToUniverse();
             Log.Info("Network", "Connected to universe");

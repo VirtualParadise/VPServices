@@ -63,6 +63,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Services\Jumps\Jumps.Migrations.cs" />
     <Compile Include="Services\Telegrams\Telegrams.Migrations.cs" />
     <Compile Include="VPS.Events.cs" />
     <Compile Include="Services\Logging\Logging.Migrations.cs" />
@@ -81,10 +82,9 @@
     <Compile Include="VPS.Commands.cs" />
     <Compile Include="Services\IService.cs" />
     <Compile Include="Services\Logging\Logging.cs" />
-    <Compile Include="Services\SwordFight.cs" />
+    <Compile Include="Services\SwordFight\SwordFight.cs" />
     <Compile Include="Services\JoinsInvites.cs" />
-    <Compile Include="Services\TeleportHistory.cs" />
-    <Compile Include="Services\Jumps.cs" />
+    <Compile Include="Services\Jumps\Jumps.cs" />
     <Compile Include="Services\Telegrams\Telegrams.cs" />
     <Compile Include="Services\WorldSettings.cs" />
     <Compile Include="VPS.Services.cs" />
