@@ -17,14 +17,14 @@ namespace VPServices.Services
         /// </summary>
         string webListScores(VPServices app, string data)
         {
-            string listing = "# Trivia scores:\n";
-            var    scores  = from IConfig c in app.UserSettings.Configs
-                             where   c.Contains(keyTriviaPoints) && c.GetInt(keyTriviaPoints) > 0
-                             orderby c.GetInt(keyTriviaPoints) descending
-                             select new Tuple<int, string> ( c.GetInt(keyTriviaPoints), c.Name );
+            var listing = "# Trivia scores:\n";
+            var query   = from   s in app.Connection.Table<sqlUserSettings>()
+                          where  s.Name == keyTriviaPoints
+                          select s;
 
-            foreach (var score in scores)
-                listing += "* **{0}** : {1} point(s)\n\n".LFormat(score.Item2, score.Item1);
+            // XXX: ID only; investigate getting names
+            foreach (var score in query)
+                listing += "* **{0}** : {1} point(s)\n\n".LFormat(score.UserID, score.Value);
 
             return app.MarkdownParser.Transform(listing);
         }

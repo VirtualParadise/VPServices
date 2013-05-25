@@ -248,7 +248,7 @@
             traces
             </summary>
         </member>
-        <member name="P:System.Log.LogLevel">
+        <member name="P:System.Log.Level">
             <summary>
             Gets or sets the current logging level, automatically logging the change in
             level to Info

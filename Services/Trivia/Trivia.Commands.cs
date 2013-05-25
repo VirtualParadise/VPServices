@@ -31,7 +31,7 @@ namespace VPServices.Services
                 new Command
                 (
                     "Trivia: Scores", "^(trivia)?scores$", cmdShowUrl,
-                    @"Prints the URL to a listing of trivia scores to the user",
+                    @"Shows you the URL to a listing of trivia scores",
                     @"!scores"
                 )
             });

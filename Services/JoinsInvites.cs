@@ -60,6 +60,8 @@ namespace VPServices.Services
             });
         }
 
+        public void Migrate(VPServices app, int target) {  }
+
         public void Dispose() { }
 
         #region Command handlers

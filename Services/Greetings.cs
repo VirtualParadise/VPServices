@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using VP;
+using VPServices;
 
 namespace VPServices.Services
 {
@@ -9,16 +10,11 @@ namespace VPServices.Services
     /// </summary>
     public class Greetings : IService
     {
-        const string settingGreetMe    = "GreetMe";
-        const string settingShowGreets = "GreetShow";
-        const string msgEntry          = "*** {0} has entered {1}";
-        const string msgExit           = "*** {0} has left {1}";
-        const string msgShowGreets     = "Entry/exit messages will now be shown to you";
-        const string msgHideGreets     = "Entry/exit messages will no longer be shown to you";
-        const string msgGreetMe        = "You will now be announced on entry/exit";
-        const string msgGreetMeNot     = "You will no longer be announced on entry/exit";
+        public string Name
+        {
+            get { return "Greetings"; }
+        }
 
-        public string Name { get { return "Greetings"; } }
         public void Init(VPServices app, Instance bot)
         {
             app.Commands.AddRange(new[] {
@@ -37,25 +33,39 @@ namespace VPServices.Services
                 ),
             });
 
-            bot.Avatars.Enter += (b,a) => { doGreet(b, a, true);  };
-            bot.Avatars.Leave += (b,a) => { doGreet(b, a, false); };
+            app.AvatarEnter += (b,a) => { doGreet(b, a, true);  };
+            app.AvatarLeave += (b,a) => { doGreet(b, a, false); };
         }
 
+        public void Migrate(VPServices app, int target) {  }
         public void Dispose() { }
+
+        const string settingGreetMe    = "GreetMe";
+        const string settingShowGreets = "GreetShow";
+
+        const string msgEntry      = "*** {0} has entered {1}";
+        const string msgExit       = "*** {0} has left {1}";
+        const string msgShowGreets = "Entry/exit messages will now be shown to you";
+        const string msgHideGreets = "Entry/exit messages will no longer be shown to you";
+        const string msgGreetMe    = "You will now be announced on entry/exit";
+        const string msgGreetMeNot = "You will no longer be announced on entry/exit";
 
         #region Command handlers
         bool cmdToggle(VPServices app, Avatar who, string data, string key)
         {
-            var    config = app.GetUserSettings(who);
             string msg    = null;
-            bool   toggle = false;
+            bool   toggle;
 
-            // Try to parse user given boolean; silently ignore on failure
             if ( data != "" )
-            if ( !VPServices.TryParseBool(data, out toggle) )
-                return false;
+            {
+                // Try to parse user given boolean; reject command on failure
+                if ( !VPServices.TryParseBool(data, out toggle) )
+                    return false;
+            }
+            else
+                toggle = !who.GetSettingBool(key);
 
-            config.Set(key, toggle);
+            who.SetSetting(key, toggle);
             switch (key)
             {
                 case settingGreetMe:
@@ -81,10 +91,9 @@ namespace VPServices.Services
                 return;
 
             var app      = VPServices.App;
-            var settings = app.GetUserSettings(who.Name);
 
             // Do not greet if GreetMe is false
-            if ( !settings.GetBoolean(settingGreetMe, true) )
+            if ( !who.GetSettingBool(settingGreetMe, true) )
                 return;
 
             foreach ( var target in app.Users )
@@ -94,8 +103,7 @@ namespace VPServices.Services
                     continue;
 
                 // Only send greet if target wants them
-                var targetSettings = app.GetUserSettings(target);
-                if ( targetSettings.GetBoolean(settingShowGreets, true) )
+                if ( target.GetSettingBool(settingShowGreets, true) )
                 {
                     var msg = entering ? msgEntry : msgExit;
                     bot.ConsoleMessage(target.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msg, who.Name, app.World);

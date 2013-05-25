@@ -12,16 +12,6 @@ namespace VPServices.Services
     /// </summary>
     public class GeneralCommands : IService
     {
-        enum offsetBy
-        {
-            X, Y, Z
-        }
-
-        const string msgCommandTitle   = "*** {0}";
-        const string msgCommandRgx     = "Regex: {0}";
-        const string msgCommandDesc    = "Description: {0}";
-        const string msgCommandExample = "Example: {0}";
-
         public string Name { get { return "General commands"; } }
         public void Init(VPServices app, Instance bot)
         {
@@ -29,14 +19,14 @@ namespace VPServices.Services
                 new Command
                 (
                     "Services: Help", @"^(help|commands|\?)$", cmdHelp,
-                    @"Prints the URL to this documentation to chat or explains a specific command",
+                    @"Prints the URL to this documentation to all users or explains a specific command to you",
                     @"!help `[command]`"
                 ),
 
                 new Command
                 (
                     "Services: Version", @"^version$", cmdVersion,
-                    @"Sends the version of this bot to the user",
+                    @"Sends all users the version of this bot",
                     @"!version", 120
                 ),
 
@@ -87,6 +77,13 @@ namespace VPServices.Services
 
                 new Command
                 (
+                    "Teleport: Ground", "^g(round)?$", cmdGround,
+                    @"Snaps the user to ground",
+                    @"!g"
+                ),
+
+                new Command
+                (
                     "Debug: Say", "^say$", cmdSay,
                     @"Makes the bot say a chat message as somebody else",
                     @"!say `who: message`"
@@ -111,7 +108,18 @@ namespace VPServices.Services
                 @"Provides documentation on using the bot in-world via chat"));
         }
 
+        public void Migrate(VPServices app, int target) {  }
         public void Dispose() { }
+
+        enum offsetBy
+        {
+            X, Y, Z
+        }
+
+        const string msgCommandTitle   = "*** {0}";
+        const string msgCommandRgx     = "Regex: {0}";
+        const string msgCommandDesc    = "Description: {0}";
+        const string msgCommandExample = "Example: {0}";
 
         #region Services commands
         bool cmdHelp(VPServices app, Avatar who, string data)
@@ -252,6 +260,21 @@ namespace VPServices.Services
             app.Bot.Avatars.Teleport(who.Session, "", AvatarPosition.GroundZero);
             return true;
         } 
+
+        bool cmdGround(VPServices app, Avatar who, string data)
+        {
+            var target = new AvatarPosition
+            {
+                X     = who.X,
+                Y     = 0.1f,
+                Z     = who.Z,
+                Pitch = who.Pitch,
+                Yaw   = who.Yaw
+            };
+
+            app.Bot.Avatars.Teleport(who.Session, target);
+            return true;
+        }
         #endregion
 
         #region Web routes
@@ -275,5 +298,6 @@ namespace VPServices.Services
             return app.MarkdownParser.Transform(listing);
         }
         #endregion
+
     }
 }

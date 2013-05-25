@@ -1,0 +1,9 @@
+- Multi-bot architecture
+- Command queueing
+- YouTube service
+- Facts service
+- Multi telegram targeting
+- Telegram history
+- Implement Cassini web server
+- MOTD
+- Chat logger with last 10 lines for entering users

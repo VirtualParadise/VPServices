@@ -8,7 +8,7 @@ namespace VPServices
     public partial class VPServices : IDisposable
     {
         public static VPServices App;
-        public static Random     Rand  = new Random();
+        public static Random     Rand    = new Random();
 
         public static Color ColorInfo  = new Color(50,50,100);
         public static Color ColorWarn  = new Color(220,80,20);
@@ -47,7 +47,7 @@ namespace VPServices
             // Set logging level
             LogLevels logLevel;
             Enum.TryParse<LogLevels>( CoreSettings.Get("LogLevel", "Production"), out logLevel );
-            Log.LogLevel = logLevel;
+            Log.Level = logLevel;
 
             // Load instance
             Bot      = new Instance( CoreSettings.Get("Name", defaultName) );
@@ -60,13 +60,16 @@ namespace VPServices
             Log.Info("Network", "Connected to universe");
 
             // Set up global events
+            SetupDatabase();
             SetupWeb();
             SetupCommands();
-            SetupUserSettings();
+            SetupUsers();
+            SetupEvents();
             ConnectToWorld();
             LoadServices();
             Log.Info("Network", "Connected to {0}", World);
 
+            CoreSettings.Set("Version", MigrationVersion);
             Bot.ConsoleBroadcast(ChatEffect.None, ColorInfo,"", "Services is now online; say !help for information");
         }
 
@@ -85,13 +88,14 @@ namespace VPServices
         public void Dispose()
         {
             Settings.Save();
-            UserSettings.Save();
 
             Server.Abort();
             Server.Close();
             Commands.Clear();
+            ClearEvents();
             ClearServices();
             Bot.Dispose();
+            Connection.Close();
         }
 
         #region Helper functions

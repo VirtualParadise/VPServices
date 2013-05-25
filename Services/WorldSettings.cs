@@ -20,6 +20,8 @@ namespace VPServices.Services
                 @"Provides a key-value list of the settings of the bot's world"));
         }
 
+        public void Migrate(VPServices app, int target) {  }
+
         public void Dispose()
         {
             Data.Clear();

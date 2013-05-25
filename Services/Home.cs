@@ -10,10 +10,11 @@ namespace VPServices.Services
     /// </summary>
     public class Home : IService
     {
-        const string settingBounce = "bounce";
-        const string settingHome   = "Home";
+        public string Name
+        { 
+            get { return "Home"; }
+        }
 
-        public string Name { get { return "Home"; } }
         public void Init(VPServices app, Instance bot)
         {
             app.Commands.AddRange(new[] {
@@ -46,15 +47,21 @@ namespace VPServices.Services
                 ),
             });
 
-            bot.Avatars.Enter += onEnter;
+            app.AvatarEnter += onEnter;
+            app.AvatarLeave += onLeave;
         }
 
+        public void Migrate(VPServices app, int target) {  }
         public void Dispose() { }
+
+        const string settingLastExit = "LastExit";
+        const string settingBounce   = "Bounce";
+        const string settingHome     = "Home";
 
         #region Command handlers
         bool cmdGoHome(VPServices app, Avatar who, string data)
         {
-            var home = app.GetUserSettings(who).Get(settingHome);
+            var home = who.GetSetting(settingHome);
             var pos  = ( home == null )
                 ? AvatarPosition.GroundZero
                 : new AvatarPosition(home);
@@ -66,7 +73,7 @@ namespace VPServices.Services
         bool cmdSetHome(VPServices app, Avatar who, string data)
         {
             var pos = who.Position.ToString();
-            app.GetUserSettings(who).Set(settingHome, pos);
+            who.SetSetting(settingHome, pos);
 
             app.Notify(who.Session, "Set your home to {0:f3}, {1:f3}, {2:f3}" , who.X, who.Y, who.Z);
             return Log.Info(Name, "Set home for {0} at {1:f3}, {2:f3}, {3:f3}", who.Name, who.X, who.Y, who.Z);
@@ -74,21 +81,15 @@ namespace VPServices.Services
 
         bool cmdClearHome(VPServices app, Avatar who, string data)
         {
-            var  config = app.GetUserSettings(who);
-            if ( config.Contains(settingHome) )
-            {
-                config.Remove(settingHome);
-                app.Notify(who.Session, "Your home has been cleared to ground zero");
-            }
-            else
-                app.Notify(who.Session, "You do not have a home location");
+            who.DeleteSetting(settingHome);
+            app.Notify(who.Session, "Your home has been cleared to ground zero");
 
             return Log.Info(Name, "Cleared home for {0}", who.Name);
         }
 
         bool cmdBounce(VPServices app, Avatar who, string data)
         {
-            app.GetUserSettings(who).Set(settingBounce, true);
+            who.SetSetting(settingBounce, true);
             app.Bot.Avatars.Teleport(who.Session, app.World, who.Position);
 
             return Log.Info(Name, "Bounced user {0}", who.Name);
@@ -102,20 +103,23 @@ namespace VPServices.Services
             if ( VPServices.App.StartUpTime.SecondsToNow() < 10 )
                 return;
 
-            IConfig settings;
-            var inst = VPServices.App;
-            var user = inst.GetUser(who.Session);
+            var lastExit = who.GetSettingDateTime(settingLastExit);
 
-            if ( user == null )
+            // Ignore bouncing/disconnected users
+            if ( lastExit.SecondsToNow() < 60 )
                 return;
-            else
-                settings = inst.GetUserSettings(user);
 
             // Do not teleport home if bouncing
-            if      ( settings.Contains(settingBounce) )
-                settings.Remove(settingBounce);
-            else if ( settings.Contains(settingHome) )
-                cmdGoHome(inst, user, null);
+            if      ( who.GetSetting(settingBounce) != null )
+                who.DeleteSetting(settingBounce);
+            else if ( who.GetSetting(settingHome) != null )
+                cmdGoHome(VPServices.App, who, null);
+        }
+
+        void onLeave(Instance sender, Avatar who)
+        {
+            // Keep track of LastExit to prevent annoying users
+            who.SetSetting(settingLastExit, DateTime.Now);
         }
         #endregion
     }
