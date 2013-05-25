@@ -68,7 +68,6 @@
     <Compile Include="Services\Logging\Logging.Migrations.cs" />
     <Compile Include="VPS.Data.cs" />
     <Compile Include="Services\Greetings.cs" />
-    <Compile Include="VPS.Extensions.cs" />
     <Compile Include="Services\Trivia\Trivia.Commands.cs" />
     <Compile Include="Services\Trivia\Trivia.Web.cs" />
     <Compile Include="Services\IRC.cs" />
@@ -95,6 +94,7 @@
     <Compile Include="VPS.WebServer.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Docs\Todo.txt" />
     <Content Include="Libraries\sqlite3.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -10,7 +10,7 @@ namespace VPServices.Services
     /// </summary>
     /// <remarks>
     /// Loggers use UNIX timestamps instead of DateTime values for future convinience
-    /// with logger tools, which are more likely to use timestamps
+    /// with logger tools, which are more likely to use timestamps.
     /// </remarks>
     partial class Logging : IService
     {
@@ -30,9 +30,9 @@ namespace VPServices.Services
             this.connection = app.Connection;
         }
 
-        SQLiteConnection connection;
-
         public void Dispose() { }
+
+        SQLiteConnection connection;
 
         void objectEvent(VPObject o, sqlBuildType type)
         {

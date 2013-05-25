@@ -62,13 +62,8 @@ namespace VPServices.Services
         #region Command handlers
         bool cmdTogglePVP(VPServices app, Avatar who, string data)
         {
-            var  config = app.GetUserSettings(who);
-            bool toggle = false;
-            DateTime lastSwitch;
-            if ( config.Contains(keyLastSwitch) )
-                lastSwitch = DateTime.Parse(config.Get(keyLastSwitch));
-            else
-                lastSwitch = DateTime.Now.AddSeconds(-60);
+            var  lastSwitch = who.GetSettingDateTime(keyLastSwitch);
+            bool toggle     = false;
 
             // Reject if too soon
             if ( lastSwitch.SecondsToNow() < 60 )
@@ -78,21 +73,19 @@ namespace VPServices.Services
                 return true;
             }
 
-            // Try to parse user given boolean; silently ignore on failure
             if ( data != "" )
             {
+                // Try to parse user given boolean; silently ignore on failure
                 if ( !VPServices.TryParseBool(data, out toggle) )
                     return false;
             }
             else
-                toggle = !config.GetBoolean(keyMode, false);
+                toggle = !who.GetSettingBool(keyMode);
 
             // Set new boolean, timeout and if new, health
-            config.Set(keyMode, toggle);
-            config.Set(keyLastSwitch, DateTime.Now);
-
-            if ( !config.Contains(keyHealth) )
-                config.Set(keyHealth, 100);
+            who.SetSetting(keyMode, toggle);
+            who.SetSetting(keyLastSwitch, DateTime.Now);
+            initialHealth(who);
 
             var verb = toggle ? "enabled" : "disabled";
             app.NotifyAll(msgToggle, verb, who.Name);
@@ -109,10 +102,8 @@ namespace VPServices.Services
 
         bool cmdHealth(VPServices app, Avatar who, string data)
         {
-            var config = app.GetUserSettings(who);
-            var health = config.GetInt(keyHealth, 100);
-
-            app.Notify(who.Session, msgHealth, health);
+            initialHealth(who);
+            app.Notify(who.Session, msgHealth, who.GetSettingInt(keyHealth));
             return true;
         } 
         #endregion
@@ -126,19 +117,19 @@ namespace VPServices.Services
             var source = app.GetUser(click.SourceSession);
             var target = app.GetUser(click.TargetSession);
 
+            // Needed as there is no intermediate click event
             if ( source == null )
                 return;
 
+            // Null session suggests bot
             if ( target == null )
             {
                 hitBot(source);
                 return;
             }
 
-            var sourceConfig = app.GetUserSettings(source);
-            var targetConfig = app.GetUserSettings(target);
 
-            if ( !sourceConfig.GetBoolean(keyMode, false) || !targetConfig.GetBoolean(keyMode, false) )
+            if ( !source.GetSettingBool(keyMode, false) || !target.GetSettingBool(keyMode, false) )
                 return;
 
             var diffX = Math.Abs(source.X - target.X);
@@ -154,7 +145,7 @@ namespace VPServices.Services
                 return;
             }
 
-            var targetHealth = targetConfig.GetInt(keyHealth, 100);
+            var targetHealth = target.GetSettingInt(keyHealth, 100);
             var critical     = VPServices.Rand.Next(100) <= 10;
             var damage       = VPServices.Rand.Next(5, 25) * ( critical ? 3 : 1 );
 
@@ -165,22 +156,28 @@ namespace VPServices.Services
             {
                 app.AlertAll(msgKill, target.Name, source.Name);
 
-                targetConfig.Set(keyDeath, DateTime.Now);
-                targetConfig.Set(keyHealth, 100);
-                sourceConfig.Set(keyHealth, sourceConfig.GetInt(keyHealth) + 5);
+                target.SetSetting(keyDeath, DateTime.Now);
+                target.SetSetting(keyHealth, 100);
+                source.SetSetting(keyHealth, source.GetSettingInt(keyHealth) + 5);
                 bot.Avatars.Teleport(click.TargetSession, AvatarPosition.GroundZero);
             }
             else
-                targetConfig.Set(keyHealth, targetHealth - damage);
+                target.SetSetting(keyHealth, targetHealth - damage);
         }
 
-        void onEnter(Instance sender, Avatar avatar)
+        void onEnter(Instance sender, Avatar user)
         {
-            var config = app.GetUserSettings(avatar);
-
-            if ( config.GetBoolean(keyMode, false) )
-                app.Warn(avatar.Session, msgReminder);
+            if ( user.GetSettingBool(keyMode) )
+                app.Warn(user.Session, msgReminder);
         } 
+        #endregion
+
+        #region Health logic
+        void initialHealth(Avatar who)
+        {
+            if (who.GetSettingInt(keyHealth) <= 0)
+                who.SetSetting(keyHealth, 100);
+        }
         #endregion
 
         #region Attack logic
@@ -199,14 +196,7 @@ namespace VPServices.Services
                 if ( who.Z < 1 && who.Z > -1 )
                     return true;
 
-            DateTime death;
-            var      config = app.GetUserSettings(who);
-
-            if ( config.Contains(keyDeath) )
-                death = DateTime.Parse(config.Get(keyDeath));
-            else
-                death = DateTime.Now.AddSeconds(-6);
-
+            var death = who.GetSettingDateTime(keyDeath);
             if ( death.SecondsToNow() < 5 )
                 return true;
 

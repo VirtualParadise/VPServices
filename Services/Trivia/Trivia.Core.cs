@@ -21,11 +21,11 @@ namespace VPServices.Services
         };
         #endregion
         
-        object   mutex         = new object();
-        bool     inProgress    = false;
-        Task     task;
-        DateTime progressSince;
-        VPServices   app;
+        object     mutex      = new object();
+        bool       inProgress = false;
+        Task       task;
+        DateTime   progressSince;
+        VPServices app;
 
         public string Name { get { return "Trivia"; } }
         public void Init(VPServices app, Instance bot)
@@ -46,7 +46,7 @@ namespace VPServices.Services
         void gameBegin(TriviaEntry entry)
         {
             app.Bot.ConsoleBroadcast(ChatEffect.Bold, VPServices.ColorInfo, entry.Category + ":", entry.Question);
-            app.Bot.Chat     += onChat;
+            app.Chat         += onChat;
             inProgress        = true;
             progressSince     = DateTime.Now;
             entryInPlay       = entry;
@@ -79,26 +79,26 @@ namespace VPServices.Services
         {
             if ( !inProgress ) return;
 
-            inProgress    = false;
-            app.Bot.Chat -= onChat;
+            inProgress = false;
+            app.Chat  -= onChat;
             Log.Fine(tag, "Game has ended");
         } 
         #endregion
 
         #region Event handlers
-        void onChat(Instance bot, ChatMessage chat)
+        void onChat(Instance bot, Avatar user, string message)
         {
             lock ( mutex )
             {
                 string[] match;
                 string[] wrongMatch;
 
-                if ( !TRegex.TryMatch(chat.Message, entryInPlay.Answer, out match) )
+                if ( !TRegex.TryMatch(message, entryInPlay.Answer, out match) )
                     return;
 
-                if ( entryInPlay.Wrong != null && TRegex.TryMatch(chat.Message, entryInPlay.Wrong, out wrongMatch) )
+                if ( entryInPlay.Wrong != null && TRegex.TryMatch(message, entryInPlay.Wrong, out wrongMatch) )
                 {
-                    Log.Debug(tag, "Given answer '{0}' by {1} matched, but turned out to be wrong; rejecting", wrongMatch[0], chat.Name);
+                    Log.Debug(tag, "Given answer '{0}' by {1} matched, but turned out to be wrong; rejecting", wrongMatch[0], user.Name);
                     return;
                 }
 
@@ -108,13 +108,13 @@ namespace VPServices.Services
 
                 if ( match[0].IEquals(entryInPlay.CanonicalAnswer) )
                     app.Bot.ConsoleBroadcast(ChatEffect.Bold, VPServices.ColorInfo, "Triviamaster",
-                        msgAccepted, entryInPlay.CanonicalAnswer, welldone, chat.Name);
+                        msgAccepted, entryInPlay.CanonicalAnswer, welldone, user.Name);
                 else
                     app.Bot.ConsoleBroadcast(ChatEffect.Bold, VPServices.ColorInfo, "Triviamaster",
-                        msgAccepted, entryInPlay.CanonicalAnswer, match[0], welldone, chat.Name);
+                        msgAccepted, entryInPlay.CanonicalAnswer, match[0], welldone, user.Name);
 
-                Log.Debug(tag, "Correct answer '{0}' by {1}", match[0], chat.Name);
-                awardPoint(chat.Name);
+                Log.Debug(tag, "Correct answer '{0}' by {1}", match[0], user.Name);
+                awardPoint(user.Name);
             }
         } 
         #endregion
@@ -122,11 +122,11 @@ namespace VPServices.Services
         #region Misc logic
         void awardPoint(string who)
         {
-            var config = app.GetUserSettings(who);
-            var points = config.GetInt(keyTriviaPoints, 0);
+            var user   = app.GetUser(who);
+            var points = user.GetSettingInt(keyTriviaPoints);
 
             points++;
-            config.Set(keyTriviaPoints, points);
+            user.SetSetting(keyTriviaPoints, points);
             Log.Fine(tag, "{0} is now up to {1} points", who, points);
 
             if ( points % 10 == 0 )
@@ -135,7 +135,8 @@ namespace VPServices.Services
 
         void skipQuestion()
         {
-            if ( task == null ) return;
+            if (task == null)
+                return;
 
             Log.Debug(tag, "Skipping question...");
             gameEnd();

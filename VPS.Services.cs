@@ -11,7 +11,7 @@ namespace VPServices
         /// <summary>
         /// Latest version for migration
         /// </summary>
-        const int Version = 1;
+        const int MigrationVersion = 1;
 
         /// <summary>
         /// Global list of all loaded services
@@ -60,18 +60,17 @@ namespace VPServices
         {
             var migration = CoreSettings.GetInt("Version", 0);
 
-            if ( migration >= Version )
+            if ( migration >= MigrationVersion )
                 return;
 
             foreach (var service in Services)
-                for (var i = migration; i < Version; i++)
+                for (var i = migration; i < MigrationVersion; i++)
                 {
                     service.Migrate(this, i + 1);
                     Log.Fine("Services", "Migrated '{0}' to version {1}", service.Name, i + 1);
                 }
 
-            CoreSettings.Set("Version", Version);
-            Log.Debug("Services", "All services migrated to version {0}", Version);
+            Log.Debug("Services", "All services migrated to version {0}", MigrationVersion);
         }
     }
 }

@@ -50,7 +50,7 @@ namespace VPServices.Services
             host      = config.Get("Server", "irc.ablivion.net");
             port      = config.GetInt("Port", 6667);
             channel   = config.Get("Channel", "#vp");
-            bot.Chat += onWorldChat;
+            app.Chat += onWorldChat;
             
             if (config.GetBoolean("Autoconnect", false))
                 connect();
@@ -114,12 +114,12 @@ namespace VPServices.Services
         #endregion
 
         #region Event handlers
-        void onWorldChat(Instance sender, ChatMessage chat)
+        void onWorldChat(Instance sender, Avatar user, string message)
         {
             if ( irc == null || !irc.IsConnected )
                 return;
 
-            var msg = string.Format("PRIVMSG {2} :{0}: {1}", chat.Name, chat.Message, channel);
+            var msg = "PRIVMSG {2} :{0}: {1}".LFormat(user.Name, message, channel);
             irc.SendRawMessage(msg);
         }
 

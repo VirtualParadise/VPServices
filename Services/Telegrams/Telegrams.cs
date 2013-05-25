@@ -29,22 +29,24 @@ namespace VPServices.Services
                 ),
             });
 
-            bot.Chat        += (b,c) => { checkTelegrams(b, c.Session, c.Name); };
-            app.AvatarEnter += (b,c) => { checkTelegrams(b, c.Session, c.Name); };
+            app.Chat        += (b,a,c) => { checkTelegrams(b, a.Session, a.Name); };
+            app.AvatarEnter += (b,c)   => { checkTelegrams(b, c.Session, c.Name); };
             app.AvatarLeave += onLeave;
             this.connection  = app.Connection;
         }
 
+        public void Dispose() { }
+
+        #region Privates and strings
         const string msgTelegrams    = "You have {0} telegram(s); say !read to read";
         const string msgTelegram     = "Sent by {0} on {1}:";
         const string msgNoTelegrams  = "You have no telegrams to read";
         const string msgTelegramSent = "Your telegram to {0} has been sent";
 
-        Dictionary<string, bool> told = new Dictionary<string,bool>();
-        SQLiteConnection         connection;
+        Dictionary<string, bool> told = new Dictionary<string, bool>();
+        SQLiteConnection         connection; 
+        #endregion
         
-        public void Dispose() { }
-
         #region Command handler
         bool cmdSendTelegram(VPServices app, Avatar who, string data)
         {
@@ -103,7 +105,7 @@ namespace VPServices.Services
         {
             var grams = getUnread(who.Name);
 
-            if ( grams.Count() > 0 )
+            if ( grams.Count() > 0 && VPServices.App.GetUser(who.Name) == null )
                 told[who.Name.ToLower()] = false;
         } 
         #endregion

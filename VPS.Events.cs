@@ -1,19 +1,24 @@
 ﻿using System;
 using VP;
+using AvatarArgs = VP.InstanceAvatars.AvatarArgs;
 
 namespace VPServices
 {
     public partial class VPServices : IDisposable
     {
-        public event InstanceAvatars.AvatarArgs AvatarEnter;
-        public event InstanceAvatars.AvatarArgs AvatarLeave;
-        public event InstanceAvatars.AvatarArgs AvatarChange;
+        public delegate void ChatArgs(Instance bot, Avatar user, string message);
+
+        public event AvatarArgs AvatarEnter;
+        public event AvatarArgs AvatarLeave;
+        public event AvatarArgs AvatarChange;
+        public event ChatArgs   Chat;
 
         public void SetupEvents()
         {
             Bot.Avatars.Enter  += onAvatarAdd;
             Bot.Avatars.Leave  += onAvatarLeave;
             Bot.Avatars.Change += onAvatarsChange;
+            Bot.Chat           += onChat;
         }
 
         public void ClearEvents()
@@ -21,61 +26,53 @@ namespace VPServices
             Bot.Avatars.Enter  -= onAvatarAdd;
             Bot.Avatars.Leave  -= onAvatarLeave;
             Bot.Avatars.Change -= onAvatarsChange;
+            Bot.Chat           -= onChat;
 
             AvatarEnter  = null;
             AvatarLeave  = null;
             AvatarChange = null;
+            Chat         = null;
         }
 
+        #region Event handlers
         void onAvatarAdd(Instance sender, Avatar avatar)
         {
-            // Do not load settings for bots else only add to unique user counts if name
-            // is not present
-            if      (avatar.IsBot)
-                Bots++;
-            else if ( GetUser(avatar.Name) != null )
-                UniqueUsers++;
-
-            TConsole.WriteLineColored(ConsoleColor.Cyan, "*** {0} enters", avatar.Name);
+            TConsole.WriteLineColored(ConsoleColor.Cyan, "*** {0} [SID#{1}] enters", avatar.Name, avatar.Session);
             Users.Add(avatar);
 
-            if (AvatarEnter != null)
+            if ( AvatarEnter != null )
                 AvatarEnter(sender, avatar);
         }
 
         void onAvatarLeave(Instance sender, Avatar avatar)
         {
-            TConsole.WriteLineColored(ConsoleColor.Cyan, "*** {0} leaves", avatar.Name);
+            TConsole.WriteLineColored(ConsoleColor.Cyan, "*** {0} [SID#{1}] leaves", avatar.Name, avatar.Session);
 
             var user = GetUser(avatar.Session);
-            if (user == null)
-                return;
-            else
-            {
-                if (AvatarLeave != null)
-                    AvatarLeave(sender, avatar);
+            if ( AvatarLeave != null )
+                AvatarLeave(sender, avatar);
 
-                Users.Remove(user);
-            }
-
-            if (avatar.IsBot)
-                Bots--;
-            else if ( GetUser(avatar.Name) == null )
-                UniqueUsers--;
+            Users.Remove(user);
         }
 
         void onAvatarsChange(Instance sender, Avatar avatar)
         {
             var user = GetUser(avatar.Session);
-            if (user == null)
-                return;
-            
             user.Position = avatar.Position;
 
-            if (AvatarChange != null)
+            if ( AvatarChange != null )
                 AvatarChange(sender, avatar);
+        } 
 
-            //TODO: change over all uses of bot avatar events to VPS events
+        void onChat(Instance sender, ChatMessage chat)
+        {
+            var user = GetUser(chat.Session);
+            if ( user == null )
+                return;
+
+            if (Chat != null)
+                Chat(sender, user, chat.Message);
         }
+        #endregion
     }
 }

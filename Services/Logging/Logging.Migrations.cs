@@ -24,7 +24,7 @@ namespace VPServices.Services
         {
             connection.CreateTable<sqlBuildHistory>();
             connection.CreateTable<sqlUserHistory>();
-            Log.Fine(Name, "Created SQLite tables for build and user history");
+            Log.Debug(Name, "Created SQLite tables for build and user history");
         }
 
         void migDatToSQLite(VPServices app)
@@ -60,7 +60,7 @@ namespace VPServices.Services
 
             backup = fileBuildHistory + ".bak";
             File.Move(fileBuildHistory, backup);
-            Log.Fine(Name, "Migrated .dat build history log to SQLite; backed up to '{0}'", backup);
+            Log.Debug(Name, "Migrated .dat build history log to SQLite; backed up to '{0}'", backup);
 
         userHistory:
             if ( !File.Exists(fileUserHistory) )
@@ -90,7 +90,7 @@ namespace VPServices.Services
 
             backup = fileUserHistory + ".bak";
             File.Move(fileUserHistory, backup);
-            Log.Fine(Name, "Migrated .dat user history log to SQLite; backed up to '{0}'", backup);
+            Log.Debug(Name, "Migrated .dat user history log to SQLite; backed up to '{0}'", backup);
             
         }
     }

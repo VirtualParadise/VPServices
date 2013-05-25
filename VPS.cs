@@ -65,12 +65,13 @@ namespace VPServices
             SetupDatabase();
             SetupWeb();
             SetupCommands();
-            SetupUserSettings();
+            SetupUsers();
             SetupEvents();
             ConnectToWorld();
             LoadServices();
             Log.Info("Network", "Connected to {0}", World);
 
+            CoreSettings.Set("Version", MigrationVersion);
             Bot.ConsoleBroadcast(ChatEffect.None, ColorInfo,"", "Services is now online; say !help for information");
         }
 
@@ -89,7 +90,6 @@ namespace VPServices
         public void Dispose()
         {
             Settings.Save();
-            UserSettings.Save();
 
             Server.Abort();
             Server.Close();

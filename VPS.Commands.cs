@@ -17,41 +17,37 @@ namespace VPServices
         /// </summary>
         public void SetupCommands()
         {
-            Bot.Chat += parseCommand;
-            Bot.Chat += (s, c) =>
+            Chat += parseCommand;
+            Chat += (s, a, m) =>
             {
-                TConsole.WriteLineColored(ConsoleColor.White, " {0} | {1}", c.Name.PadRight(16), c.Message);
+                TConsole.WriteLineColored(ConsoleColor.White, " {0} | {1}", a.Name.PadRight(16), m);
             };
 
             Bot.Console += (s, c) =>
             {
-                TConsole.WriteLineColored(ConsoleColor.White, "CONSOLE: {0} {1}", c.Name, c.Message);
+                TConsole.WriteLineColored(ConsoleColor.White, "Console: {0} {1}", c.Name, c.Message);
             };
         }
 
         /// <summary>
         /// Parses incoming chat for a command and runs it
         /// </summary>
-        void parseCommand(Instance sender, ChatMessage chat)
+        void parseCommand(Instance sender, Avatar user, string message)
         {
             // Accept only commands
-            if ( !chat.Message.StartsWith("!") )
+            if ( !message.StartsWith("!") )
                 return;
 
-            var intercept = chat.Message
+            var intercept = message
                 .Trim()
                 .Split(new[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries);
 
             var beginTime     = DateTime.Now;
-            var user          = GetUser(chat.Session);
             var targetCommand = intercept[0].Substring(1).ToLower();
             var data          =
                 intercept.Length == 2
                 ? intercept[1].Trim()
                 : "";
-
-            if (user == null)
-                return;
 
             // Iterate through commands, rejecting invokes if time limited
             foreach (var cmd in Commands)
@@ -60,7 +56,7 @@ namespace VPServices
                     var timeSpan = cmd.LastInvoked.SecondsToNow();
                     if (timeSpan < cmd.TimeLimit)
                     {
-                        App.Warn(chat.Session, "That command was used too recently; try again in {0} seconds.", cmd.TimeLimit - timeSpan);
+                        App.Warn(user.Session, "That command was used too recently; try again in {0} seconds.", cmd.TimeLimit - timeSpan);
                         Log.Info("Commands", "User {0} tried to invoke {1} too soon", user.Name, cmd.Name);
                     }
                     else
@@ -73,14 +69,14 @@ namespace VPServices
                             var success = cmd.Handler(this, user, data);
                             if (!success)
                             {
-                                App.Warn(chat.Session, "Invalid command use; please see example:");
-                                Bot.ConsoleMessage(chat.Session, ChatEffect.Italic, ColorWarn, "", cmd.Example);
+                                App.Warn(user.Session, "Invalid command use; please see example:");
+                                Bot.ConsoleMessage(user.Session, ChatEffect.Italic, ColorWarn, "", cmd.Example);
                             }
                         }
                         catch (Exception e)
                         {
-                            App.Alert(chat.Session, "Sorry, I ran into an issue executing that command. Please notify the host.");
-                            App.Alert(chat.Session, "Error: {0}", e.Message);
+                            App.Alert(user.Session, "Sorry, I ran into an issue executing that command. Please notify the host.");
+                            App.Alert(user.Session, "Error: {0}", e.Message);
 
                             Log.Severe("Commands", "Exception firing command {0}", cmd.Name);
                             e.LogFullStackTrace();
@@ -91,7 +87,7 @@ namespace VPServices
                     return;
                 }
 
-            App.Warn(chat.Session, "Invalid command; try !help");
+            App.Warn(user.Session, "Invalid command; try !help");
             Log.Debug("Commands", "Unknown: {0}", targetCommand);
             return;
         }

@@ -21,3 +21,4 @@ Build/*.dat
 Build/*.dll
 Build/*.xml
 Build/*.db
+Build/Libraries/sqlite3.dll

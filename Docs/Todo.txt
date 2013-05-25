@@ -3,6 +3,8 @@
 - Command queueing
 - YouTube service
 - Facts service
-- !clearghosts, !ground
+- !ground
 - Multi telegram targeting
 - Telegram history
+- Implement Cassini web server
+- MOTD

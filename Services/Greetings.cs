@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using VP;
+using VPServices;
 
 namespace VPServices.Services
 {
@@ -52,16 +53,19 @@ namespace VPServices.Services
         #region Command handlers
         bool cmdToggle(VPServices app, Avatar who, string data, string key)
         {
-            var    config = app.GetUserSettings(who);
             string msg    = null;
-            bool   toggle = false;
+            bool   toggle;
 
-            // Try to parse user given boolean; silently ignore on failure
             if ( data != "" )
-            if ( !VPServices.TryParseBool(data, out toggle) )
-                return false;
+            {
+                // Try to parse user given boolean; reject command on failure
+                if ( !VPServices.TryParseBool(data, out toggle) )
+                    return false;
+            }
+            else
+                toggle = !who.GetSettingBool(key);
 
-            config.Set(key, toggle);
+            who.SetSetting(key, toggle);
             switch (key)
             {
                 case settingGreetMe:
@@ -87,10 +91,9 @@ namespace VPServices.Services
                 return;
 
             var app      = VPServices.App;
-            var settings = app.GetUserSettings(who.Name);
 
             // Do not greet if GreetMe is false
-            if ( !settings.GetBoolean(settingGreetMe, true) )
+            if ( !who.GetSettingBool(settingGreetMe, true) )
                 return;
 
             foreach ( var target in app.Users )
@@ -100,8 +103,7 @@ namespace VPServices.Services
                     continue;
 
                 // Only send greet if target wants them
-                var targetSettings = app.GetUserSettings(target);
-                if ( targetSettings.GetBoolean(settingShowGreets, true) )
+                if ( target.GetSettingBool(settingShowGreets, true) )
                 {
                     var msg = entering ? msgEntry : msgExit;
                     bot.ConsoleMessage(target.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msg, who.Name, app.World);

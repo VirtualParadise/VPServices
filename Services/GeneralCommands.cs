@@ -77,6 +77,13 @@ namespace VPServices.Services
 
                 new Command
                 (
+                    "Teleport: Ground", "^g(round)?$", cmdGround,
+                    @"Snaps the user to ground",
+                    @"!g"
+                ),
+
+                new Command
+                (
                     "Debug: Say", "^say$", cmdSay,
                     @"Makes the bot say a chat message as somebody else",
                     @"!say `who: message`"
@@ -239,6 +246,21 @@ namespace VPServices.Services
             app.Bot.Avatars.Teleport(who.Session, "", AvatarPosition.GroundZero);
             return true;
         } 
+
+        bool cmdGround(VPServices app, Avatar who, string data)
+        {
+            var target = new AvatarPosition
+            {
+                X     = who.X,
+                Y     = 0.1f,
+                Z     = who.Z,
+                Pitch = who.Pitch,
+                Yaw   = who.Yaw
+            };
+
+            app.Bot.Avatars.Teleport(who.Session, target);
+            return true;
+        }
         #endregion
 
         #region Web routes
