@@ -68,6 +68,13 @@ namespace VPServices
                     continue;
                 }
 
+                var keys = config.GetKeys();
+                if (keys.Length <= 0)
+                {
+                    Log.Fine("Migration", "Found empty config for '{0}'; discarding", config.Name);
+                    continue;
+                }
+
             promptUserID:
                 Console.WriteLine("\n[Migrations] What user ID is user '{0}'?", config.Name);
                 Console.Write("> ");
@@ -78,7 +85,7 @@ namespace VPServices
                     goto promptUserID;
 
                 Connection.BeginTransaction();
-                foreach ( var key in config.GetKeys() )
+                foreach ( var key in keys )
                 {
                     Log.Fine("Users", "Migrating config key '{0}' for user '{1}'", key, id);
                     Connection.Insert( new sqlUserSettings
