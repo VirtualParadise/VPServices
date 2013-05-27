@@ -284,14 +284,9 @@
             Creates a ConsoleMessage from a native instance's attributes
             </summary>
         </member>
-        <member name="M:VP.AvatarPosition.#ctor(System.String)">
-            <summary>
-            Creates an avatar position from a comma-seperated list
-            </summary>
-        </member>
         <member name="M:VP.AvatarPosition.ToString">
             <summary>
-            Formats the position to a pretty formatted comma-seperated list
+            Formats the AvatarPosition to a human readable string
             </summary>
         </member>
         <member name="P:VP.AvatarPosition.Coordinates">

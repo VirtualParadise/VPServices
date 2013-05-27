@@ -12,13 +12,16 @@ namespace VPServices
     {
         public HttpListener Server         = new HttpListener();
         public Markdown     MarkdownParser = new Markdown();
+
         public string PublicUrl;
+        public Task   ServerTask;
 
         /// <summary>
         /// Global list of all routes registered
         /// </summary>
         public SortedSet<WebRoute> Routes = new SortedSet<WebRoute>();
 
+        #region HTML
         const string HTML_WHOLE =
 @"<!DOCTYPE html>
 {0}
@@ -39,14 +42,16 @@ namespace VPServices
 </body>";
 
         const string HTML_NOTHANDLED =
-@"This bot does not handle route {0}. See <a href='{1}'>here</a> for route reference.";
+@"This bot does not handle route {0}. See <a href='{1}'>here</a> for route reference."; 
+        #endregion
 
         public void SetupWeb()
         {
             PublicUrl = WebSettings.Get("PublicUrl");
             Server.Prefixes.Add(WebSettings.Get("Prefix"));
             Server.Start();
-            Task.Factory.StartNew(() =>
+
+            ServerTask = Task.Factory.StartNew(() =>
             {
                 while (Server.IsListening)
                 {
@@ -63,6 +68,20 @@ namespace VPServices
             });
 
             Log.Info("Web server", "Listening on {0}", WebSettings.Get("Prefix"));
+        }
+
+        public void ClearWeb()
+        {
+            if (Server.IsListening)
+                Server.Abort();
+
+            if (ServerTask != null)
+            {
+                if (ServerTask.Status == TaskStatus.Running)
+                    ServerTask.Wait();
+
+                ServerTask.Dispose();
+            }
         }
 
         void processContext(HttpListenerContext ctx)

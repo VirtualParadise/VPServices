@@ -59,14 +59,17 @@ namespace VPServices
             ConnectToUniverse();
             Log.Info("Network", "Connected to universe");
 
-            // Set up global events
+            // Set up subsystems
             SetupDatabase();
             SetupWeb();
             SetupCommands();
-            SetupUsers();
             SetupEvents();
-            ConnectToWorld();
             LoadServices();
+
+            // Set up services
+            ConnectToWorld();
+            PerformMigrations();
+            InitServices();
             Log.Info("Network", "Connected to {0}", World);
 
             CoreSettings.Set("Version", MigrationVersion);
@@ -87,15 +90,13 @@ namespace VPServices
         /// </summary>
         public void Dispose()
         {
-            Settings.Save();
-
-            Server.Abort();
-            Server.Close();
             Commands.Clear();
+
+            ClearWeb();
             ClearEvents();
             ClearServices();
+            CloseDatabase();
             Bot.Dispose();
-            Connection.Close();
         }
 
         #region Helper functions

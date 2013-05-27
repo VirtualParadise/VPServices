@@ -13,5 +13,14 @@ namespace VPServices
             Connection   = new SQLiteConnection(database, true);
             Log.Info("Database", "Set up {0} as database", database);
         }
+
+        public void CloseDatabase()
+        {
+            if (Connection != null)
+            {
+                Connection.Close();
+                Connection.Dispose();
+            }
+        }
     }
 }
