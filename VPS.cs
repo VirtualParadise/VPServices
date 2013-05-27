@@ -16,6 +16,7 @@ namespace VPServices
         public static Color ColorAlert  = new Color(255,0,0);
 
         public Instance Bot;
+        public string   Owner;
 
         public static void Main(string[] args)
         {
@@ -55,6 +56,7 @@ namespace VPServices
             userName = NetworkSettings.Get("Username");
             password = NetworkSettings.Get("Password");
             World    = NetworkSettings.Get("World");
+            Owner    = userName;
 
             // Connect to network
             ConnectToUniverse();

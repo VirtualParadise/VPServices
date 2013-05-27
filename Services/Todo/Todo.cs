@@ -1,10 +1,8 @@
-﻿using System;
+﻿using SQLite;
+using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 using VP;
-using SQLite;
 
 namespace VPServices.Services
 {
@@ -12,7 +10,7 @@ namespace VPServices.Services
     {
         public string Name
         { 
-            get { return "Ideas"; }
+            get { return "Todo"; }
         }
 
         public void Init(VPServices app, Instance bot)
@@ -57,6 +55,7 @@ namespace VPServices.Services
 
         #region Privates and strings
         const string msgAdded       = "Added todo entry";
+        const string msgDone        = "Todo marked as done";
         const string msgNonExistant = "A todo entry with that ID does not exist";
         const string msgNoUndone    = "All todo entries are marked as done";
         const string msgResults     = "*** Search results for '{0}'";
@@ -99,7 +98,7 @@ namespace VPServices.Services
                 return true;
             }
             
-            app.Notify(who.Session, "Todo marked as done");
+            app.Notify(who.Session, msgDone);
             return Log.Info(Name, "Marked todo #{0} as done for {1}", id, who.Name);
         }
 
@@ -169,6 +168,7 @@ namespace VPServices.Services
 
                 listing +=
 @"## [{0}] #{1} - {2}
+
 * **By:** {3} (#{4})
 * **When:** {5}
 
@@ -187,6 +187,7 @@ namespace VPServices.Services
         public int      ID    { get; set; }
         public int      WhoID { get; set; }
         public string   Who   { get; set; }
+        [MaxLength(255)]
         public string   What  { get; set; }
         public DateTime When  { get; set; }
         public bool     Done  { get; set; }

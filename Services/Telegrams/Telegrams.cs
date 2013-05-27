@@ -47,7 +47,7 @@ namespace VPServices.Services
         SQLiteConnection         connection; 
         #endregion
         
-        #region Command handler
+        #region Command handlers
         bool cmdSendTelegram(VPServices app, Avatar who, string data)
         {
             var matches = Regex.Match(data, "^(.+?): (.+)$");

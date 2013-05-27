@@ -63,6 +63,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Services\Facts\Facts.cs" />
+    <Compile Include="Services\Facts\Facts.Migrations.cs" />
     <Compile Include="Services\Home\Home.Migrations.cs" />
     <Compile Include="Services\Todo\Todo.Migrations.cs" />
     <Compile Include="VPS.Migrations.cs" />
@@ -85,7 +87,7 @@
     <Compile Include="VPS.Commands.cs" />
     <Compile Include="Services\IService.cs" />
     <Compile Include="Services\Logging\Logging.cs" />
-    <Compile Include="Services\SwordFight\SwordFight.cs" />
+    <None Include="Services\SwordFight\SwordFight.cs" />
     <Compile Include="Services\JoinsInvites.cs" />
     <Compile Include="Services\Jumps\Jumps.cs" />
     <Compile Include="Services\Telegrams\Telegrams.cs" />
