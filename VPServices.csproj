@@ -63,6 +63,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Services\Home\Home.Migrations.cs" />
+    <Compile Include="VPS.Migrations.cs" />
     <Compile Include="Services\Jumps\Jumps.Migrations.cs" />
     <Compile Include="Services\Telegrams\Telegrams.Migrations.cs" />
     <Compile Include="VPS.Events.cs" />
@@ -76,7 +78,7 @@
     <Compile Include="Services\Trivia\Trivia.Core.cs" />
     <Compile Include="Services\Trivia\Trivia.Entries.cs" />
     <Compile Include="VPS.Settings.cs" />
-    <Compile Include="Services\Home.cs" />
+    <Compile Include="Services\Home\Home.cs" />
     <Compile Include="Services\GeneralCommands.cs" />
     <Compile Include="VPS.Users.cs" />
     <Compile Include="VPS.Commands.cs" />

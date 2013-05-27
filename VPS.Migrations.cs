@@ -13,7 +13,7 @@ namespace VPServices
         /// 1 - Jumps, Logging, Telegrams, UserSettings services
         /// 2 - Home service
         /// </remarks>
-        const int MigrationVersion = 1;
+        const int MigrationVersion = 2;
 
         #region VPServices migrations
         public void PerformMigrations()
@@ -35,7 +35,7 @@ namespace VPServices
             foreach ( var service in Services )
                 for ( var i = migration; i < MigrationVersion; i++ )
                 {
-                    service.Migrate(this, this.Connection, i + 1);
+                    service.Migrate(this, i + 1);
                     Log.Fine("Services", "Migrated '{0}' to version {1}", service.Name, i + 1);
                 }
 
@@ -64,7 +64,7 @@ namespace VPServices
         {
             Connection.CreateTable<sqlUserSettings>();
             Connection.Execute(
-                @"CREATE TRIGGER DeleteOldUserSetting
+                @"CREATE TRIGGER IF NOT EXISTS DeleteOldUserSetting
                 BEFORE INSERT ON UserSettings 
                 FOR EACH ROW 
                 BEGIN 
@@ -99,7 +99,7 @@ namespace VPServices
                 }
 
             promptUserID:
-                Console.WriteLine("\n[Migrations] What user ID is user '{0}'?", config.Name);
+                Console.WriteLine("\n[Migrations] What Virtual Paradise account number is user '{0}'?", config.Name);
                 Console.Write("> ");
                 var givenId = Console.ReadLine();
                 int id;

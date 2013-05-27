@@ -8,3 +8,5 @@
 - MOTD
 - Chat logger with last 10 lines for entering users
 - Make Services not try to restart; shut down instead
+- Fix "connection" field anti-pattern
+- Investigate re-migration if database not found

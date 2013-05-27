@@ -1,9 +1,7 @@
 ﻿using SQLite;
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
+using System.Linq;
 using VP;
 
 namespace VPServices.Services
@@ -15,7 +13,7 @@ namespace VPServices.Services
             get { return "Jumps"; }
         }
 
-        public void   Init (VPServices app, Instance bot)
+        public void Init (VPServices app, Instance bot)
         {
             app.Commands.AddRange(new[] {
                 new Command

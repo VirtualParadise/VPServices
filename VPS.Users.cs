@@ -56,8 +56,8 @@ namespace VPServices
         /// </summary>
         public static string GetSetting(this Avatar user, string key)
         {
-            var query = from   s in VPServices.App.Connection.Table<sqlUserSettings>()
-                        select s;
+            var conn  = VPServices.App.Connection;
+            var query = conn.Query<sqlUserSettings>("SELECT * FROM UserSettings WHERE UserID = ? AND Name = ? COLLATE NOCASE", user.Id, key);
 
             if (query.Count() <= 0)
                 return null;
