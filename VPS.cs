@@ -10,9 +10,10 @@ namespace VPServices
         public static VPServices App;
         public static Random     Rand    = new Random();
 
-        public static Color ColorInfo  = new Color(50,50,100);
-        public static Color ColorWarn  = new Color(220,80,20);
-        public static Color ColorAlert = new Color(255,0,0);
+        public static Color ColorLesser = new Color(150,150,200);
+        public static Color ColorInfo   = new Color(50,50,100);
+        public static Color ColorWarn   = new Color(220,80,20);
+        public static Color ColorAlert  = new Color(255,0,0);
 
         public Instance Bot;
 

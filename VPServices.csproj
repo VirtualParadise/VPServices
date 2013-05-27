@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Services\Home\Home.Migrations.cs" />
+    <Compile Include="Services\Todo\Todo.Migrations.cs" />
     <Compile Include="VPS.Migrations.cs" />
     <Compile Include="Services\Jumps\Jumps.Migrations.cs" />
     <Compile Include="Services\Telegrams\Telegrams.Migrations.cs" />
@@ -74,7 +75,7 @@
     <Compile Include="Services\Trivia\Trivia.Commands.cs" />
     <Compile Include="Services\Trivia\Trivia.Web.cs" />
     <Compile Include="Services\IRC.cs" />
-    <None Include="Services\Ideas.cs" />
+    <Compile Include="Services\Todo\Todo.cs" />
     <Compile Include="Services\Trivia\Trivia.Core.cs" />
     <Compile Include="Services\Trivia\Trivia.Entries.cs" />
     <Compile Include="VPS.Settings.cs" />

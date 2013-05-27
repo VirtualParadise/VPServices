@@ -12,8 +12,9 @@ namespace VPServices
         /// 0 - Pre-SQLite Services (initial setup)
         /// 1 - Jumps, Logging, Telegrams, UserSettings services
         /// 2 - Home service
+        /// 3 - Todo, Facts services
         /// </remarks>
-        const int MigrationVersion = 2;
+        const int MigrationVersion = 3;
 
         #region VPServices migrations
         public void PerformMigrations()

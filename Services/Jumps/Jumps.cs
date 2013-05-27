@@ -19,7 +19,7 @@ namespace VPServices.Services
                 new Command
                 (
                     "Jumps: Add", "^(addjump|aj)$", cmdAddJump,
-                    @"Adds a jump of the specified name at user's position",
+                    @"Adds a jump of the specified name at your position",
                     @"!aj `name`"
                 ),
 
@@ -33,19 +33,19 @@ namespace VPServices.Services
                 new Command
                 (
                     "Jumps: List", "^(listjumps?|lj|jumps?list)$", cmdJumpList,
-                    @"Prints the URL to a listing of jumps to chat or lists those matching a search term",
+                    @"Prints the URL to a listing of jumps to chat or lists those matching a search term to you",
                     @"!lj `[search]`"
                 ),
 
                 new Command
                 (
                     "Jumps: Jump", "^j(ump)?$", cmdJump,
-                    @"Teleports user to the specified or a random jump",
+                    @"Teleports you to the specified or a random jump",
                     @"!j `name|random`"
                 ),
             });
 
-            app.Routes.Add(new WebRoute("Jumps", "^(list)jumps?$", webListJumps,
+            app.Routes.Add(new WebRoute("Jumps", "^(list)?jumps?$", webListJumps,
                 @"Provides a list of jump points registered in the system"));
 
             this.connection = app.Connection;
@@ -53,6 +53,7 @@ namespace VPServices.Services
 
         public void Dispose() { }
 
+        #region Privates and strings
         const string msgAdded       = "Added jump '{0}' at {1}, {2}, {3} ({4} yaw, {5} pitch)";
         const string msgDeleted     = "Deleted jump '{0}'";
         const string msgExists      = "That jump already exists";
@@ -63,7 +64,8 @@ namespace VPServices.Services
         const string msgNoResults   = "No results; check {0}";
         const string webJumps       = "jumps";
 
-        SQLiteConnection connection;
+        SQLiteConnection connection; 
+        #endregion
 
         #region Command handlers
         bool cmdAddJump(VPServices app, Avatar who, string data)
@@ -188,7 +190,7 @@ namespace VPServices.Services
 
             foreach ( var jump in list )
             {
-                listing += string.Format(
+                listing +=
 @"## !jump {0}
 
 * **Coordinates:** {1:f3}, {2:f3}, {3:f3}
@@ -196,7 +198,7 @@ namespace VPServices.Services
 * **Creator:** {6}
 * **Created:** {7}
 
-", jump.Name, jump.X, jump.Y, jump.Z, jump.Pitch, jump.Yaw, jump.Creator, jump.When);
+".LFormat(jump.Name, jump.X, jump.Y, jump.Z, jump.Pitch, jump.Yaw, jump.Creator, jump.When);
             }
 
             return serv.MarkdownParser.Transform(listing);
