@@ -11,6 +11,8 @@ namespace VPServices
         {
             var database = CoreSettings.Get("Database", "VPServices.db");
             Connection   = new SQLiteConnection(database, true);
+            Connection.BusyTimeout = TimeSpan.MaxValue;
+
             Log.Info("Database", "Set up {0} as database", database);
         }
 
