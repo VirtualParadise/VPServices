@@ -66,6 +66,10 @@
     <Compile Include="Services\Facts\Facts.cs" />
     <Compile Include="Services\Facts\Facts.Migrations.cs" />
     <Compile Include="Services\Home\Home.Migrations.cs" />
+    <Compile Include="Services\IRC\IRC.Events.cs" />
+    <Compile Include="Services\IRC\IRC.Constants.cs" />
+    <Compile Include="Services\IRC\IRC.Outgoing.cs" />
+    <Compile Include="Services\IRC\IRC.Incoming.cs" />
     <Compile Include="Services\Todo\Todo.Migrations.cs" />
     <Compile Include="VPS.Migrations.cs" />
     <Compile Include="Services\Jumps\Jumps.Migrations.cs" />
@@ -76,7 +80,7 @@
     <Compile Include="Services\Greetings.cs" />
     <Compile Include="Services\Trivia\Trivia.Commands.cs" />
     <Compile Include="Services\Trivia\Trivia.Web.cs" />
-    <Compile Include="Services\IRC.cs" />
+    <Compile Include="Services\IRC\IRC.Commands.cs" />
     <Compile Include="Services\Todo\Todo.cs" />
     <Compile Include="Services\Trivia\Trivia.Core.cs" />
     <Compile Include="Services\Trivia\Trivia.Entries.cs" />
@@ -87,6 +91,7 @@
     <Compile Include="VPS.Commands.cs" />
     <Compile Include="Services\IService.cs" />
     <Compile Include="Services\Logging\Logging.cs" />
+    <Compile Include="Services\IRC\IRC.Core.cs" />
     <None Include="Services\SwordFight\SwordFight.cs" />
     <Compile Include="Services\JoinsInvites.cs" />
     <Compile Include="Services\Jumps\Jumps.cs" />

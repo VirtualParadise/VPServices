@@ -11,3 +11,4 @@
 - Fix "connection" field anti-pattern
 - Investigate re-migration if database not found
 - Documentation: notes about sqlite3 for other platforms
+- !reload command

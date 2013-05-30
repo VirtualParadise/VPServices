@@ -37,7 +37,6 @@ namespace VPServices
                 CoreSettings    = Settings.Configs.Add("Core");
                 NetworkSettings = Settings.Configs.Add("Network");
                 WebSettings     = Settings.Configs.Add("Web");
-                Settings.Save(file);
             }
         }
     }
