@@ -118,7 +118,7 @@ namespace VPServices.Services
             }
 
             var jump = getJump(name);
-            if ( jump.Name == null )
+            if ( jump == null )
             {
                 app.Warn(who.Session, msgNonExistant, jumpsUrl);
                 return Log.Debug(Name, "{1} tried to delete non-existant jump {0}", name, who.Name);
