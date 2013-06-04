@@ -74,23 +74,19 @@ namespace VPServices.Services
         {
 			switch (state)
             {
-                case IRCState.Connected:
-                    irc.Disconnect();
-                    break;
-
                 case IRCState.Connecting:
                     VPServices.App.AlertAll(msgConnectError, e.Error.Message);
-                    irc.Disconnect();
                     break;
 
                 case IRCState.Disconnecting:
-                    VPServices.App.AlertAll(msgDisconnectError, e.Error.Message);
-                    state = IRCState.Connected;
-                    break;
+                    Log.Warn(Name, "Error whilst disconnecting: {0}", e.Error.Message);
+                    return;
             }
 
 			Log.Severe(Name, "Error whilst in state '{0}':", state);
 			Log.Severe(Name, e.Error.Message);
+            state = IRCState.Disconnected;
+            irc.Disconnect();
         }
         #endregion
     }

@@ -54,6 +54,14 @@ namespace VPServices.Services
 
         public void Dispose() { }
 
+        #region Privates
+        IRCState  state = IRCState.Disconnected;
+        IrcClient irc   = new IrcClient();
+        IRCConfig config;
+
+        DateTime lastConnect = TDateTime.UnixEpoch; 
+        #endregion
+
         #region Settings logic
         void loadSettings(VPServices app)
         {
@@ -83,7 +91,8 @@ namespace VPServices.Services
 		#region Dis/connection logic
         void connect(VPServices app)
         {
-			state = IRCState.Connecting;
+            lastConnect = DateTime.Now;
+			state       = IRCState.Connecting;
 
             app.NotifyAll(msgConnecting, app.World, config.Channel, config.Host);
             Log.Info(Name, "Creating and establishing IRC bridge...");

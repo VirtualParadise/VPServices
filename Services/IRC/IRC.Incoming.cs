@@ -1,6 +1,5 @@
 ﻿using IrcDotNet;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using VP;
 
@@ -33,12 +32,23 @@ namespace VPServices.Services
                     messageToVP(true, "", msgEntry, e.Message.Source.Name, config.Channel);
                 else if ( e.Message.Command.IEquals("PART") )
                     messageToVP(true, "", msgPart, e.Message.Source.Name, config.Channel);
+                else if ( e.Message.Command.IEquals("KICK") )
+                {
+                    messageToVP(true, "", msgKicked, e.Message.Parameters[1], config.Channel);
+
+                    if (e.Message.Parameters[1] == config.Registration.NickName)
+                        disconnect(VPServices.App);
+                }
 
                 return;
             }
 
             if ( e.Message.Command.IEquals("QUIT") )
                 messageToVP(true, "", msgQuit, e.Message.Source.Name, e.Message.Parameters[0]);
+
+            if ( e.Message.Command.IEquals("NICK") )
+                messageToVP(true, "", msgNick, e.Message.Source.Name, e.Message.Parameters[0]);
+            
         }
 
         void messageToVP(bool announce, string name, string message, params object[] parts)
