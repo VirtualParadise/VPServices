@@ -111,7 +111,7 @@ namespace VPServices.Services
                         msgAccepted, entryInPlay.CanonicalAnswer, welldone, user.Name);
                 else
                     app.Bot.ConsoleBroadcast(ChatEffect.Bold, VPServices.ColorInfo, "Triviamaster",
-                        msgAccepted, entryInPlay.CanonicalAnswer, match[0], welldone, user.Name);
+                        msgAcceptedFrom, entryInPlay.CanonicalAnswer, match[0], welldone, user.Name);
 
                 Log.Debug(tag, "Correct answer '{0}' by {1}", match[0], user.Name);
                 awardPoint(user.Name);
