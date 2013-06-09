@@ -15,17 +15,11 @@ namespace VPServices.Services
                     return true;
 
                 case IRCState.Connecting:
-                    if ( lastConnect.SecondsToNow() > 30 )
-                    {
-                        Log.Warn(Name, "Connection attempt taking too long; disconnecting and reattempting");
-                        state = IRCState.Disconnected;
-                        irc.Disconnect();
+                    Log.Warn(Name, "Forcing disconnect and reconnect during connecting state");
+                    state = IRCState.Disconnected;
+                    irc.Disconnect();
                         
-                        connect(app);
-                        return true;
-                    }
-
-                    app.Warn(who.Session, msgAlreadyConnecting, config.Channel, config.Host);
+                    connect(app);
                     return true;
 
                 case IRCState.Disconnecting:

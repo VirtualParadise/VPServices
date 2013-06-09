@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using VP;
 
 namespace VPServices.Services
@@ -15,13 +16,18 @@ namespace VPServices.Services
             if ( message.StartsWith("!") )
                 return;
 
-            string msg = "";
-            if ( message.StartsWith("/me ") )
-                msg = "PRIVMSG {0} :{3}ACTION {1} {2}{3}".LFormat(config.Channel, user.Name, message.Substring(4), ircAction);
-            else
-                msg = "PRIVMSG {0} :{1}: {2}".LFormat(config.Channel, user.Name, message);
+            var msgRoll = message.TerseSplit("\n");
 
-            irc.SendRawMessage(msg);
+            foreach (var msg in msgRoll)
+            {
+                string outgoing = "";
+                if ( msg.StartsWith("/me ") )
+                    outgoing = "PRIVMSG {0} :{3}ACTION {1} {2}{3}".LFormat(config.Channel, user.Name, msg.Substring(4), ircAction);
+                else
+                    outgoing = "PRIVMSG {0} :{1}: {2}".LFormat(config.Channel, user.Name, msg);
+
+                irc.SendRawMessage(outgoing);
+            }
         }
 
         void onWorldLeave(Instance sender, Avatar avatar)

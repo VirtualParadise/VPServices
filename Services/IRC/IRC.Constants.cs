@@ -22,7 +22,6 @@ namespace VPServices.Services
         const string msgMuted        = "That IRC user is {0} muted";
 
 		// Errors
-		const string msgAlreadyConnecting    = "Already attempting to connect to {0}@{1} (taking too long? try again in 30 seconds)";
 		const string msgAlreadyConnected     = "Already connected to {0}@{1}";
 		const string msgNotConnected         = "Not connected to IRC";
 		const string msgDisconnecting        = "Waiting for disconnection";

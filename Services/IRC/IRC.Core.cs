@@ -18,13 +18,13 @@ namespace VPServices.Services
                 new Command
                 (
                     "IRC: Connect", "^irc(start|connect)$", cmdIRCConnect,
-                    @"Starts the IRC-VP bridge", "!ircstart", 5
+                    @"Starts the IRC-VP bridge", "!ircstart"
                 ),
                 
                 new Command
                 (
                     "IRC: Disconnect", "^irc(end|disconnect)$", cmdIRCDisconnect,
-                    @"Stops the IRC-VP bridge", "!ircend", 5
+                    @"Stops the IRC-VP bridge", "!ircend"
                 ),
 
                 new Command
@@ -58,8 +58,6 @@ namespace VPServices.Services
         IRCState  state = IRCState.Disconnected;
         IrcClient irc   = new IrcClient();
         IRCConfig config;
-
-        DateTime lastConnect = TDateTime.UnixEpoch; 
         #endregion
 
         #region Settings logic
@@ -91,9 +89,7 @@ namespace VPServices.Services
 		#region Dis/connection logic
         void connect(VPServices app)
         {
-            lastConnect = DateTime.Now;
 			state       = IRCState.Connecting;
-
             app.NotifyAll(msgConnecting, app.World, config.Channel, config.Host);
             Log.Info(Name, "Creating and establishing IRC bridge...");
 

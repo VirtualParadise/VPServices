@@ -1,6 +1,7 @@
 ﻿using IrcDotNet;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using VP;
 
 namespace VPServices.Services
@@ -69,7 +70,26 @@ namespace VPServices.Services
                 if ( muted.Contains(name) )
                     continue;
 
-                VPServices.App.Bot.ConsoleMessage(user.Session, fx, color, name, message, parts);
+                // Keep within VP message limit
+                if (message.Length > 245)
+                {
+                    var messages = new List<string>();
+                    var buffer   = message;
+
+                    while (buffer.Length > 245)
+                    {
+                        var part = buffer.Substring(0, 245);
+                        buffer   = buffer.Substring(245);
+
+                        messages.Add(part);
+                    }
+
+                    messages.Add(buffer);
+                    foreach (var line in messages)
+                        VPServices.App.Bot.ConsoleMessage(user.Session, fx, color, name, line, parts);
+                }
+                else
+                    VPServices.App.Bot.ConsoleMessage(user.Session, fx, color, name, message, parts);
             }
         }
     }
