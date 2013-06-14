@@ -26,6 +26,11 @@
             Implementation of AddRange for ISets
             </summary>
         </member>
+        <member name="M:System.Collections.Generic.TCollections.IContains(System.Collections.Generic.IEnumerable{System.String},System.String)">
+            <summary>
+            Case-insensitive check if a collection of strings contains a given string
+            </summary>
+        </member>
         <member name="T:System.TConsole">
             <summary>
             Provides additional thread-safe methods for writing to the console using colors

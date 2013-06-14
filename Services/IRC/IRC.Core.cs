@@ -71,7 +71,7 @@ namespace VPServices.Services
                 Port    = ini.GetInt("Port", 6667),
                 Channel = ini.Get("Channel", "#vp"),
 
-                AutoConnect   = ini.GetBoolean("AutoConnect", false),
+                AutoConnect   = ini.GetBoolean("Autoconnect", false),
                 DebugProtocol = ini.GetBoolean("DebugProtocol", false),
 
                 Registration = new IrcUserRegistrationInfo
@@ -89,7 +89,7 @@ namespace VPServices.Services
 		#region Dis/connection logic
         void connect(VPServices app)
         {
-			state       = IRCState.Connecting;
+			state = IRCState.Connecting;
             app.NotifyAll(msgConnecting, app.World, config.Channel, config.Host);
             Log.Info(Name, "Creating and establishing IRC bridge...");
 
