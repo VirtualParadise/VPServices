@@ -67,8 +67,9 @@ namespace VPServices.Services
                 var muted    = ( muteList ?? "" ).TerseSplit(',').ToList();
 
                 // No broadcasting to those muting target user
-                if ( muted.Contains(name) )
-                    continue;
+                foreach (var mute in muted)
+                    if ( mute.IEquals(name) )
+                        continue;
 
                 // Keep within VP message limit
                 if (message.Length > 245)
