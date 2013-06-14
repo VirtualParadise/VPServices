@@ -216,7 +216,7 @@ namespace VPServices.Services
             else if ( compass <= 22.5 + (45 * 7) ) compassPoint = "south-east";
             else if ( compass <= 360 )             compassPoint = "south";
 
-            app.Notify(who.Session, "You are at {0:f4}, {1:f4}, {2:f4}, facing {3} ({4:f0}), pitch {5:f0}", who.X, who.Y, who.Z, compassPoint, who.Yaw, who.Pitch);
+            app.Notify(who.Session, "You are at X: {0:f4} Y: {1:f4}a Z: {2:f4}, facing {3} ({4:f0}), pitch {5:f0}", who.X, who.Y, who.Z, compassPoint, who.Yaw, who.Pitch);
             return true;
         }
 

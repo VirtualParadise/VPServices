@@ -1,7 +1,5 @@
 - Multi-bot architecture
 - Command queueing
-- YouTube service
-- Facts service
 - Multi telegram targeting
 - Telegram history
 - Implement Cassini web server
@@ -13,3 +11,4 @@
 - Documentation: notes about sqlite3 for other platforms
 - !reload command
 - Jump point aliasing
+- !jump/near
