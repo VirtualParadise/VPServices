@@ -26,7 +26,7 @@ namespace VPServices.Services
 		const string msgNotConnected         = "Not connected to IRC";
 		const string msgDisconnecting        = "Waiting for disconnection";
 		const string msgCantInterrupt        = "Cannot interrupt a pending connection";
-        const string msgUnexpectedDisconnect = "IRC has been unexpectedly disconnected; please retry with !ircconnect";
+        const string msgUnexpectedDisconnect = "IRC has been unexpectedly disconnected; please reconnect manually with !ircconnect";
         const string msgConnectError         = "Error whilst connecting: {0}";
         
 		// Tokens

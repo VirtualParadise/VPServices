@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using VP;
 
 namespace VPServices.Services
@@ -16,8 +17,10 @@ namespace VPServices.Services
 
                 case IRCState.Connecting:
                     Log.Warn(Name, "Forcing disconnect and reconnect during connecting state");
-                    state = IRCState.Disconnected;
                     irc.Disconnect();
+
+                    while (state != IRCState.Disconnected)
+                        Thread.Sleep(100);
                         
                     connect(app);
                     return true;

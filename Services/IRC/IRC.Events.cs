@@ -74,6 +74,10 @@ namespace VPServices.Services
         {
 			switch (state)
             {
+                case IRCState.Connected:
+                    VPServices.App.WarnAll(msgUnexpectedDisconnect);
+                    break;
+
                 case IRCState.Connecting:
                     VPServices.App.AlertAll(msgConnectError, e.Error.Message);
                     break;

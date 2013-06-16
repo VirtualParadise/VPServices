@@ -16,6 +16,13 @@ namespace VPServices.Services
             var bot = VPServices.App.Bot;
             if ( e.Message.Parameters[0] == config.Channel )
             {
+                // No chat if not connected
+                if ( state != IRCState.Connected || !irc.IsConnected )
+                {
+                    Log.Warn(Name, "Received IRC channel message but state is not 'Connected' or IRC is not reported to be connected");
+                    return;
+                }
+
                 if ( e.Message.Command.IEquals("PRIVMSG") )
                 {
                     var msg = e.Message.Parameters[1];
