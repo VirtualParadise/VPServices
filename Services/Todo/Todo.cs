@@ -162,7 +162,7 @@ namespace VPServices.Services
             }
 
             var query = from    t in connection.Table<sqlTodo>()
-                        where   (t.What + t.Who).Contains(data)
+                        where   t.What.Contains(data) || t.Who.Contains(data)
                         orderby t.Done ascending
                         orderby t.ID descending
                         select  t;
