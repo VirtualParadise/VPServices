@@ -32,6 +32,13 @@ namespace VPServices.Services
 
                 new Command
                 (
+                    "Todo: Delete", "^(tododel(ete)?|deltodo|dtd)$", cmdDeleteTodo,
+                    @"Deletes a todo entry",
+                    @"!tododel `id`"
+                ),
+
+                new Command
+                (
                     "Todo: List", "^(listtodos?|ltd|todolist)$", cmdListTodo,
                     @"Prints the URL to the todo list to chat or lists those matching a search term to you",
                     @"!todolist `[search]`"
@@ -56,6 +63,7 @@ namespace VPServices.Services
         #region Privates and strings
         const string msgAdded       = "Added todo entry";
         const string msgDone        = "Todo marked as done";
+        const string msgDeleted     = "Todo deleted";
         const string msgNonExistant = "A todo entry with that ID does not exist";
         const string msgNoUndone    = "All todo entries are marked as done";
         const string msgResults     = "*** Search results for '{0}'";
@@ -71,6 +79,9 @@ namespace VPServices.Services
         #region Command handlers
         bool cmdAddTodo(VPServices app, Avatar who, string data)
         {
+            if ( string.IsNullOrWhiteSpace(data) )
+                return false;
+
             connection.Insert( new sqlTodo
             {
                 What  = data,
@@ -100,6 +111,24 @@ namespace VPServices.Services
             
             app.Notify(who.Session, msgDone);
             return Log.Info(Name, "Marked todo #{0} as done for {1}", id, who.Name);
+        }
+
+        bool cmdDeleteTodo(VPServices app, Avatar who, string data)
+        {
+            int id;
+            if ( !int.TryParse(data, out id) )
+                return false;
+
+            var affected = connection.Execute("DELETE FROM Todo WHERE ID = ?", id);
+
+            if (affected <= 0)
+            {
+                app.Warn(who.Session, msgNonExistant);
+                return true;
+            }
+            
+            app.Notify(who.Session, msgDeleted);
+            return Log.Info(Name, "Deleted todo #{0} for {1}", id, who.Name);
         }
 
         bool cmdListTodo(VPServices app, Avatar who, string data)
