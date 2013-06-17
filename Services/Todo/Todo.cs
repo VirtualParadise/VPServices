@@ -26,15 +26,15 @@ namespace VPServices.Services
                 new Command
                 (
                     "Todo: Finish", "^(tododone|finishtodo)$", cmdFinishTodo,
-                    @"Marks a todo entry as finished",
-                    @"!tododone `id`"
+                    @"Marks a single or multiple todo entries as finished",
+                    @"!tododone `id[, id, [...]]`"
                 ),
 
                 new Command
                 (
                     "Todo: Delete", "^(tododel(ete)?|deltodo|dtd)$", cmdDeleteTodo,
-                    @"Deletes a todo entry",
-                    @"!tododel `id`"
+                    @"Deletes a single or multiple todo entries",
+                    @"!tododel `id[, id, [...]]`"
                 ),
 
                 new Command
@@ -62,9 +62,10 @@ namespace VPServices.Services
 
         #region Privates and strings
         const string msgAdded       = "Added todo entry";
-        const string msgDone        = "Todo marked as done";
-        const string msgDeleted     = "Todo deleted";
-        const string msgNonExistant = "A todo entry with that ID does not exist";
+        const string msgDone        = "Todo(s) marked as done";
+        const string msgDeleted     = "Todo(s) deleted";
+        const string msgInvalid     = "'{0}' is not a valid ID";
+        const string msgNonExistant = "A todo entry with ID {0} does not exist";
         const string msgNoUndone    = "All todo entries are marked as done";
         const string msgResults     = "*** Search results for '{0}'";
         const string msgResultA     = "[{0}] #{1} - {2}";
@@ -97,38 +98,56 @@ namespace VPServices.Services
 
         bool cmdFinishTodo(VPServices app, Avatar who, string data)
         {
-            int id;
-            if ( !int.TryParse(data, out id) )
-                return false;
+            var ids = data.TerseSplit(",");
 
-            var affected = connection.Execute("UPDATE Todo SET Done = ? WHERE ID = ?", true, id);
-
-            if (affected <= 0)
+            foreach (var entry in ids)
             {
-                app.Warn(who.Session, msgNonExistant);
-                return true;
+                var trimmed = entry.Trim();
+                int id;
+
+                if ( !int.TryParse(trimmed, out id) )
+                {
+                    app.Warn(who.Session, msgInvalid, trimmed);
+                    continue;
+                }
+
+                var affected = connection.Execute("UPDATE Todo SET Done = ? WHERE ID = ?", true, id);
+
+                if (affected <= 0)
+                    app.Warn(who.Session, msgNonExistant, id);
+                else
+                    Log.Info(Name, "Marked todo #{0} as done for {1}", id, who.Name);
             }
             
             app.Notify(who.Session, msgDone);
-            return Log.Info(Name, "Marked todo #{0} as done for {1}", id, who.Name);
+            return true;
         }
 
         bool cmdDeleteTodo(VPServices app, Avatar who, string data)
         {
-            int id;
-            if ( !int.TryParse(data, out id) )
-                return false;
+            var ids = data.TerseSplit(",");
 
-            var affected = connection.Execute("DELETE FROM Todo WHERE ID = ?", id);
-
-            if (affected <= 0)
+            foreach (var entry in ids)
             {
-                app.Warn(who.Session, msgNonExistant);
-                return true;
+                var trimmed = entry.Trim();
+                int id;
+
+                if ( !int.TryParse(trimmed, out id) )
+                {
+                    app.Warn(who.Session, msgInvalid, trimmed);
+                    continue;
+                }
+
+                var affected = connection.Execute("DELETE FROM Todo WHERE ID = ?", id);
+
+                if (affected <= 0)
+                    app.Warn(who.Session, msgNonExistant, id);
+                else
+                    Log.Info(Name, "Deleted todo #{0} for {1}", id, who.Name);
             }
             
             app.Notify(who.Session, msgDeleted);
-            return Log.Info(Name, "Deleted todo #{0} for {1}", id, who.Name);
+            return true;
         }
 
         bool cmdListTodo(VPServices app, Avatar who, string data)
@@ -143,7 +162,7 @@ namespace VPServices.Services
             }
 
             var query = from    t in connection.Table<sqlTodo>()
-                        where   t.What.Contains(data)
+                        where   (t.What + t.Who).Contains(data)
                         orderby t.Done ascending
                         orderby t.ID descending
                         select  t;
