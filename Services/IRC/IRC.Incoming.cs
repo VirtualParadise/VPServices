@@ -1,6 +1,5 @@
-﻿using IrcDotNet;
+﻿using Meebey.SmartIrc4net;
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using VP;
 
@@ -8,55 +7,47 @@ namespace VPServices.Services
 {
     partial class IRC : IService
     {
-        void onIRCMessage(object sender, IrcRawMessageEventArgs e)
+        void onIRCMessage(object sender, IrcEventArgs e)
         {
-            if ( config.DebugProtocol )
-                Log.Fine(Name, "Protocol message: {0}", e.RawContent);
+            messageToVP(false, e.Data.Nick, e.Data.Message);
+        }
 
-            var bot = VPServices.App.Bot;
-            if ( e.Message.Parameters[0] == config.Channel )
-            {
-                // No chat if not connected
-                if ( state != IRCState.Connected || !irc.IsConnected )
-                {
-                    Log.Warn(Name, "Received IRC channel message but state is not 'Connected' or IRC is not reported to be connected");
-                    return;
-                }
+        void onIRCAction(object sender, ActionEventArgs e)
+        {
+            messageToVP(false, "", "{0} {1}", e.Data.Nick, e.ActionMessage);
+        }
 
-                if ( e.Message.Command.IEquals("PRIVMSG") )
-                {
-                    var msg = e.Message.Parameters[1];
+        void onIRCJoin(object sender, JoinEventArgs e)
+        {
+            messageToVP(true, "", msgEntry, e.Who, e.Channel);
+        }
 
-                    if (msg[0] == ircAction)
-                    {
-                        msg = msg.Trim(ircAction);
-                        msg = msg.Remove(0, 7);
-                        messageToVP(false, "", "{0} {1}", e.Message.Source.Name, msg);
-                    }
-                    else
-                        messageToVP(false, e.Message.Source.Name, msg);
-                }
-                else if ( e.Message.Command.IEquals("JOIN") )
-                    messageToVP(true, "", msgEntry, e.Message.Source.Name, config.Channel);
-                else if ( e.Message.Command.IEquals("PART") )
-                    messageToVP(true, "", msgPart, e.Message.Source.Name, config.Channel);
-                else if ( e.Message.Command.IEquals("KICK") )
-                {
-                    messageToVP(true, "", msgKicked, e.Message.Parameters[1], config.Channel);
+        void onIRCPart(object sender, PartEventArgs e)
+        {
+            messageToVP(true, "", msgPart, e.Who, e.Channel);
+        }
 
-                    if (e.Message.Parameters[1] == config.Registration.NickName)
-                        disconnect(VPServices.App);
-                }
+        void onIRCQuit(object sender, QuitEventArgs e)
+        {
+            messageToVP(true, "", msgQuit, e.Who, e.QuitMessage);
+        }
 
-                return;
-            }
+        void onIRCKick(object sender, KickEventArgs e)
+        {
+            messageToVP(true, "", msgKicked, e.Who, e.Whom, e.Channel, e.KickReason);
 
-            if ( e.Message.Command.IEquals("QUIT") )
-                messageToVP(true, "", msgQuit, e.Message.Source.Name, e.Message.Parameters[0]);
+            if (e.Whom == config.NickName)
+                irc.Disconnect();
+        }
 
-            if ( e.Message.Command.IEquals("NICK") )
-                messageToVP(true, "", msgNick, e.Message.Source.Name, e.Message.Parameters[0]);
-            
+        void onIRCBan(object sender, BanEventArgs e)
+        {
+            messageToVP(true, "", msgBanned, e.Who, e.Hostmask, e.Channel);
+        }
+
+        void onIRCNick(object sender, NickChangeEventArgs e)
+        {
+            messageToVP(true, "", msgNick, e.OldNickname, e.NewNickname);
         }
 
         void messageToVP(bool announce, string name, string message, params object[] parts)

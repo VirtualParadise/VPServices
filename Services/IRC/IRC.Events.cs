@@ -1,6 +1,4 @@
-﻿using Meebey.SmartIrc4net;
-using System;
-using VP;
+﻿using VPServices;
 
 namespace VPServices.Services
 {
@@ -14,84 +12,22 @@ namespace VPServices.Services
             app.Chat        += onWorldChat;
 
             // IRC (incoming) events
-            irc.OnRegistered       += onIRCRegistered;
-            irc.ConnectFailed      += onIRCConnectFailed;
-            irc.Disconnected       += onIRCDisconnected;
-            irc.RawMessageReceived += onIRCMessage;
+            irc.OnChannelMessage += onIRCMessage;
+            irc.OnChannelAction  += onIRCAction;
+            irc.OnJoin           += onIRCJoin;
+            irc.OnPart           += onIRCPart;
+            irc.OnQuit           += onIRCQuit;
+            irc.OnKick           += onIRCKick;
+            irc.OnBan            += onIRCBan;
+            irc.OnNickChange     += onIRCNick;
 
-            // IRC errors
-            irc.Error                += onIRCError;
-            irc.ErrorMessageReceived += (o, e) => { Log.Warn(Name, "IRC error: {0}", e.Message); };
-            irc.ProtocolError        += (o, e) => { Log.Warn(Name, "Protocol error: {0} {1}", e.Code, e.Message); };
+            // IRC error events
+            irc.OnConnectionError += onIRCConnError;
         }
 
-		#region Dis/connection event handlers
-		/// <summary>
-		/// Received when connected to server; needed to subsequently join channel
-		/// </summary>
-        void onIRCRegistered(object sender, EventArgs e)
+        void onIRCConnError(object sender, System.EventArgs e)
         {
-            irc.Channels.Join(config.Channel);
-            state = IRCState.Connected;
+            VPServices.App.WarnAll(msgUnexpectedDisconnect);
         }
-
-        void onIRCConnectFailed(object sender, IrcErrorEventArgs e)
-        {
-            VPServices.App.AlertAll(msgConnectError, e.Error.Message);
-            irc.Disconnect();
-        }
-
-        void onIRCDisconnected(object sender, EventArgs e)
-        {
-            switch (state)
-            {
-                /// Does not appear to fire for any connection errors...
-                case IRCState.Connected:
-                    VPServices.App.WarnAll(msgUnexpectedDisconnect);
-                    break;
-
-                case IRCState.Connecting:
-                    Log.Warn(Name, "Got disconnection event whilst connecting");
-                    break;
-
-                /// When receiving disconnected event during this state, IRC is actually
-                /// quitting but not fully disconnected. Bug?
-                case IRCState.Disconnecting:
-                    VPServices.App.NotifyAll(msgDisconnected, VPServices.App.World, config.Channel, config.Host);
-                    irc.Disconnect();
-                    break;
-
-                /// Disconnected proper
-                case IRCState.Disconnected:
-                    Log.Debug(Name, "Disconnection complete");
-                    break;
-            }
-
-            state = IRCState.Disconnected;
-        }
-
-		void onIRCError(object sender, IrcErrorEventArgs e)
-        {
-			switch (state)
-            {
-                case IRCState.Connected:
-                    VPServices.App.WarnAll(msgUnexpectedDisconnect);
-                    break;
-
-                case IRCState.Connecting:
-                    VPServices.App.AlertAll(msgConnectError, e.Error.Message);
-                    break;
-
-                case IRCState.Disconnecting:
-                    Log.Warn(Name, "Error whilst disconnecting: {0}", e.Error.Message);
-                    return;
-            }
-
-			Log.Severe(Name, "Error whilst in state '{0}':", state);
-			Log.Severe(Name, e.Error.Message);
-            state = IRCState.Disconnected;
-            irc.Disconnect();
-        }
-        #endregion
     }
 }

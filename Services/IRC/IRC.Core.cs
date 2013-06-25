@@ -1,7 +1,8 @@
 ﻿using Meebey.SmartIrc4net;
+using Nini.Config;
 using System;
 using System.Collections.Generic;
-using System.Threading;
+using System.Threading.Tasks;
 using VP;
 
 namespace VPServices.Services
@@ -42,13 +43,13 @@ namespace VPServices.Services
                     @"Unmutes specific user or all of IRC for you", "!ircunmute `[target]`"
                 ),
             });
-
             
             setupEvents(app);
             loadSettings(app);
 
+            // Auto-connect IRC asynchronously if set
             if ( config.AutoConnect )
-                connect(app);
+                Task.Factory.StartNew(() => { connect(app); });
         }
 
         public void Migrate(VPServices app, int target) {  }
@@ -56,63 +57,122 @@ namespace VPServices.Services
         public void Dispose() { }
 
         #region Privates
-        IRCState  state = IRCState.Disconnected;
         IrcClient irc   = new IrcClient();
-        object    mutex = new Mutex();
-        IrcConfig config;
-        Thread    thread;
+        object    mutex = new object();
+        IConfig   iniConfig;
+
+        IrcConfig _config;
+        /// <summary>
+        /// Thread-safe setter for IRC config
+        /// </summary>
+        IrcConfig config
+        {
+            get { return _config; }
+            set { lock (mutex) { _config = value; } }
+        }
         #endregion
 
         #region Settings logic
         void loadSettings(VPServices app)
         {
-            var ini = app.Settings.Configs["IRC"] ?? app.Settings.Configs.Add("IRC");
-
-            config = new IrcConfig
+            lock (mutex)
             {
-                Host    = ini.Get("Server", "localhost"),
-                Port    = ini.GetInt("Port", 6667),
-                Channel = ini.Get("Channel", "#vp"),
+                iniConfig = app.Settings.Configs["IRC"] ?? app.Settings.Configs.Add("IRC");
 
-                AutoConnect   = ini.GetBoolean("Autoconnect", false),
-                DebugProtocol = ini.GetBoolean("DebugProtocol", false),
+                config = new IrcConfig
+                {
+                    Host    = iniConfig.Get("Server", "localhost"),
+                    Port    = iniConfig.GetInt("Port", 6667),
+                    Channel = iniConfig.Get("Channel", "#vp"),
 
-                NickName = ini.Get("Nickname", "VPBridgeBot"),
-                RealName = ini.Get("Realname", "VPBridge Admin"),
-                UserName = ini.Get("Username", "VPBridgeAdmin"),
-            };
+                    AutoConnect = iniConfig.GetBoolean("Autoconnect", false),
+                    NickName    = iniConfig.Get("Nickname", "VPBridgeBot"),
+                    RealName    = iniConfig.Get("Realname", "VPBridgeAdmin"),
+                };
 
-            Log.Debug(Name, "Loaded IRC connection settings");
+                Log.Debug(Name, "Loaded IRC connection settings");
+            }
         } 
         #endregion
 
 		#region Dis/connection logic
         void connect(VPServices app)
         {
-			state = IRCState.Connecting;
-            app.NotifyAll(msgConnecting, app.World, config.Channel, config.Host);
-            Log.Info(Name, "Creating and establishing IRC bridge...");
+            lock (mutex)
+            {
+                app.NotifyAll(msgConnecting, app.World, config.Channel, config.Host);
+                Log.Info(Name, "Creating and establishing IRC bridge...");
 
-                        
-            irc.Connect(config.Host, config.Port, false, config.Registration);
+                try
+                {
+                    irc.Connect(config.Host, config.Port);
+                    irc.Login(config.NickName, config.RealName);
+
+                    Log.Debug(Name, "Connected and logged into {0}", config.Host);
+                }
+                catch (Exception e)
+                {
+                    // Ensure disconnection
+                    if (irc.IsConnected)
+                        irc.Disconnect();
+
+                    app.WarnAll(msgConnectError, e.Message);
+                    Log.Warn(Name, "Could not login to IRC: {0}", e.Message);
+                    return;
+                }
+                
+                try
+                {
+                    irc.RfcJoin(config.Channel);
+
+                    Log.Debug(Name, "Joined channel {0}", config.Channel);
+                }
+                catch (Exception e)
+                {
+                    // Ensure disconnection
+                    if (irc.IsConnected)
+                        irc.Disconnect();
+
+                    app.WarnAll(msgConnectError, e.Message);
+                    Log.Warn(Name, "Could not join channel: {0}", e.Message);
+                    return;
+                }
+
+                // Start IRC task
+                Task.Factory.StartNew(updateLoop);
+            }
+        }
+
+        void updateLoop()
+        {
+            while (irc.IsConnected)
+                try
+                {
+                    irc.ListenOnce();
+                }
+                catch (Exception e)
+                {
+                    Log.Warn(Name, "Exception in IRC listen loop: {0}", e.Message);
+                    return;
+                }
         }
 
         void disconnect(VPServices app)
         {
-			state = IRCState.Disconnecting;
+            lock (mutex)
+            {
+                if (!irc.IsConnected)
+                    return;
 
-            Log.Info(Name, "Disconnecting IRC bridge...");
-            irc.Quit(10000, "Goodbye");
+                app.NotifyAll(msgDisconnected, app.World, config.Channel, config.Host);
+                Log.Info(Name, "Disconnecting IRC bridge...");
+
+                irc.RfcQuit("Goodbye");
+                irc.Disconnect();
+                Log.Debug(Name, "Disconnected IRC bridge");
+            }
         } 
         #endregion
-    }
-
-	enum IRCState
-    {
-        Disconnecting,
-        Disconnected,
-        Connecting,
-        Connected
     }
 
 	struct IrcConfig
@@ -122,9 +182,7 @@ namespace VPServices.Services
 		public string Channel;
 		public string NickName;
 		public string RealName;
-		public string UserName;
 
 		public bool AutoConnect;
-		public bool DebugProtocol;
     }
 }
