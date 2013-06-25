@@ -13,7 +13,7 @@ namespace VPServices.Services
     public class GeneralCommands : IService
     {
         public string Name { get { return "General commands"; } }
-        public void Init(VPServices app, Instance bot)
+        public void Load(VPServices app, Instance bot)
         {
             app.Commands.AddRange(new[] {
                 new Command

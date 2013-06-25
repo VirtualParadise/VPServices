@@ -12,3 +12,4 @@
 - !reload command
 - Jump point aliasing
 - !jump/near
+- per plugin migration

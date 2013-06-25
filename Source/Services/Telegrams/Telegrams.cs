@@ -11,7 +11,7 @@ namespace VPServices.Services
     {
         public string Name { get { return "Telegrams"; } }
 
-        public void Init(VPServices app, Instance bot)
+        public void Load(VPServices app, Instance bot)
         {
             VPServices.App.Commands.AddRange(new[] {
                 new Command

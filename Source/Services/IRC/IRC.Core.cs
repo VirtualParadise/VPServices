@@ -12,7 +12,7 @@ namespace VPServices.Services
             get { return "IRC"; }
         }
 
-        public void Init (VPServices app, Instance bot)
+        public void Load (VPServices app, Instance bot)
         {
             app.Commands.AddRange(new[] {
                 new Command

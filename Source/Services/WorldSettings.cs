@@ -12,7 +12,7 @@ namespace VPServices.Services
         public Dictionary<string, string> Data = new Dictionary<string, string>();
 
         public string Name { get { return "World Settings"; } }
-        public void   Init (VPServices app, Instance bot)
+        public void   Load (VPServices app, Instance bot)
         {
             bot.Data.GetWorldSetting += onWorldSetting;
 

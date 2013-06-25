@@ -19,7 +19,7 @@ namespace VPServices.Services
             get { return "Logging"; }
         }
 
-        public void Init(VPServices app, Instance bot)
+        public void Load(VPServices app, Instance bot)
         {
             bot.Property.ObjectCreate += (s,i,o) => { objectEvent(o, sqlBuildType.Create); };
             bot.Property.ObjectChange += (s,i,o) => { objectEvent(o, sqlBuildType.Modify); };

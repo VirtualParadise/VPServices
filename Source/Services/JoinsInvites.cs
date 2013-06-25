@@ -23,7 +23,7 @@ namespace VPServices.Services
         List<JoinInvite> requests = new List<JoinInvite>();
 
         public string Name { get { return "Joins & invites"; } }
-        public void Init(VPServices app, Instance bot)
+        public void Load(VPServices app, Instance bot)
         {
             app.Commands.AddRange(new[] {
                 new Command

@@ -28,7 +28,7 @@ namespace VPServices.Services
         VPServices app;
 
         public string Name { get { return "Trivia"; } }
-        public void Init(VPServices app, Instance bot)
+        public void Load(VPServices app, Instance bot)
         {
             this.app = app;
             addCommands ();

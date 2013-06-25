@@ -42,7 +42,7 @@ namespace VPServices
         {
             foreach (var service in Services)
             {
-                service.Init(this, Bot);
+                service.Load(this, Bot);
                 Log.Fine("Services", "Loaded service '{0}'", service.Name);
             }
         }
