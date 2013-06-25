@@ -1,6 +1,7 @@
-﻿using IrcDotNet;
+﻿using Meebey.SmartIrc4net;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using VP;
 
 namespace VPServices.Services
@@ -57,7 +58,9 @@ namespace VPServices.Services
         #region Privates
         IRCState  state = IRCState.Disconnected;
         IrcClient irc   = new IrcClient();
-        IRCConfig config;
+        object    mutex = new Mutex();
+        IrcConfig config;
+        Thread    thread;
         #endregion
 
         #region Settings logic
@@ -65,7 +68,7 @@ namespace VPServices.Services
         {
             var ini = app.Settings.Configs["IRC"] ?? app.Settings.Configs.Add("IRC");
 
-            config = new IRCConfig
+            config = new IrcConfig
             {
                 Host    = ini.Get("Server", "localhost"),
                 Port    = ini.GetInt("Port", 6667),
@@ -74,12 +77,9 @@ namespace VPServices.Services
                 AutoConnect   = ini.GetBoolean("Autoconnect", false),
                 DebugProtocol = ini.GetBoolean("DebugProtocol", false),
 
-                Registration = new IrcUserRegistrationInfo
-                {
-                    NickName = ini.Get("Nickname", "VPBridgeBot"),
-                    RealName = ini.Get("Realname", "VPBridge Admin"),
-                    UserName = ini.Get("Username", "VPBridgeAdmin"),
-                }
+                NickName = ini.Get("Nickname", "VPBridgeBot"),
+                RealName = ini.Get("Realname", "VPBridge Admin"),
+                UserName = ini.Get("Username", "VPBridgeAdmin"),
             };
 
             Log.Debug(Name, "Loaded IRC connection settings");
@@ -93,6 +93,7 @@ namespace VPServices.Services
             app.NotifyAll(msgConnecting, app.World, config.Channel, config.Host);
             Log.Info(Name, "Creating and establishing IRC bridge...");
 
+                        
             irc.Connect(config.Host, config.Port, false, config.Registration);
         }
 
@@ -114,15 +115,16 @@ namespace VPServices.Services
         Connected
     }
 
-	struct IRCConfig
+	struct IrcConfig
     {
 		public string Host;
 		public int    Port;
 		public string Channel;
+		public string NickName;
+		public string RealName;
+		public string UserName;
 
 		public bool AutoConnect;
 		public bool DebugProtocol;
-
-		public IrcUserRegistrationInfo Registration;
     }
 }

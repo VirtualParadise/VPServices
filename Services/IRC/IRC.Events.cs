@@ -1,4 +1,4 @@
-﻿using IrcDotNet;
+﻿using Meebey.SmartIrc4net;
 using System;
 using VP;
 
@@ -14,7 +14,7 @@ namespace VPServices.Services
             app.Chat        += onWorldChat;
 
             // IRC (incoming) events
-            irc.Registered         += onIRCRegistered;
+            irc.OnRegistered       += onIRCRegistered;
             irc.ConnectFailed      += onIRCConnectFailed;
             irc.Disconnected       += onIRCDisconnected;
             irc.RawMessageReceived += onIRCMessage;

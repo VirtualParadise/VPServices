@@ -1,6 +1,4 @@
-﻿using IrcDotNet;
-using System;
-using VP;
+﻿using VP;
 
 namespace VPServices.Services
 {
