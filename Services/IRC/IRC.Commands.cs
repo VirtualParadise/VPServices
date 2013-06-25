@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Threading;
 using VP;
 
 namespace VPServices.Services
@@ -9,53 +8,31 @@ namespace VPServices.Services
     {
         bool cmdIRCConnect(VPServices app, Avatar who, string data)
         {
-            switch (state)
+            lock (mutex)
             {
-                case IRCState.Connected:
+                if (irc.IsConnected)
+                {
                     app.Warn(who.Session, msgAlreadyConnected, config.Channel, config.Host);
                     return true;
+                }
 
-                case IRCState.Connecting:
-                    Log.Warn(Name, "Forcing disconnect and reconnect during connecting state");
-                    irc.Disconnect();
-
-                    while (state != IRCState.Disconnected)
-                        Thread.Sleep(100);
-                        
-                    connect(app);
-                    return true;
-
-                case IRCState.Disconnecting:
-                    app.Warn(who.Session, msgDisconnecting);
-                    return true;
-
-                default:
-                case IRCState.Disconnected:
-                    connect(app);
-                    return true;
+                connect(app);
+                return true;
             }
         }
 
         bool cmdIRCDisconnect(VPServices app, Avatar who, string data)
         {
-            switch (state)
+            lock (mutex)
             {
-                case IRCState.Disconnecting:
-                    app.Warn(who.Session, msgDisconnecting);
-                    return true;
-
-                case IRCState.Disconnected:
+                if (!irc.IsConnected)
+                {
                     app.Warn(who.Session, msgNotConnected);
                     return true;
+                }
 
-                case IRCState.Connecting:
-                    app.Warn(who.Session, msgCantInterrupt);
-                    return true;
-
-                default:
-                case IRCState.Connected:
-                    disconnect(app);
-                    return true;
+                disconnect(app);
+                return true;
             }
         }
 
