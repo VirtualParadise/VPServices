@@ -9,7 +9,10 @@ namespace VPServices.Services
 {
     partial class Telegrams : IService
     {
-        public string Name { get { return "Telegrams"; } }
+        public string Name
+        {
+            get { return "Telegrams"; }
+        }
 
         public void Init(VPServices app, Instance bot)
         {
