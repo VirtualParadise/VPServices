@@ -50,6 +50,18 @@ namespace VPServices
 
     static class AvatarExtensions
     {
+        public static Dictionary<string, string> GetSettings(this Avatar user)
+        {
+            var conn  = VPServices.App.Connection;
+            var query = conn.Query<sqlUserSettings>("SELECT * FROM UserSettings WHERE UserID = ? ORDER BY Name ASC", user.Id);
+            var dict  = new Dictionary<string, string>();
+
+            foreach (var entry in query)
+                dict.Add(entry.Name, entry.Value);
+
+            return dict;            
+        }
+
         /// <summary>
         /// Gets a user setting of the specified key as a string, or returns null if
         /// not set
