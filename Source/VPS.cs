@@ -8,7 +8,7 @@ namespace VPServices
     public partial class VPServices : IDisposable
     {
         public static VPServices App;
-        public static Random     Rand    = new Random();
+        public static Random     Rand = new Random();
 
         public static Color ColorLesser = new Color(150,150,200);
         public static Color ColorInfo   = new Color(50,50,100);
