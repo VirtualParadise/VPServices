@@ -21,6 +21,26 @@ namespace VPServices.Services
                     irc.SendMessage(SendType.Message, config.Channel, user.Name + ": " +  msg );
         }
 
+        void onWorldConsole(Instance sender, ConsoleMessage console)
+        {
+            // No chat if not connected
+            if (!irc.IsConnected)
+                return;
+            
+            // Ignore nameless consoles
+            if ( string.IsNullOrWhiteSpace(console.Name) )
+                return;
+
+            // Ignore Services bot messages
+            if (console.Name == sender.Name)
+                return;
+
+            var msgRoll = console.Message.TerseSplit("\n");
+
+            foreach (var msg in msgRoll)
+                irc.SendMessage(SendType.Message, config.Channel, "C* " + console.Name + " " +  msg );
+        }
+
         void onWorldEnter(Instance sender, Avatar avatar)
         {
             if (!irc.IsConnected)

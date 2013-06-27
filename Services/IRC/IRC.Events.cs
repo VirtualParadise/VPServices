@@ -10,6 +10,7 @@ namespace VPServices.Services
             app.AvatarEnter += onWorldEnter;
             app.AvatarLeave += onWorldLeave;
             app.Chat        += onWorldChat;
+            app.Bot.Console += onWorldConsole;
 
             // IRC (incoming) events
             irc.OnChannelMessage += onIRCMessage;
