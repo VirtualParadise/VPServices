@@ -54,6 +54,7 @@ namespace VPServices.Services
         {
             var fx    = announce ? ChatEffect.Italic : ChatEffect.None;
             var color = announce ? VPServices.ColorInfo : colorChat;
+            message   = message.LFormat(parts);
 
             foreach (var user in VPServices.App.Users)
             {
@@ -84,10 +85,10 @@ namespace VPServices.Services
 
                     messages.Add(buffer);
                     foreach (var line in messages)
-                        VPServices.App.Bot.ConsoleMessage(user.Session, fx, color, name, line, parts);
+                        VPServices.App.Bot.ConsoleMessage(user.Session, fx, color, name, "{0}", line);
                 }
                 else
-                    VPServices.App.Bot.ConsoleMessage(user.Session, fx, color, name, message, parts);
+                    VPServices.App.Bot.ConsoleMessage(user.Session, fx, color, name, "{0}", message);
             }
         }
     }
