@@ -9,7 +9,7 @@ namespace VPServices.Services
     {
         void onIRCMessage(object sender, IrcEventArgs e)
         {
-            messageToVP(false, e.Data.Nick, e.Data.Message);
+            messageToVP(false, e.Data.Nick, "{0}", e.Data.Message);
         }
 
         void onIRCAction(object sender, ActionEventArgs e)
