@@ -1,6 +1,5 @@
-﻿using IrcDotNet;
+﻿using Meebey.SmartIrc4net;
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using VP;
 
@@ -8,54 +7,54 @@ namespace VPServices.Services
 {
     partial class IRC : ServiceBase
     {
-        void onIRCMessage(object sender, IrcRawMessageEventArgs e)
+        void onIRCMessage(object sender, IrcEventArgs e)
         {
-            if ( config.DebugProtocol )
-                Log.Fine(Name, "Protocol message: {0}", e.RawContent);
+            messageToVP(false, e.Data.Nick, "{0}", e.Data.Message);
+        }
 
-            var bot = VPServices.App.Bot;
-            if ( e.Message.Parameters[0] == config.Channel )
-            {
-                if ( e.Message.Command.IEquals("PRIVMSG") )
-                {
-                    var msg = e.Message.Parameters[1];
+        void onIRCAction(object sender, ActionEventArgs e)
+        {
+            messageToVP(false, "", "{0} {1}", e.Data.Nick, e.ActionMessage);
+        }
 
-                    if (msg[0] == ircAction)
-                    {
-                        msg = msg.Trim(ircAction);
-                        msg = msg.Remove(0, 7);
-                        messageToVP(false, "", "{0} {1}", e.Message.Source.Name, msg);
-                    }
-                    else
-                        messageToVP(false, e.Message.Source.Name, msg);
-                }
-                else if ( e.Message.Command.IEquals("JOIN") )
-                    messageToVP(true, "", msgEntry, e.Message.Source.Name, config.Channel);
-                else if ( e.Message.Command.IEquals("PART") )
-                    messageToVP(true, "", msgPart, e.Message.Source.Name, config.Channel);
-                else if ( e.Message.Command.IEquals("KICK") )
-                {
-                    messageToVP(true, "", msgKicked, e.Message.Parameters[1], config.Channel);
+        void onIRCJoin(object sender, JoinEventArgs e)
+        {
+            messageToVP(true, "", msgEntry, e.Who, e.Channel);
+        }
 
-                    if (e.Message.Parameters[1] == config.Registration.NickName)
-                        disconnect(VPServices.App);
-                }
+        void onIRCPart(object sender, PartEventArgs e)
+        {
+            messageToVP(true, "", msgPart, e.Who, e.Channel);
+        }
 
-                return;
-            }
+        void onIRCQuit(object sender, QuitEventArgs e)
+        {
+            messageToVP(true, "", msgQuit, e.Who, e.QuitMessage);
+        }
 
-            if ( e.Message.Command.IEquals("QUIT") )
-                messageToVP(true, "", msgQuit, e.Message.Source.Name, e.Message.Parameters[0]);
+        void onIRCKick(object sender, KickEventArgs e)
+        {
+            messageToVP(true, "", msgKicked, e.Who, e.Whom, e.Channel, e.KickReason);
 
-            if ( e.Message.Command.IEquals("NICK") )
-                messageToVP(true, "", msgNick, e.Message.Source.Name, e.Message.Parameters[0]);
-            
+            if (e.Whom == config.NickName)
+                irc.Disconnect();
+        }
+
+        void onIRCBan(object sender, BanEventArgs e)
+        {
+            messageToVP(true, "", msgBanned, e.Who, e.Hostmask, e.Channel);
+        }
+
+        void onIRCNick(object sender, NickChangeEventArgs e)
+        {
+            messageToVP(true, "", msgNick, e.OldNickname, e.NewNickname);
         }
 
         void messageToVP(bool announce, string name, string message, params object[] parts)
         {
             var fx    = announce ? ChatEffect.Italic : ChatEffect.None;
             var color = announce ? VPServices.ColorInfo : colorChat;
+            message   = message.LFormat(parts);
 
             foreach (var user in VPServices.App.Users)
             {
@@ -64,10 +63,10 @@ namespace VPServices.Services
                     continue;
 
                 var muteList = user.GetSetting(settingMuteList);
-                var muted    = ( muteList ?? "" ).TerseSplit(',').ToList();
+                var muted    = ( muteList ?? "" ).TerseSplit(',');
 
                 // No broadcasting to those muting target user
-                if ( muted.Contains(name) )
+                if ( muted.IContains(name) )
                     continue;
 
                 // Keep within VP message limit
@@ -86,10 +85,10 @@ namespace VPServices.Services
 
                     messages.Add(buffer);
                     foreach (var line in messages)
-                        VPServices.App.Bot.ConsoleMessage(user.Session, fx, color, name, line, parts);
+                        VPServices.App.Bot.ConsoleMessage(user.Session, fx, color, name, "{0}", line);
                 }
                 else
-                    VPServices.App.Bot.ConsoleMessage(user.Session, fx, color, name, message, parts);
+                    VPServices.App.Bot.ConsoleMessage(user.Session, fx, color, name, "{0}", message);
             }
         }
     }

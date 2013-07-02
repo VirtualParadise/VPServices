@@ -1,5 +1,5 @@
-﻿using System;
-using System.Text.RegularExpressions;
+﻿using Meebey.SmartIrc4net;
+using System;
 using VP;
 
 namespace VPServices.Services
@@ -9,47 +9,54 @@ namespace VPServices.Services
         void onWorldChat(Instance sender, Avatar user, string message)
         {
             // No chat if not connected
-            if ( state != IRCState.Connected || !irc.IsConnected )
-                return;
-
-            // Ignore commands
-            if ( message.StartsWith("!") )
+            if (!irc.IsConnected)
                 return;
 
             var msgRoll = message.TerseSplit("\n");
 
             foreach (var msg in msgRoll)
-            {
-                string outgoing = "";
                 if ( msg.StartsWith("/me ") )
-                    outgoing = "PRIVMSG {0} :{3}ACTION {1} {2}{3}".LFormat(config.Channel, user.Name, msg.Substring(4), ircAction);
+                    irc.SendMessage(SendType.Action, config.Channel, user.Name + " " + msg.Substring(4) );
                 else
-                    outgoing = "PRIVMSG {0} :{1}: {2}".LFormat(config.Channel, user.Name, msg);
-
-                irc.SendRawMessage(outgoing);
-            }
+                    irc.SendMessage(SendType.Message, config.Channel, user.Name + ": " +  msg );
         }
 
-        void onWorldLeave(Instance sender, Avatar avatar)
+        void onWorldConsole(Instance sender, ConsoleMessage console)
         {
-            if ( state != IRCState.Connected || !irc.IsConnected )
+            // No chat if not connected
+            if (!irc.IsConnected)
+                return;
+            
+            // Ignore nameless consoles
+            if ( string.IsNullOrWhiteSpace(console.Name) )
                 return;
 
-            var msg = @"PRIVMSG {0} :{3}ACTION *** {1} has left {2}{3}"
-                .LFormat(config.Channel, avatar.Name, VPServices.App.World, ircAction);
+            // Ignore Services bot messages
+            if (console.Name == sender.Name)
+                return;
 
-            irc.SendRawMessage(msg);
+            var msgRoll = console.Message.TerseSplit("\n");
+
+            foreach (var msg in msgRoll)
+                irc.SendMessage(SendType.Message, config.Channel, "C* " + console.Name + " " +  msg );
         }
 
         void onWorldEnter(Instance sender, Avatar avatar)
         {
-            if ( state != IRCState.Connected || !irc.IsConnected )
+            if (!irc.IsConnected)
                 return;
 
-            var msg = @"PRIVMSG {0} :{3}ACTION *** {1} has entered {2}{3}"
-                .LFormat(config.Channel, avatar.Name, VPServices.App.World, ircAction);
+            var msg = msgEntry.LFormat(avatar.Name, VPServices.App.World);
+            irc.SendMessage(SendType.Action, config.Channel, msg);
+        }
 
-            irc.SendRawMessage(msg);
+        void onWorldLeave(Instance sender, Avatar avatar)
+        {
+            if (!irc.IsConnected)
+                return;
+
+            var msg = msgPart.LFormat(avatar.Name, VPServices.App.World);
+            irc.SendMessage(SendType.Action, config.Channel, msg);
         }
     }
 }

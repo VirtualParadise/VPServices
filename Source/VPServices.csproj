@@ -35,12 +35,11 @@
     <Reference Include="CsvHelper">
       <HintPath>Libraries\CsvHelper.dll</HintPath>
     </Reference>
-    <Reference Include="IrcDotNet, Version=0.4.1.28293, Culture=neutral, PublicKeyToken=44f6d157e750246b, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>Libraries\IrcDotNet.dll</HintPath>
-    </Reference>
     <Reference Include="MarkdownSharp">
       <HintPath>Libraries\MarkdownSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Meebey.SmartIrc4net">
+      <HintPath>Libraries\Meebey.SmartIrc4net.dll</HintPath>
     </Reference>
     <Reference Include="Nini, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -63,6 +62,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Services\Rkill.cs" />
     <Compile Include="Services\Facts\Facts.cs" />
     <Compile Include="Services\Facts\Facts.Migrations.cs" />
     <Compile Include="Services\Home\Home.Migrations.cs" />

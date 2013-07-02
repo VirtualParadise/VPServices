@@ -126,7 +126,7 @@ namespace VPServices.Services
             var lastExit = who.GetSettingDateTime(settingLastExit);
 
             // Ignore bouncing/disconnected users
-            if ( lastExit.SecondsToNow() < 60 )
+            if ( lastExit.SecondsToNow() < 10 )
                 return;
 
             // Do not teleport home if bouncing

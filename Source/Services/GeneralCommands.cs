@@ -12,8 +12,12 @@ namespace VPServices.Services
     /// </summary>
     public class GeneralCommands : ServiceBase
     {
-        public string Name { get { return "General commands"; } }
-        public void Load(VPServices app, Instance bot)
+        public string Name
+        {
+            get { return "General commands"; }
+        }
+
+        public void Init(VPServices app, Instance bot)
         {
             app.Commands.AddRange(new[] {
                 new Command
@@ -35,6 +39,13 @@ namespace VPServices.Services
                     "Info: Position", "^(my)?(coord(s|inates)?|pos(ition)?|compass)$", cmdCoords,
                     @"Prints user's position to chat, including coordinates, pitch, yaw and compass",
                     @"!pos"
+                ),
+
+                new Command
+                (
+                    "Info: Data", "^(my)?(data|settings)$", cmdData,
+                    @"Prints a listing of user's settings saved by the bot",
+                    @"!mydata"
                 ),
 
                 new Command
@@ -158,6 +169,27 @@ namespace VPServices.Services
             var fileDate = File.GetLastWriteTime(asm);
 
             app.NotifyAll("I was built on {0}", fileDate);
+            return true;
+        } 
+
+        const string msgDataResults   = "*** User settings stored for you:";
+        const string msgDataNoResults = "No user data is stored for you";
+        const string msgDataResult    = "{0}: {1}";
+
+        bool cmdData(VPServices app, Avatar who, string data)
+        {
+            var settings = who.GetSettings();
+
+            if (settings.Count <= 0)
+            {
+                app.Notify(who.Session, msgDataNoResults);
+                return true;
+            }
+
+            app.Bot.ConsoleMessage(who.Session, ChatEffect.BoldItalic, VPServices.ColorInfo, "", msgDataResults);
+            foreach (var s in settings)
+                app.Bot.ConsoleMessage(who.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msgDataResult, s.Key, s.Value);
+
             return true;
         } 
         #endregion

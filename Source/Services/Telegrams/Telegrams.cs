@@ -9,7 +9,10 @@ namespace VPServices.Services
 {
     partial class Telegrams : ServiceBase
     {
-        public string Name { get { return "Telegrams"; } }
+        public string Name
+        {
+            get { return "Telegrams"; }
+        }
 
         public void Load(VPServices app, Instance bot)
         {
@@ -23,7 +26,7 @@ namespace VPServices.Services
 
                 new Command
                 (
-                    "Telegrams: check", "^(telegrams|read)", cmdReadTelegrams,
+                    "Telegrams: Check", "^(telegrams|read)", cmdReadTelegrams,
                     @"Gets all pending telegrams",
                     @"!read"
                 ),
