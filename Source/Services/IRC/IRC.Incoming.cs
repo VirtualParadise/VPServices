@@ -6,7 +6,7 @@ using VP;
 
 namespace VPServices.Services
 {
-    partial class IRC : IService
+    partial class IRC : ServiceBase
     {
         void onIRCMessage(object sender, IrcRawMessageEventArgs e)
         {

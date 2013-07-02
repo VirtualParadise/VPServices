@@ -3,7 +3,7 @@ using System.IO;
 
 namespace VPServices.Services
 {
-    partial class Telegrams : IService
+    partial class Telegrams : ServiceBase
     {
         public void Migrate(VPServices app, int target)
         {

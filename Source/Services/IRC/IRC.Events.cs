@@ -4,7 +4,7 @@ using VP;
 
 namespace VPServices.Services
 {
-	partial class IRC : IService
+	partial class IRC : ServiceBase
     {
         void setupEvents(VPServices app)
         {

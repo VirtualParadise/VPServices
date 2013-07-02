@@ -5,7 +5,7 @@ using VP;
 
 namespace VPServices.Services
 {
-    public partial class Home : IService
+    public partial class Home : ServiceBase
     {
         public void Migrate(VPServices app, int target)
         {

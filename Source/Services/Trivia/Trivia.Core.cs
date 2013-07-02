@@ -7,7 +7,7 @@ using VP;
 
 namespace VPServices.Services
 {
-    public partial class Trivia : IService
+    public partial class Trivia : ServiceBase
     {
         #region Strings
         const  string   msgAccepted     = "Ding! The answer was {0}, {1} {2}";

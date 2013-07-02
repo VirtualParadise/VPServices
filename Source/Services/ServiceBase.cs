@@ -1,8 +1,15 @@
 ﻿using System;
+using System.Threading.Tasks;
 using VP;
 
 namespace VPServices.Services
 {
+    public abstract class ServiceBase : IService
+    {
+
+        
+    }
+    
     public interface IService
     {
         /// <summary>

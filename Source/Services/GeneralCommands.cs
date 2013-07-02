@@ -10,7 +10,7 @@ namespace VPServices.Services
     /// <summary>
     /// Handles general utility commands
     /// </summary>
-    public class GeneralCommands : IService
+    public class GeneralCommands : ServiceBase
     {
         public string Name { get { return "General commands"; } }
         public void Load(VPServices app, Instance bot)

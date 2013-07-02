@@ -4,7 +4,7 @@ using VP;
 
 namespace VPServices.Services
 {
-    public partial class Trivia : IService
+    public partial class Trivia : ServiceBase
     {
         const string msgFirstLoad = "Loading trivia database for the first time...";
         const string msgSkipping  = "Skipping previous question...";

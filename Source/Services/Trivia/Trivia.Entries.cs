@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace VPServices.Services
 {
-    public partial class Trivia : IService
+    public partial class Trivia : ServiceBase
     {
         const string configTrivia = "Trivia";
         const string fileDatabase = "TriviaQuickfire.csv";

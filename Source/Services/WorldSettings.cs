@@ -7,7 +7,7 @@ namespace VPServices.Services
     /// <summary>
     /// Stores and log world settings
     /// </summary>
-    class WorldSettings : IService
+    class WorldSettings : ServiceBase
     {
         public Dictionary<string, string> Data = new Dictionary<string, string>();
 

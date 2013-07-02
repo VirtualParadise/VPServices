@@ -7,7 +7,7 @@ using VP;
 
 namespace VPServices.Services
 {
-    partial class Telegrams : IService
+    partial class Telegrams : ServiceBase
     {
         public string Name { get { return "Telegrams"; } }
 

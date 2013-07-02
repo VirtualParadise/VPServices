@@ -4,7 +4,7 @@ using VP;
 
 namespace VPServices.Services
 {
-    partial class IRC : IService
+    partial class IRC : ServiceBase
     {
         // Colors
         static Color colorChat = new Color(120, 120, 120);

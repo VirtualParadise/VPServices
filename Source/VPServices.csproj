@@ -89,7 +89,7 @@
     <Compile Include="Services\GeneralCommands.cs" />
     <Compile Include="VPS.Users.cs" />
     <Compile Include="VPS.Commands.cs" />
-    <Compile Include="Services\IService.cs" />
+    <Compile Include="Services\ServiceBase.cs" />
     <Compile Include="Services\Logging\Logging.cs" />
     <Compile Include="Services\IRC\IRC.Core.cs" />
     <None Include="Services\SwordFight\SwordFight.cs" />
