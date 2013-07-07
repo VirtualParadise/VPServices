@@ -7,7 +7,7 @@ using VP;
 
 namespace VPServices.Services
 {
-    public partial class Facts : ServiceBase
+    public partial class Facts : IService
     {
         public string Name
         { 

@@ -10,7 +10,7 @@ namespace VPServices.Services
     /// <summary>
     /// Handles general utility commands
     /// </summary>
-    public class GeneralCommands : ServiceBase
+    public class GeneralCommands : IService
     {
         public string Name
         {

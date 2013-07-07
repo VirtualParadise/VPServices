@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace VPServices.Services
 {
-    public partial class Trivia : ServiceBase
+    public partial class Trivia : IService
     {
         void addWebRoutes()
         {

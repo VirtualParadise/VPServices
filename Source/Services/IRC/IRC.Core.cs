@@ -7,7 +7,7 @@ using VP;
 
 namespace VPServices.Services
 {
-	partial class IRC : ServiceBase
+	partial class IRC : IService
     {
 		public string Name
         { 

@@ -12,7 +12,7 @@ namespace VPServices.Services
     /// Loggers use UNIX timestamps instead of DateTime values for future convinience
     /// with logger tools, which are more likely to use timestamps.
     /// </remarks>
-    partial class Logging : ServiceBase
+    partial class Logging : IService
     {
         public string Name
         { 

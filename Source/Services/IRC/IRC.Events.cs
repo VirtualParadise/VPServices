@@ -2,7 +2,7 @@
 
 namespace VPServices.Services
 {
-	partial class IRC : ServiceBase
+	partial class IRC : IService
     {
         void setupEvents(VPServices app)
         {

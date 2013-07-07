@@ -3,7 +3,7 @@ using System.IO;
 
 namespace VPServices.Services
 {
-    public partial class Todo : ServiceBase
+    public partial class Todo : IService
     {
         public void Migrate(VPServices app, int target)
         {

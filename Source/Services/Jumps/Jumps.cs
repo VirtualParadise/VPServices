@@ -6,7 +6,7 @@ using VP;
 
 namespace VPServices.Services
 {
-    public partial class Jumps : ServiceBase
+    public partial class Jumps : IService
     {
         public string Name
         { 

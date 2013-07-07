@@ -6,7 +6,7 @@ using VP;
 
 namespace VPServices.Services
 {
-    public class SwordFight : IService
+    public class SwordFight : ServiceBase
     {
         const string msgReminder   = "PvP swordfight mode is still enabled for you";
         const string msgToggle     = "PvP swordfight mode has been {0} for {1}";

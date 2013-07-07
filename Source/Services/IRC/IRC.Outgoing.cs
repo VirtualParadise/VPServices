@@ -4,7 +4,7 @@ using VP;
 
 namespace VPServices.Services
 {
-    partial class IRC : ServiceBase
+    partial class IRC : IService
     {
         void onWorldChat(Instance sender, Avatar user, string message)
         {

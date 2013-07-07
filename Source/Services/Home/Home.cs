@@ -9,7 +9,7 @@ namespace VPServices.Services
     /// <summary>
     /// Handles home setting / teleport and bouncing
     /// </summary>
-    public partial class Home : ServiceBase
+    public partial class Home : IService
     {
         public string Name
         { 

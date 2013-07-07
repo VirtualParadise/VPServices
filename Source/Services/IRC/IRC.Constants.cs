@@ -2,7 +2,7 @@
 
 namespace VPServices.Services
 {
-    partial class IRC : ServiceBase
+    partial class IRC : IService
     {
         // Colors
         static Color colorChat = new Color(120, 120, 120);

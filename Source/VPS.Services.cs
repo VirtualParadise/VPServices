@@ -11,7 +11,7 @@ namespace VPServices
         /// <summary>
         /// Global list of all loaded services
         /// </summary>
-        public List<ServiceBase> Services = new List<ServiceBase>();
+        public List<IService> Services = new List<IService>();
 
         /// <summary>
         /// Disposes all loaded services and clears list
@@ -25,15 +25,15 @@ namespace VPServices
         }
 
         /// <summary>
-        /// Loads all services that implement the IService interface into Loaded
+        /// Loads all services that implement the ServiceBase interface into Loaded
         /// </summary>
         public void LoadServices()
         {
             //http://stackoverflow.com/questions/699852/how-to-find-all-the-classes-which-implement-a-given-interface
-            var type     = typeof(ServiceBase);
+            var type     = typeof(IService);
             var services = from   t in Assembly.GetExecutingAssembly().GetTypes()
                            where  t.GetInterfaces().Contains(type) && !t.IsInterface
-                           select Activator.CreateInstance(t) as ServiceBase;
+                           select Activator.CreateInstance(t) as IService;
 
             Services.AddRange(services);
         }

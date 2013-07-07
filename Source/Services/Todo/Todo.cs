@@ -6,7 +6,7 @@ using VP;
 
 namespace VPServices.Services
 {
-    public partial class Todo : ServiceBase
+    public partial class Todo : IService
     {
         public string Name
         { 

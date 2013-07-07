@@ -7,7 +7,7 @@ namespace VPServices.Services
     /// <summary>
     /// Handles joins and invites between users
     /// </summary>
-    public class JoinsInvites : ServiceBase
+    public class JoinsInvites : IService
     {
         const string msgRequest          = "{0} would like to {1} you; please respond with !yes or !no";
         const string msgRequestSent      = "Request sent; waiting for {0} to accept...";

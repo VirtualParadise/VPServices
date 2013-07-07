@@ -4,7 +4,7 @@ using System.IO;
 
 namespace VPServices.Services
 {
-    public partial class Jumps : ServiceBase
+    public partial class Jumps : IService
     {
         public void Migrate(VPServices app, int target)
         {

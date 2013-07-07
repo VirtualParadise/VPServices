@@ -8,7 +8,7 @@ namespace VPServices.Services
     /// <summary>
     /// Handles user entry / exit announcements
     /// </summary>
-    public class Greetings : ServiceBase
+    public class Greetings : IService
     {
         public string Name
         {
