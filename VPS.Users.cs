@@ -68,13 +68,23 @@ namespace VPServices
         /// </summary>
         public static string GetSetting(this Avatar user, string key)
         {
-            var conn  = VPServices.App.Connection;
-            var query = conn.Query<sqlUserSettings>("SELECT * FROM UserSettings WHERE UserID = ? AND Name = ? COLLATE NOCASE", user.Id, key);
+            try
+            {
+                var conn  = VPServices.App.Connection;
+                var query = conn.Query<sqlUserSettings>("SELECT * FROM UserSettings WHERE UserID = ? AND Name = ? COLLATE NOCASE", user.Id, key);
 
-            if (query.Count() <= 0)
+                if (query.Count() <= 0)
+                    return null;
+                else
+                    return query.First().Value;
+            }
+            catch (Exception e)
+            {
+                Log.Severe("Users", "Could not get setting '{0}' for ID {1}", key, user.Id);
+                e.LogFullStackTrace();
+
                 return null;
-            else
-                return query.First().Value;
+            }
         }
 
         public static int GetSettingInt(this Avatar user, string key, int defValue = 0)
