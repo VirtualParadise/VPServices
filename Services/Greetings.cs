@@ -20,14 +20,14 @@ namespace VPServices.Services
             app.Commands.AddRange(new[] {
                 new Command
                 (
-                    "Greetings: Show/hide", "^greet(ing)?s?$", (o,e,a) => { return cmdToggle(o,e,a, settingShowGreets); },
+                    "Greetings: Show/hide", "^greet(ing)?s?$", (o,e,a) => { return cmdToggle(o,e,a, SettingShowGreets); },
                     @"Toggles or sets whether or not the bot sends you user entry/exit messages",
                     @"!greets `[true|false]`"
                 ),
 
                 new Command
                 (
-                    "Greetings: Greet me", "^greetme$", (o,e,a) => { return cmdToggle(o,e,a, settingGreetMe); },
+                    "Greetings: Greet me", "^greetme$", (o,e,a) => { return cmdToggle(o,e,a, SettingGreetMe); },
                     @"Toggles or sets whether or not the bot should announce your entry and exit to other users",
                     @"!greetme `[true|false]`"
                 ),
@@ -40,8 +40,8 @@ namespace VPServices.Services
         public void Migrate(VPServices app, int target) {  }
         public void Dispose() { }
 
-        const string settingGreetMe    = "GreetMe";
-        const string settingShowGreets = "GreetShow";
+        public const string SettingGreetMe    = "GreetMe";
+        public const string SettingShowGreets = "GreetShow";
 
         const string msgEntry      = "*** {0} has entered {1}";
         const string msgExit       = "*** {0} has left {1}";
@@ -49,6 +49,13 @@ namespace VPServices.Services
         const string msgHideGreets = "Entry/exit messages will no longer be shown to you";
         const string msgGreetMe    = "You will now be announced on entry/exit";
         const string msgGreetMeNot = "You will no longer be announced on entry/exit";
+
+        #region Public cross-plugin methods
+        public bool CanGreet(Avatar who)
+        {
+            return who.GetSettingBool(SettingGreetMe, true);
+        }
+        #endregion
 
         #region Command handlers
         bool cmdToggle(VPServices app, Avatar who, string data, string key)
@@ -68,11 +75,11 @@ namespace VPServices.Services
             who.SetSetting(key, toggle);
             switch (key)
             {
-                case settingGreetMe:
+                case SettingGreetMe:
                     msg = toggle ? msgGreetMe : msgGreetMeNot;
                     break;
 
-                case settingShowGreets:
+                case SettingShowGreets:
                     msg = toggle ? msgShowGreets : msgHideGreets;
                     break;
             }
@@ -90,10 +97,10 @@ namespace VPServices.Services
             if ( VPServices.App.StartUpTime.SecondsToNow() < 10 )
                 return;
 
-            var app      = VPServices.App;
+            var app = VPServices.App;
 
             // Do not greet if GreetMe is false
-            if ( !who.GetSettingBool(settingGreetMe, true) )
+            if ( !CanGreet(who) )
                 return;
 
             foreach ( var target in app.Users )
@@ -103,7 +110,7 @@ namespace VPServices.Services
                     continue;
 
                 // Only send greet if target wants them
-                if ( target.GetSettingBool(settingShowGreets, true) )
+                if ( target.GetSettingBool(SettingShowGreets, true) )
                 {
                     var msg = entering ? msgEntry : msgExit;
                     bot.ConsoleMessage(target.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msg, who.Name, app.World);

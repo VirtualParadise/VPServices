@@ -46,6 +46,11 @@ namespace VPServices.Services
             if (!irc.IsConnected)
                 return;
 
+            // Reject for those who have greetme off
+            var greets = app.GetService<Greetings>();
+            if ( greets != null && !greets.CanGreet(avatar) )
+                return;
+
             var msg = msgEntry.LFormat(avatar.Name, VPServices.App.World);
             irc.SendMessage(SendType.Action, config.Channel, msg);
         }
@@ -53,6 +58,11 @@ namespace VPServices.Services
         void onWorldLeave(Instance sender, Avatar avatar)
         {
             if (!irc.IsConnected)
+                return;
+
+            // Reject for those who have greetme off
+            var greets = app.GetService<Greetings>();
+            if ( greets != null && !greets.CanGreet(avatar) )
                 return;
 
             var msg = msgPart.LFormat(avatar.Name, VPServices.App.World);
