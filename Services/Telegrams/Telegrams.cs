@@ -60,14 +60,15 @@ namespace VPServices.Services
             var target = matches.Groups[1].Value.Trim();
             var msg    = matches.Groups[2].Value.Trim();
             
-            connection.Insert(new sqlTelegram
-            {
-                Source  = who.Name,
-                Target  = target,
-                Message = msg,
-                When    = DateTime.Now,
-                Read    = false
-            });
+            lock (app.DataMutex)
+                connection.Insert(new sqlTelegram
+                {
+                    Source  = who.Name,
+                    Target  = target,
+                    Message = msg,
+                    When    = DateTime.Now,
+                    Read    = false
+                });
 
             told[target.ToLower()] = false;
             app.Notify(who.Session, msgTelegramSent, target);
@@ -84,17 +85,21 @@ namespace VPServices.Services
                 return true;
             }
 
-            connection.BeginTransaction();
-            foreach ( var gram in grams )
+            lock ( app.DataMutex )
             {
-                app.Bot.ConsoleMessage(who.Session, ChatEffect.Bold, VPServices.ColorAlert, "", msgTelegram, gram.Source, gram.When);
-                app.Bot.ConsoleMessage(who.Session, ChatEffect.None, VPServices.ColorAlert, "", gram.Message);
-                app.Bot.ConsoleMessage(who.Session, ChatEffect.None, VPServices.ColorAlert, "", "");
-                gram.Read = true;
-                connection.Update(gram);
-            }
+                connection.BeginTransaction();
+                foreach ( var gram in grams )
+                {
+                    app.Bot.ConsoleMessage(who.Session, ChatEffect.Bold, VPServices.ColorAlert, "", msgTelegram, gram.Source, gram.When);
+                    app.Bot.ConsoleMessage(who.Session, ChatEffect.None, VPServices.ColorAlert, "", gram.Message);
+                    app.Bot.ConsoleMessage(who.Session, ChatEffect.None, VPServices.ColorAlert, "", "");
+                    gram.Read = true;
+                    connection.Update(gram);
+                }
 
-            connection.Commit();            
+                connection.Commit();    
+            }         
+
             return true;
         }
         #endregion
@@ -116,8 +121,8 @@ namespace VPServices.Services
         #region Telegram data logic
         List<sqlTelegram> getUnread(string target)
         {
-            var query = connection.Query<sqlTelegram>("SELECT * FROM Telegrams WHERE Read = ? AND Target = ? COLLATE NOCASE", false, target);
-            return query;
+            lock (VPServices.App.DataMutex)
+                return connection.Query<sqlTelegram>("SELECT * FROM Telegrams WHERE Read = ? AND Target = ? COLLATE NOCASE", false, target);
         }
 
         void checkTelegrams(Instance bot, int session, string name)

@@ -81,15 +81,18 @@ namespace VPServices.Services
                 return true;
             }
           
-            connection.Execute("DELETE FROM Facts WHERE Topic = ? COLLATE NOCASE", topic);
-            connection.Insert( new sqlFact
+            lock (app.DataMutex)
             {
-                Topic       = topic,
-                Description = what,
-                When        = DateTime.Now,
-                WhoID       = who.Id,
-                Locked      = locked
-            });
+                connection.Execute("DELETE FROM Facts WHERE Topic = ? COLLATE NOCASE", topic);
+                connection.Insert( new sqlFact
+                {
+                    Topic       = topic,
+                    Description = what,
+                    When        = DateTime.Now,
+                    WhoID       = who.Id,
+                    Locked      = locked
+                });
+            }
 
             app.Notify(who.Session, msg, topic, locked ? "locked " : "");
             return Log.Info(Name, "Saved a fact from {0} for topic {1} (locked: {2})", who.Name, topic, locked);
@@ -112,8 +115,10 @@ namespace VPServices.Services
                 app.Warn(who.Session, msgLocked, fact.WhoID);
                 return true;
             }
-            
-            connection.Execute("DELETE FROM Facts WHERE Topic = ? COLLATE NOCASE", data);
+
+            lock (app.DataMutex)
+                connection.Execute("DELETE FROM Facts WHERE Topic = ? COLLATE NOCASE", data);
+
             app.Notify(who.Session, msgDeleted);
             return Log.Info(Name, "{0} deleted factoid for topic {1}", who.Name, data);
         }
@@ -153,27 +158,31 @@ namespace VPServices.Services
         #region Web routes
         string webListFacts(VPServices app, string data)
         {
-            var listing = "# Factoids:\n";
-            var list    = connection.Query<sqlFact>("SELECT * FROM Facts ORDER BY Topic ASC;");
+            lock (app.DataMutex)
+            {
+                var listing = "# Factoids:\n";
+                var list    = connection.Query<sqlFact>("SELECT * FROM Facts ORDER BY Topic ASC;");
 
-            foreach ( var fact in list )
-                listing +=
-@"## {0} is {1}
+                foreach ( var fact in list )
+                    listing +=
+    @"## {0} is {1}
 
-* **By:** #{2}
-* **When:** {3}
-* **Locked:** {4}
+    * **By:** #{2}
+    * **When:** {3}
+    * **Locked:** {4}
 
-".LFormat(fact.Topic, fact.Description, fact.WhoID, fact.When, fact.Locked);
+    ".LFormat(fact.Topic, fact.Description, fact.WhoID, fact.When, fact.Locked);
 
-            return app.MarkdownParser.Transform(listing);
+                return app.MarkdownParser.Transform(listing);
+            }
         } 
         #endregion
 
         #region Facts logic
         sqlFact getFact(string topic)
         {
-            return connection.Query<sqlFact>("SELECT * FROM Facts WHERE Topic = ? COLLATE NOCASE", topic).FirstOrDefault();
+            lock (VPServices.App.DataMutex)
+                return connection.Query<sqlFact>("SELECT * FROM Facts WHERE Topic = ? COLLATE NOCASE", topic).FirstOrDefault();
         }
         #endregion
     }

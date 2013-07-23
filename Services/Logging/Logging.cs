@@ -36,28 +36,30 @@ namespace VPServices.Services
 
         void objectEvent(VPObject o, sqlBuildType type)
         {
-            connection.Insert( new sqlBuildHistory
-            {
-                ID   = o.Id,
-                X    = o.Position.X,
-                Y    = o.Position.Y,
-                Z    = o.Position.Z,
-                Type = type,
-                When = TDateTime.UnixTimestamp
-            });
+            lock (VPServices.App.DataMutex)
+                connection.Insert( new sqlBuildHistory
+                {
+                    ID   = o.Id,
+                    X    = o.Position.X,
+                    Y    = o.Position.Y,
+                    Z    = o.Position.Z,
+                    Type = type,
+                    When = TDateTime.UnixTimestamp
+                });
         }
 
         void onObjDelete(Instance sender, int sessionId, int objectId)
         {
-            connection.Insert( new sqlBuildHistory
-            {
-                ID   = objectId,
-                X    = 0,
-                Y    = 0,
-                Z    = 0,
-                Type = sqlBuildType.Delete,
-                When = TDateTime.UnixTimestamp
-            });
+            lock (VPServices.App.DataMutex)
+                connection.Insert( new sqlBuildHistory
+                {
+                    ID   = objectId,
+                    X    = 0,
+                    Y    = 0,
+                    Z    = 0,
+                    Type = sqlBuildType.Delete,
+                    When = TDateTime.UnixTimestamp
+                });
         }
 
         void userEvent(Avatar avatar, sqlUserType type)
@@ -65,13 +67,14 @@ namespace VPServices.Services
             if ( VPServices.App.StartUpTime.SecondsToNow() < 10 )
                 return;
 
-            connection.Insert ( new sqlUserHistory
-            {
-                ID   = avatar.Id,
-                Name = avatar.Name,
-                Type = type,
-                When = TDateTime.UnixTimestamp
-            });
+            lock (VPServices.App.DataMutex)
+                connection.Insert ( new sqlUserHistory
+                {
+                    ID   = avatar.Id,
+                    Name = avatar.Name,
+                    Type = type,
+                    When = TDateTime.UnixTimestamp
+                });
         }        
     }
 

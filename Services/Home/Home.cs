@@ -85,15 +85,16 @@ namespace VPServices.Services
 
         bool cmdSetHome(VPServices app, Avatar who, string data)
         {
-            connection.InsertOrReplace( new sqlHome
-            {
-                UserID = who.Id,
-                X      = who.X,
-                Y      = who.Y,
-                Z      = who.Z,
-                Pitch  = who.Pitch,
-                Yaw    = who.Yaw
-            });
+            lock (app.DataMutex)
+                connection.InsertOrReplace( new sqlHome
+                {
+                    UserID = who.Id,
+                    X      = who.X,
+                    Y      = who.Y,
+                    Z      = who.Z,
+                    Pitch  = who.Pitch,
+                    Yaw    = who.Yaw
+                });
 
             app.Notify(who.Session, "Set your home to {0:f3}, {1:f3}, {2:f3}" , who.X, who.Y, who.Z);
             return Log.Info(Name, "Set home for {0} at {1:f3}, {2:f3}, {3:f3}", who.Name, who.X, who.Y, who.Z);
@@ -101,9 +102,10 @@ namespace VPServices.Services
 
         bool cmdClearHome(VPServices app, Avatar who, string data)
         {
-            connection.Execute("DELETE FROM Home WHERE UserID = ?", who.Id);
-            app.Notify(who.Session, "Your home has been cleared to ground zero");
+            lock (app.DataMutex)
+                connection.Execute("DELETE FROM Home WHERE UserID = ?", who.Id);
 
+            app.Notify(who.Session, "Your home has been cleared to ground zero");
             return Log.Info(Name, "Cleared home for {0}", who.Name);
         }
 

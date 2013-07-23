@@ -6,6 +6,7 @@ namespace VPServices
     public partial class VPServices : IDisposable
     {
         public SQLiteConnection Connection;
+        public object           DataMutex = new object();
 
         public void SetupDatabase()
         {

@@ -83,14 +83,15 @@ namespace VPServices.Services
             if ( string.IsNullOrWhiteSpace(data) )
                 return false;
 
-            connection.Insert( new sqlTodo
-            {
-                What  = data,
-                When  = DateTime.Now,
-                Who   = who.Name,
-                WhoID = who.Id,
-                Done  = false
-            });
+            lock (app.DataMutex)
+                connection.Insert( new sqlTodo
+                {
+                    What  = data,
+                    When  = DateTime.Now,
+                    Who   = who.Name,
+                    WhoID = who.Id,
+                    Done  = false
+                });
 
             app.Notify(who.Session, msgAdded);
             return Log.Info(Name, "Saved a todo for {0}: {1}", who.Name, data);
@@ -111,12 +112,15 @@ namespace VPServices.Services
                     continue;
                 }
 
-                var affected = connection.Execute("UPDATE Todo SET Done = ? WHERE ID = ?", true, id);
+                lock (app.DataMutex)
+                {
+                    var affected = connection.Execute("UPDATE Todo SET Done = ? WHERE ID = ?", true, id);
 
-                if (affected <= 0)
-                    app.Warn(who.Session, msgNonExistant, id);
-                else
-                    Log.Info(Name, "Marked todo #{0} as done for {1}", id, who.Name);
+                    if ( affected <= 0 )
+                        app.Warn(who.Session, msgNonExistant, id);
+                    else
+                        Log.Info(Name, "Marked todo #{0} as done for {1}", id, who.Name); 
+                }
             }
             
             app.Notify(who.Session, msgDone);
@@ -138,12 +142,15 @@ namespace VPServices.Services
                     continue;
                 }
 
-                var affected = connection.Execute("DELETE FROM Todo WHERE ID = ?", id);
+                lock (app.DataMutex)
+                {
+                    var affected = connection.Execute("DELETE FROM Todo WHERE ID = ?", id);
 
-                if (affected <= 0)
-                    app.Warn(who.Session, msgNonExistant, id);
-                else
-                    Log.Info(Name, "Deleted todo #{0} for {1}", id, who.Name);
+                    if ( affected <= 0 )
+                        app.Warn(who.Session, msgNonExistant, id);
+                    else
+                        Log.Info(Name, "Deleted todo #{0} for {1}", id, who.Name); 
+                }
             }
             
             app.Notify(who.Session, msgDeleted);
@@ -161,28 +168,31 @@ namespace VPServices.Services
                 return true;
             }
 
-            var query = from    t in connection.Table<sqlTodo>()
-                        where   t.What.Contains(data) || t.Who.Contains(data)
-                        orderby t.Done ascending
-                        orderby t.ID descending
-                        select  t;
-
-            // No results
-            if ( query.Count() <= 0 )
+            lock ( app.DataMutex )
             {
-                app.Warn(who.Session, msgNoResults, todoUrl);
-                return true;
-            }
+                var query = from t in connection.Table<sqlTodo>()
+                            where t.What.Contains(data) || t.Who.Contains(data)
+                            orderby t.Done ascending
+                            orderby t.ID descending
+                            select t;
 
-            // Iterate results
-            app.Bot.ConsoleMessage(who.Session, ChatEffect.BoldItalic, VPServices.ColorInfo, "", msgResults, data);
-            foreach ( var q in query )
-            {
-                var done  = q.Done ? '✓' : '✗';
-                var color = q.Done ? VPServices.ColorLesser : VPServices.ColorInfo;
-                app.Bot.ConsoleMessage(who.Session, "", "");
-                app.Bot.ConsoleMessage(who.Session, ChatEffect.Italic, color, "", msgResultA, done, q.ID, q.What);
-                app.Bot.ConsoleMessage(who.Session, ChatEffect.Italic, color, "", msgResultB, q.Who, q.When);
+                // No results
+                if ( query.Count() <= 0 )
+                {
+                    app.Warn(who.Session, msgNoResults, todoUrl);
+                    return true;
+                }
+
+                // Iterate results
+                app.Bot.ConsoleMessage(who.Session, ChatEffect.BoldItalic, VPServices.ColorInfo, "", msgResults, data);
+                foreach ( var q in query )
+                {
+                    var done  = q.Done ? '✓' : '✗';
+                    var color = q.Done ? VPServices.ColorLesser : VPServices.ColorInfo;
+                    app.Bot.ConsoleMessage(who.Session, "", "");
+                    app.Bot.ConsoleMessage(who.Session, ChatEffect.Italic, color, "", msgResultA, done, q.ID, q.What);
+                    app.Bot.ConsoleMessage(who.Session, ChatEffect.Italic, color, "", msgResultB, q.Who, q.When);
+                } 
             }
 
             return true;
@@ -190,40 +200,46 @@ namespace VPServices.Services
 
         bool cmdGetTodo(VPServices app, Avatar who, string data)
         {
-            var random = connection.Query<sqlTodo>("SELECT * FROM Todo WHERE Done = ? ORDER BY RANDOM() LIMIT 1;", false).FirstOrDefault();
-
-            if (random == null)
-                app.Warn(who.Session, msgNoUndone);
-            else
+            lock ( app.DataMutex )
             {
-                app.Notify(who.Session, msgRandom, random.ID, random.Who, random.When);
-                app.Notify(who.Session, "{0}", random.What);
-            }
+                var random = connection.Query<sqlTodo>("SELECT * FROM Todo WHERE Done = ? ORDER BY RANDOM() LIMIT 1;", false).FirstOrDefault();
 
-            return true;
+                if ( random == null )
+                    app.Warn(who.Session, msgNoUndone);
+                else
+                {
+                    app.Notify(who.Session, msgRandom, random.ID, random.Who, random.When);
+                    app.Notify(who.Session, "{0}", random.What);
+                }
+
+                return true; 
+            }
         }
         #endregion
 
         #region Web routes
         string webListTodos(VPServices app, string data)
         {
-            var listing = "# Todo entries:\n";
-            var list    = connection.Query<sqlTodo>("SELECT * FROM Todo ORDER BY Done ASC, ID DESC;");
-
-            foreach ( var todo in list )
+            lock ( app.DataMutex )
             {
-                var done = todo.Done ? "&#10003;" : "&#10007;";
+                var listing = "# Todo entries:\n";
+                var list    = connection.Query<sqlTodo>("SELECT * FROM Todo ORDER BY Done ASC, ID DESC;");
 
-                listing +=
-@"## [{0}] #{1} - {2}
+                foreach ( var todo in list )
+                {
+                    var done = todo.Done ? "&#10003;" : "&#10007;";
+
+                    listing +=
+    @"## [{0}] #{1} - {2}
 
 * **By:** {3} (#{4})
 * **When:** {5}
 
 ".LFormat(done, todo.ID, todo.What, todo.Who, todo.WhoID, todo.When);
-            }
+                }
 
-            return app.MarkdownParser.Transform(listing);
+                return app.MarkdownParser.Transform(listing); 
+            }
         } 
         #endregion
     }
