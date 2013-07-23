@@ -201,8 +201,9 @@ namespace VPServices.Services
 
             if ( !who.Name.IEquals(owner) )
                 return false;
-            else
-                throw new Exception("Forced crash");
+
+            app.Crash = true;
+            return true;
         }
 
         bool cmdHang(VPServices app, Avatar who, string data)

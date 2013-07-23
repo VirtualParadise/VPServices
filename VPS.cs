@@ -17,6 +17,7 @@ namespace VPServices
 
         public Instance Bot;
         public string   Owner;
+        public bool     Crash;
 
         public static void Main(string[] args)
         {
@@ -85,6 +86,13 @@ namespace VPServices
         public void UpdateLoop()
         {
             Bot.Wait(0);
+
+            if (Crash)
+            {
+                Crash = false;
+                throw new Exception("Forced crash in update loop");
+            }
+
             Thread.Sleep(100);
         }
 
