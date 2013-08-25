@@ -122,7 +122,7 @@ namespace VPServices.Services
         void onEnter(Instance sender, Avatar who)
         {
             // Do not teleport users home within 10 seconds of bot's startup
-            if ( VPServices.App.StartUpTime.SecondsToNow() < 10 )
+            if ( VPServices.App.LastConnect.SecondsToNow() < 10 )
                 return;
 
             var lastExit = who.GetSettingDateTime(settingLastExit);

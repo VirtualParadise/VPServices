@@ -6,8 +6,8 @@ namespace VPServices
 {
     public partial class VPServices : IDisposable
     {
-        public DateTime StartUpTime;
-        public string World;
+        public DateTime LastConnect;
+        public string   World;
 
         string userName;
         string password;
@@ -22,6 +22,7 @@ namespace VPServices
                 try
                 {
                     Bot.Login(userName, password);
+                    LastConnect = DateTime.Now;
                     
                     // Disconnect events
                     Bot.WorldDisconnect    += onWorldDisconnect;
@@ -49,7 +50,7 @@ namespace VPServices
                 {
                     Bot.Enter(World);
                     Bot.GoTo(0, 10, 0);
-                    StartUpTime = DateTime.Now;
+                    LastConnect = DateTime.Now;
                     return;
                 }
                 catch (Exception e)

@@ -64,7 +64,7 @@ namespace VPServices.Services
 
         void userEvent(Avatar avatar, sqlUserType type)
         {
-            if ( VPServices.App.StartUpTime.SecondsToNow() < 10 )
+            if ( VPServices.App.LastConnect.SecondsToNow() < 10 )
                 return;
 
             lock (VPServices.App.DataMutex)

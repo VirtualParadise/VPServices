@@ -94,7 +94,7 @@ namespace VPServices.Services
         {
             // No greetings within 10 seconds of bot load, to prevent flooding of entries
             // on initial user list load
-            if ( VPServices.App.StartUpTime.SecondsToNow() < 10 )
+            if ( VPServices.App.LastConnect.SecondsToNow() < 10 )
                 return;
 
             var app = VPServices.App;

@@ -16,16 +16,15 @@ namespace VPServices.Services
         TriviaEntry[] entries;
         TriviaEntry   entryInPlay;
 
-        void loadTrivia()
+        bool loadTrivia()
         {
             var config   = app.Settings.Configs[configTrivia];
             var fileName = config.Get(keyDatabase, fileDatabase);
 
             if ( !File.Exists(fileName) )
             {
-                app.Bot.Say("Sorry, I was unable to start trivia as my database is missing");
-                Log.Warn(tag, "Could not begin; set database '{0}' is missing", fileName);
-                return;
+                Log.Warn(tag, "Could not load database; '{0}' is missing", fileName);
+                return false;
             }
 
             var file        = new StreamReader(fileName);
@@ -48,6 +47,7 @@ namespace VPServices.Services
             reader.Dispose();
             file  .Dispose();
             Log.Debug(tag, "Loaded trivia database '{0}', {1} entries", fileName, entries.Length);
+            return true;
         }
 
         /// <summary>
