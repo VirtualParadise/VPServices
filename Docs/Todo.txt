@@ -12,3 +12,4 @@
 - !reload command
 - Jump point aliasing
 - !jump/near
+- better clearing/"expiry" of user objects upon unexpected disconnect
