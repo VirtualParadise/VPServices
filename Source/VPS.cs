@@ -73,7 +73,6 @@ namespace VPServices
 
             // Set up subsystems
             SetupDatabase();
-            SetupWeb();
             SetupCommands();
             SetupEvents();
             LoadServices();
@@ -111,7 +110,6 @@ namespace VPServices
         {
             Commands.Clear();
 
-            ClearWeb();
             ClearEvents();
             ClearServices();
             CloseDatabase();

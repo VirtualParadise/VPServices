@@ -39,9 +39,6 @@ namespace VPServices.Services
                 ),
             });
 
-            app.Routes.Add(new WebRoute("Facts", "^(list)?facts?$", webListFacts,
-                @"Provides a list of defined facts"));
-
             this.connection = app.Connection;
         }
 
@@ -153,29 +150,6 @@ namespace VPServices.Services
             app.NotifyAll(msgFact, fact.Topic, fact.Description);
             return true;
         }
-        #endregion
-
-        #region Web routes
-        string webListFacts(VPServices app, string data)
-        {
-            lock (app.DataMutex)
-            {
-                var listing = "# Factoids:\n";
-                var list    = connection.Query<sqlFact>("SELECT * FROM Facts ORDER BY Topic ASC;");
-
-                foreach ( var fact in list )
-                    listing +=
-    @"## {0} is {1}
-
-    * **By:** #{2}
-    * **When:** {3}
-    * **Locked:** {4}
-
-    ".LFormat(fact.Topic, fact.Description, fact.WhoID, fact.When, fact.Locked);
-
-                return app.MarkdownParser.Transform(listing);
-            }
-        } 
         #endregion
 
         #region Facts logic

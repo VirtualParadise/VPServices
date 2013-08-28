@@ -45,9 +45,6 @@ namespace VPServices.Services
                 ),
             });
 
-            app.Routes.Add(new WebRoute("Jumps", "^(list)?jumps?$", webListJumps,
-                @"Provides a list of jump points registered in the system"));
-
             this.connection = app.Connection;
         }
 
@@ -187,29 +184,6 @@ namespace VPServices.Services
             }
 
             return true;
-        } 
-        #endregion
-
-        #region Web routes
-        string webListJumps(VPServices serv, string data)
-        {
-            var listing = "# Jump points available:\n";
-            var list    = connection.Query<sqlJump>("SELECT * FROM Jumps ORDER BY Name ASC;");
-
-            foreach ( var jump in list )
-            {
-                listing +=
-@"## !jump {0}
-
-* **Coordinates:** {1:f3}, {2:f3}, {3:f3}
-* **Pitch / yaw:** {4:f0} / {5:f0}
-* **Creator:** {6}
-* **Created:** {7}
-
-".LFormat(jump.Name, jump.X, jump.Y, jump.Z, jump.Pitch, jump.Yaw, jump.Creator, jump.When);
-            }
-
-            return serv.MarkdownParser.Transform(listing);
         } 
         #endregion
 

@@ -16,8 +16,7 @@ namespace VPServices.Services
         {
             bot.Data.GetWorldSetting += onWorldSetting;
 
-            app.Routes.Add(new WebRoute("WorldSettings", "^worldsettings?$", webWorldSettings,
-                @"Provides a key-value list of the settings of the bot's world"));
+            //TODO: command for world settings
         }
 
         public void Migrate(VPServices app, int target) {  }
@@ -33,7 +32,7 @@ namespace VPServices.Services
             Data[key] = value;
         }
 
-        string webWorldSettings(VPServices app, string data)
+        string cmdWorldSettings(VPServices app, string data)
         {
             string listing = string.Format("# Settings for world '{0}':\n", app.World);
 
@@ -45,7 +44,7 @@ namespace VPServices.Services
                     listing += string.Format("* **{0}** : {1}\n", setting.Key, setting.Value);
             }
 
-            return app.MarkdownParser.Transform(listing);
+            return "";
         }
     }
 }

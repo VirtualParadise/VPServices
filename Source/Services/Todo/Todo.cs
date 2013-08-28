@@ -52,9 +52,6 @@ namespace VPServices.Services
                 ),
             });
 
-            app.Routes.Add(new WebRoute("Todo", "^(list)?todos?$", webListTodos,
-                @"Provides a list of todo entries"));
-
             this.connection = app.Connection;
         }
 
@@ -215,32 +212,6 @@ namespace VPServices.Services
                 return true; 
             }
         }
-        #endregion
-
-        #region Web routes
-        string webListTodos(VPServices app, string data)
-        {
-            lock ( app.DataMutex )
-            {
-                var listing = "# Todo entries:\n";
-                var list    = connection.Query<sqlTodo>("SELECT * FROM Todo ORDER BY Done ASC, ID DESC;");
-
-                foreach ( var todo in list )
-                {
-                    var done = todo.Done ? "&#10003;" : "&#10007;";
-
-                    listing +=
-    @"## [{0}] #{1} - {2}
-
-* **By:** {3} (#{4})
-* **When:** {5}
-
-".LFormat(done, todo.ID, todo.What, todo.Who, todo.WhoID, todo.When);
-                }
-
-                return app.MarkdownParser.Transform(listing); 
-            }
-        } 
         #endregion
     }
 
