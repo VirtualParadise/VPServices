@@ -19,11 +19,14 @@ namespace VPServices
         /// </summary>
         public Avatar[] GetUsers(string name)
         {
-            var query = from   u in Users
-                        where  u.Name.IEquals(name)
-                        select u;
+            lock (SyncMutex)
+            {
+                var query = from   u in Users
+                            where  u.Name.IEquals(name)
+                            select u;
 
-            return query.ToArray();
+                return query.ToArray();
+            }
         }
 
         /// <summary>
@@ -39,11 +42,14 @@ namespace VPServices
         /// </summary>
         public Avatar GetUser(int session)
         {
-            var query = from   u in Users
-                        where  u.Session == session
-                        select u;
+            lock (SyncMutex)
+            {
+                var query = from   u in Users
+                            where  u.Session == session
+                            select u;
 
-            return query.FirstOrDefault();
+                return query.FirstOrDefault();
+            }
         } 
         #endregion
     }
@@ -52,14 +58,17 @@ namespace VPServices
     {
         public static Dictionary<string, string> GetSettings(this Avatar user)
         {
-            var conn  = VPServices.App.Connection;
-            var query = conn.Query<sqlUserSettings>("SELECT * FROM UserSettings WHERE UserID = ? ORDER BY Name ASC", user.Id);
-            var dict  = new Dictionary<string, string>();
+            lock (VPServices.App.DataMutex)
+            {
+                var conn  = VPServices.App.Connection;
+                var query = conn.Query<sqlUserSettings>("SELECT * FROM UserSettings WHERE UserID = ? ORDER BY Name ASC", user.Id);
+                var dict  = new Dictionary<string, string>();
 
-            foreach (var entry in query)
-                dict.Add(entry.Name, entry.Value);
+                foreach (var entry in query)
+                    dict.Add(entry.Name, entry.Value);
 
-            return dict;            
+                return dict;
+            }
         }
 
         /// <summary>
@@ -68,13 +77,26 @@ namespace VPServices
         /// </summary>
         public static string GetSetting(this Avatar user, string key)
         {
-            var conn  = VPServices.App.Connection;
-            var query = conn.Query<sqlUserSettings>("SELECT * FROM UserSettings WHERE UserID = ? AND Name = ? COLLATE NOCASE", user.Id, key);
+            try
+            {
+                lock (VPServices.App.DataMutex)
+                {
+                    var conn  = VPServices.App.Connection;
+                    var query = conn.Query<sqlUserSettings>("SELECT * FROM UserSettings WHERE UserID = ? AND Name = ? COLLATE NOCASE", user.Id, key);
 
-            if (query.Count() <= 0)
+                    if (query.Count() <= 0)
+                        return null;
+                    else
+                        return query.First().Value;
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Severe("Users", "Could not get setting '{0}' for ID {1}", key, user.Id);
+                e.LogFullStackTrace();
+
                 return null;
-            else
-                return query.First().Value;
+            }
         }
 
         public static int GetSettingInt(this Avatar user, string key, int defValue = 0)
@@ -112,17 +134,21 @@ namespace VPServices
 
         public static void SetSetting(this Avatar user, string key, object value)
         {
-            VPServices.App.Connection.InsertOrReplace(new sqlUserSettings
+            lock (VPServices.App.DataMutex)
             {
-                UserID = user.Id,
-                Name   = key,
-                Value  = value.ToString()
-            });
+                VPServices.App.Connection.InsertOrReplace(new sqlUserSettings
+                {
+                    UserID = user.Id,
+                    Name   = key,
+                    Value  = value.ToString()
+                });
+            }
         }
 
         public static void DeleteSetting(this Avatar user, string key)
         {
-            VPServices.App.Connection.Execute("DELETE FROM UserSettings WHERE UserID = ? AND Name = ?", user.Id, key);
+            lock (VPServices.App.DataMutex)
+                VPServices.App.Connection.Execute("DELETE FROM UserSettings WHERE UserID = ? AND Name = ?", user.Id, key);
         }
     }
 

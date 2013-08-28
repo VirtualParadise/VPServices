@@ -87,17 +87,18 @@ namespace VPServices.Services
                 return Log.Debug(Name, "{0} tried to overwrite jump {1}", who.Name, getJump(name).Name);
             }
 
-            connection.Insert( new sqlJump
-            {
-                Name    = name,
-                Creator = who.Name,
-                When    = DateTime.Now,
-                X       = who.X,
-                Y       = who.Y,
-                Z       = who.Z,
-                Pitch   = who.Pitch,
-                Yaw     = who.Yaw
-            });
+            lock (app.DataMutex)
+                connection.Insert( new sqlJump
+                {
+                    Name    = name,
+                    Creator = who.Name,
+                    When    = DateTime.Now,
+                    X       = who.X,
+                    Y       = who.Y,
+                    Z       = who.Z,
+                    Pitch   = who.Pitch,
+                    Yaw     = who.Yaw
+                });
 
             app.NotifyAll(msgAdded, name, who.X, who.Y, who.Z, who.Yaw, who.Pitch);
             return Log.Info(Name, "Saved a jump for {0} at {1}, {2}, {3} for {4}", who.Name, who.X, who.Y, who.Z, name);
@@ -124,7 +125,8 @@ namespace VPServices.Services
                 return Log.Debug(Name, "{1} tried to delete non-existant jump {0}", name, who.Name);
             }
             else
-                connection.Delete(jump);
+                lock (app.DataMutex)
+                    connection.Delete(jump);
 
             app.NotifyAll(msgDeleted, name);
             return Log.Info(Name, "Deleted {0} jump for {1}", name, who.Name);
@@ -141,21 +143,24 @@ namespace VPServices.Services
                 return true;
             }
 
-            var query = from   j in connection.Table<sqlJump>()
-                        where  j.Name.Contains(data)
-                        select j;
-
-            // No results
-            if ( query.Count() <= 0 )
+            lock ( app.DataMutex )
             {
-                app.Warn(who.Session, msgNoResults, jumpsUrl);
-                return true;
-            }
+                var query = from j in connection.Table<sqlJump>()
+                            where j.Name.Contains(data)
+                            select j;
 
-            // Iterate results
-            app.Bot.ConsoleMessage(who.Session, ChatEffect.BoldItalic, VPServices.ColorInfo, "", msgResults, data);
-            foreach ( var q in query )
-                app.Bot.ConsoleMessage(who.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msgResult, q.Name, q.Creator, q.When);
+                // No results
+                if ( query.Count() <= 0 )
+                {
+                    app.Warn(who.Session, msgNoResults, jumpsUrl);
+                    return true;
+                }
+
+                // Iterate results
+                app.Bot.ConsoleMessage(who.Session, ChatEffect.BoldItalic, VPServices.ColorInfo, "", msgResults, data);
+                foreach ( var q in query )
+                    app.Bot.ConsoleMessage(who.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msgResult, q.Name, q.Creator, q.When);
+            }
 
             return true;
         }
@@ -169,14 +174,17 @@ namespace VPServices.Services
             if ( name == "" )
                 return false;
 
-            var jump  = ( name == "random" )
-                ? connection.Query<sqlJump>("SELECT * FROM Jumps ORDER BY RANDOM() LIMIT 1;").FirstOrDefault()
-                : getJump(name);
+            lock ( app.DataMutex )
+            {
+                var jump  = ( name == "random" )
+                        ? connection.Query<sqlJump>("SELECT * FROM Jumps ORDER BY RANDOM() LIMIT 1;").FirstOrDefault()
+                        : getJump(name);
 
-            if ( jump != null )
-                app.Bot.Avatars.Teleport(who.Session, "", new Vector3(jump.X, jump.Y, jump.Z), jump.Yaw, jump.Pitch);
-            else
-                app.Warn(who.Session, msgNonExistant, jumpsUrl);
+                if ( jump != null )
+                    app.Bot.Avatars.Teleport(who.Session, "", new Vector3(jump.X, jump.Y, jump.Z), jump.Yaw, jump.Pitch);
+                else
+                    app.Warn(who.Session, msgNonExistant, jumpsUrl); 
+            }
 
             return true;
         } 
@@ -208,9 +216,12 @@ namespace VPServices.Services
         #region Jump data logic
         sqlJump getJump(string name)
         {
-            var query = connection.Query<sqlJump>("SELECT * FROM Jumps WHERE Name = ? COLLATE NOCASE", name);
+            lock (VPServices.App.DataMutex)
+            {
+                var query = connection.Query<sqlJump>("SELECT * FROM Jumps WHERE Name = ? COLLATE NOCASE", name);
 
-            return query.FirstOrDefault();
+                return query.FirstOrDefault();
+            }
         }
         #endregion
     }

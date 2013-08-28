@@ -46,6 +46,7 @@ namespace VPServices.Services
             
             setupEvents(app);
             loadSettings(app);
+            this.app = app;
 
             // Auto-connect IRC asynchronously if set
             if ( config.AutoConnect )
@@ -57,9 +58,10 @@ namespace VPServices.Services
         public void Dispose() { }
 
         #region Privates
-        IrcClient irc   = new IrcClient();
-        object    mutex = new object();
-        IConfig   iniConfig;
+        VPServices app;
+        IrcClient  irc   = new IrcClient();
+        object     mutex = new object();
+        IConfig    iniConfig;
 
         IrcConfig _config;
         /// <summary>

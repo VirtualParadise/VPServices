@@ -43,7 +43,12 @@ namespace VPServices.Services
             {
                 app.Notify(who.Session, msgFirstLoad);
                 Log.Debug(tag, msgFirstLoad);
-                loadTrivia();
+
+                if ( !loadTrivia() )
+                {
+                    app.Bot.Say("Sorry, I was unable to start trivia as my database is missing");
+                    return true;
+                }
             }
 
             // Skip question
@@ -67,8 +72,10 @@ namespace VPServices.Services
         bool cmdReloadTrivia(VPServices app, Avatar who, string data)
         {
             entries = null;
-            loadTrivia();
-            app.Notify(who.Session, msgReloaded, entries.Length);
+            if ( !loadTrivia() )
+                app.Bot.Say("Sorry, I was unable to find my trivia database");
+            else
+                app.Notify(who.Session, msgReloaded, entries.Length);
 
             return true;
         }

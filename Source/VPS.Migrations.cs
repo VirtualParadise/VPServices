@@ -19,8 +19,11 @@ namespace VPServices
         #region VPServices migrations
         public void PerformMigrations()
         {
-            migrateUsers();
-            migrateServices();
+            lock (VPServices.App.DataMutex)
+            {
+                migrateUsers();
+                migrateServices();
+            }
         }
 
         /// <summary>

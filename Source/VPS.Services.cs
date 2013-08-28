@@ -14,6 +14,23 @@ namespace VPServices
         public List<IService> Services = new List<IService>();
 
         /// <summary>
+        /// Fetches a service by type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>Service instance if available, null if not</returns>
+        public T GetService<T>()
+            where T : class, IService
+        {
+            var type = typeof(T);
+
+            foreach (var service in Services)
+                if ( service.GetType().Equals(type) )
+                    return (T) service;
+
+            return null;
+        }
+
+        /// <summary>
         /// Disposes all loaded services and clears list
         /// </summary>
         public void ClearServices()

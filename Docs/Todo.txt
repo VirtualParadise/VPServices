@@ -13,3 +13,4 @@
 - Jump point aliasing
 - !jump/near
 - per plugin migration
+- better clearing/"expiry" of user objects upon unexpected disconnect

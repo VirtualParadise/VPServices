@@ -17,13 +17,16 @@ namespace VPServices
 
         public Instance Bot;
         public string   Owner;
+        public bool     Crash;
 
-        public static void Main(string[] args)
+        public static int Main(string[] args)
         {
+            int exit = 0;
+
             // Set up logger
             new ConsoleLogger();
+            Console.WriteLine("### [{0}] Services is starting...", DateTime.Now);
 
-            init:
             try
             {
                 App = new VPServices();
@@ -36,9 +39,15 @@ namespace VPServices
             catch (Exception e)
             {
                 e.LogFullStackTrace();
-                App.Dispose();
-                goto init;
+                exit = 1;
             }
+            finally
+            {
+                App.Dispose();
+            }
+
+            Console.WriteLine("### [{0}] Services is now exiting", DateTime.Now);
+            return exit;
         }
 
         /// <summary>
@@ -85,6 +94,13 @@ namespace VPServices
         public void UpdateLoop()
         {
             Bot.Wait(0);
+
+            if (Crash)
+            {
+                Crash = false;
+                throw new Exception("Forced crash in update loop");
+            }
+
             Thread.Sleep(100);
         }
 

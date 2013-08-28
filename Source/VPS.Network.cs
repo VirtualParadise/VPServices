@@ -6,8 +6,8 @@ namespace VPServices
 {
     public partial class VPServices : IDisposable
     {
-        public DateTime StartUpTime;
-        public string World;
+        public DateTime LastConnect;
+        public string   World;
 
         string userName;
         string password;
@@ -22,6 +22,7 @@ namespace VPServices
                 try
                 {
                     Bot.Login(userName, password);
+                    LastConnect = DateTime.Now;
                     
                     // Disconnect events
                     Bot.WorldDisconnect    += onWorldDisconnect;
@@ -49,7 +50,7 @@ namespace VPServices
                 {
                     Bot.Enter(World);
                     Bot.GoTo(0, 10, 0);
-                    StartUpTime = DateTime.Now;
+                    LastConnect = DateTime.Now;
                     return;
                 }
                 catch (Exception e)
@@ -65,12 +66,20 @@ namespace VPServices
         void onUniverseDisconnect(Instance sender)
         {
             Log.Warn("Network", "Disconnected from universe! Reconnecting...");
+
+            lock (SyncMutex)
+                Users.Clear();
+
             ConnectToUniverse();
         }
 
         void onWorldDisconnect(Instance sender)
         {
             Log.Warn("Network", "Disconnected from world! Reconnecting...");
+
+            lock (SyncMutex)
+                Users.Clear();
+
             ConnectToWorld();
         }
     }

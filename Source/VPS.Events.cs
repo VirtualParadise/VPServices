@@ -38,7 +38,9 @@ namespace VPServices
         void onAvatarAdd(Instance sender, Avatar avatar)
         {
             TConsole.WriteLineColored(ConsoleColor.Cyan, "*** {0} [SID#{1}] enters", avatar.Name, avatar.Session);
-            Users.Add(avatar);
+            
+            lock (SyncMutex)
+                Users.Add(avatar);
 
             if ( AvatarEnter != null )
                 AvatarEnter(sender, avatar);
@@ -52,7 +54,8 @@ namespace VPServices
             if ( AvatarLeave != null )
                 AvatarLeave(sender, avatar);
 
-            Users.Remove(user);
+            lock (SyncMutex)
+                Users.Remove(user);
         }
 
         void onAvatarsChange(Instance sender, Avatar avatar)

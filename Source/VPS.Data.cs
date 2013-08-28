@@ -7,6 +7,16 @@ namespace VPServices
     {
         public SQLiteConnection Connection;
 
+        /// <summary>
+        /// Mutex to lock to when accessing collections or objects shared across tasks
+        /// </summary>
+        public object SyncMutex = new object();
+
+        /// <summary>
+        /// Mutex to lock to when accessing databases (SQLite methods, etc)
+        /// </summary>
+        public object DataMutex = new object();
+
         public void SetupDatabase()
         {
             var database = CoreSettings.Get("Database", "VPServices.db");
