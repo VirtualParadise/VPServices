@@ -56,39 +56,42 @@ namespace VPServices.Services
             var color = announce ? VPServices.ColorInfo : colorChat;
             message   = message.LFormat(parts);
 
-            foreach (var user in VPServices.App.Users)
+            lock (VPServices.App.SyncMutex)
             {
-                // No broadcasting to those muting IRC
-                if ( user.GetSettingBool(settingMuteIRC) )
-                    continue;
-
-                var muteList = user.GetSetting(settingMuteList);
-                var muted    = ( muteList ?? "" ).TerseSplit(',');
-
-                // No broadcasting to those muting target user
-                if ( muted.IContains(name) )
-                    continue;
-
-                // Keep within VP message limit
-                if (message.Length > 245)
+                foreach (var user in VPServices.App.Users)
                 {
-                    var messages = new List<string>();
-                    var buffer   = message;
+                    // No broadcasting to those muting IRC
+                    if ( user.GetSettingBool(settingMuteIRC) )
+                        continue;
 
-                    while (buffer.Length > 245)
+                    var muteList = user.GetSetting(settingMuteList);
+                    var muted    = ( muteList ?? "" ).TerseSplit(',');
+
+                    // No broadcasting to those muting target user
+                    if ( muted.IContains(name) )
+                        continue;
+
+                    // Keep within VP message limit
+                    if (message.Length > 245)
                     {
-                        var part = buffer.Substring(0, 245);
-                        buffer   = buffer.Substring(245);
+                        var messages = new List<string>();
+                        var buffer   = message;
 
-                        messages.Add(part);
+                        while (buffer.Length > 245)
+                        {
+                            var part = buffer.Substring(0, 245);
+                            buffer   = buffer.Substring(245);
+
+                            messages.Add(part);
+                        }
+
+                        messages.Add(buffer);
+                        foreach (var line in messages)
+                            VPServices.App.Bot.ConsoleMessage(user.Session, fx, color, name, "{0}", line);
                     }
-
-                    messages.Add(buffer);
-                    foreach (var line in messages)
-                        VPServices.App.Bot.ConsoleMessage(user.Session, fx, color, name, "{0}", line);
+                    else
+                        VPServices.App.Bot.ConsoleMessage(user.Session, fx, color, name, "{0}", message);
                 }
-                else
-                    VPServices.App.Bot.ConsoleMessage(user.Session, fx, color, name, "{0}", message);
             }
         }
     }

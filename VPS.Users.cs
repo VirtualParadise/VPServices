@@ -19,11 +19,14 @@ namespace VPServices
         /// </summary>
         public Avatar[] GetUsers(string name)
         {
-            var query = from   u in Users
-                        where  u.Name.IEquals(name)
-                        select u;
+            lock (SyncMutex)
+            {
+                var query = from   u in Users
+                            where  u.Name.IEquals(name)
+                            select u;
 
-            return query.ToArray();
+                return query.ToArray();
+            }
         }
 
         /// <summary>
@@ -39,11 +42,14 @@ namespace VPServices
         /// </summary>
         public Avatar GetUser(int session)
         {
-            var query = from   u in Users
-                        where  u.Session == session
-                        select u;
+            lock (SyncMutex)
+            {
+                var query = from   u in Users
+                            where  u.Session == session
+                            select u;
 
-            return query.FirstOrDefault();
+                return query.FirstOrDefault();
+            }
         } 
         #endregion
     }

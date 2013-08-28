@@ -66,14 +66,20 @@ namespace VPServices
         void onUniverseDisconnect(Instance sender)
         {
             Log.Warn("Network", "Disconnected from universe! Reconnecting...");
-            Users.Clear();
+
+            lock (SyncMutex)
+                Users.Clear();
+
             ConnectToUniverse();
         }
 
         void onWorldDisconnect(Instance sender)
         {
             Log.Warn("Network", "Disconnected from world! Reconnecting...");
-            Users.Clear();
+
+            lock (SyncMutex)
+                Users.Clear();
+
             ConnectToWorld();
         }
     }

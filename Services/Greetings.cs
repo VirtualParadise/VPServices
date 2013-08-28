@@ -103,17 +103,20 @@ namespace VPServices.Services
             if ( !CanGreet(who) )
                 return;
 
-            foreach ( var target in app.Users )
+            lock (VPServices.App.SyncMutex)
             {
-                // Do not send greet to bots or to the entering user themselves
-                if ( target.IsBot || target.Session == who.Session )
-                    continue;
-
-                // Only send greet if target wants them
-                if ( target.GetSettingBool(SettingShowGreets, true) )
+                foreach ( var target in app.Users )
                 {
-                    var msg = entering ? msgEntry : msgExit;
-                    bot.ConsoleMessage(target.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msg, who.Name, app.World);
+                    // Do not send greet to bots or to the entering user themselves
+                    if ( target.IsBot || target.Session == who.Session )
+                        continue;
+
+                    // Only send greet if target wants them
+                    if ( target.GetSettingBool(SettingShowGreets, true) )
+                    {
+                        var msg = entering ? msgEntry : msgExit;
+                        bot.ConsoleMessage(target.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msg, who.Name, app.World);
+                    }
                 }
             }
         } 
