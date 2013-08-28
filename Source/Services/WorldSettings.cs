@@ -25,7 +25,7 @@ namespace VPServices.Services
                 new Command
                 (
                     "World: Settings", @"^world(settings|attributes)$", cmdListSettings,
-                    @"Lists all of this world's settings or searches them",
+                    @"Lists all of this world's settings or searches keys and values matching given term",
                     @"!worldsettings `[search term]`"
                 ),
             });
@@ -41,7 +41,7 @@ namespace VPServices.Services
         const string msgTitle    = "*** World settings for '{0}'";
         const string msgResults  = "*** Search results for '{0}'";
         const string msgResult   = "{0} : {1}";
-        const string msgNotFound = "Could not match any world setting for '{0}'; try `!worldsettings`";
+        const string errNotFound = "Could not match any world setting for '{0}'; try `!worldsettings`";
 
         void onWorldSetting(Instance sender, string key, string value)
         {
@@ -58,7 +58,7 @@ namespace VPServices.Services
                             select  s;
 
                 if (query.Count() == 0)
-                    app.Warn(who.Session, msgNotFound, data);
+                    app.Warn(who.Session, errNotFound, data);
                 else
                 {
                     app.Bot.ConsoleMessage(who.Session, ChatEffect.BoldItalic, VPServices.ColorInfo, "", msgResults, data);

@@ -33,8 +33,8 @@ namespace VPServices.Services
                 new Command
                 (
                     "Jumps: List", "^(listjumps?|lj|jumps?list)$", cmdJumpList,
-                    @"Prints the URL to a listing of jumps to chat or lists those matching a search term to you",
-                    @"!lj `[search]`"
+                    @"Searches list of jumps for name or creator matching given term",
+                    @"!lj `search term`"
                 ),
 
                 new Command
@@ -53,13 +53,14 @@ namespace VPServices.Services
         #region Privates and strings
         const string msgAdded       = "Added jump '{0}' at {1}, {2}, {3} ({4} yaw, {5} pitch)";
         const string msgDeleted     = "Deleted jump '{0}'";
-        const string msgExists      = "That jump already exists";
-        const string msgNonExistant = "That jump does not exist; check {0}";
-        const string msgReserved    = "That name is reserved";
         const string msgResults     = "*** Search results for '{0}'";
-        const string msgResult      = "!j {0}   - by {1} on {2}";
-        const string msgNoResults   = "No results; check {0}";
-        const string webJumps       = "jumps";
+        const string msgResult      = "!j {0}";
+        const string msgResult2     = "➜ {0}X {1}Y {2}Z, {3} pitch {4} yaw";
+        const string msgResult3     = "➜ by {0} on {1}";
+        const string errExists      = "That jump already exists";
+        const string errNonExistant = "That jump does not exist; try searching with !lj";
+        const string errReserved    = "That name is reserved";
+        const string errNotFound    = "Could not match any jumps or creators for '{0}'";
 
         SQLiteConnection connection; 
         #endregion
@@ -67,96 +68,98 @@ namespace VPServices.Services
         #region Command handlers
         bool cmdAddJump(VPServices app, Avatar who, string data)
         {
-            var name = data.ToLower();
-
-            // Reject null entries and reserved words
-            if ( name == "" )
+            if (data == "")
                 return false;
-            else if ( name == "random" )
-            {
-                app.Warn(who.Session, msgReserved);
-                return true;
-            }
+            else
+                data = data.ToLower();
 
-            if ( getJump(name) != null )
+            if (data == "random")
+                app.Warn(who.Session, errReserved);
+            else
             {
-                app.Warn(who.Session, msgExists);
-                return Log.Debug(Name, "{0} tried to overwrite jump {1}", who.Name, getJump(name).Name);
-            }
 
-            lock (app.DataMutex)
-                connection.Insert( new sqlJump
+                if (getJump(data) != null)
                 {
-                    Name    = name,
-                    Creator = who.Name,
-                    When    = DateTime.Now,
-                    X       = who.X,
-                    Y       = who.Y,
-                    Z       = who.Z,
-                    Pitch   = who.Pitch,
-                    Yaw     = who.Yaw
-                });
+                    app.Warn(who.Session, errExists);
+                    Log.Debug(Name, "User '{0}' tried to add existing jump '{1}'", who.Name, data);
+                    return true;
+                }
 
-            app.NotifyAll(msgAdded, name, who.X, who.Y, who.Z, who.Yaw, who.Pitch);
-            return Log.Info(Name, "Saved a jump for {0} at {1}, {2}, {3} for {4}", who.Name, who.X, who.Y, who.Z, name);
+                lock (app.DataMutex)
+                    connection.Insert( new sqlJump
+                    {
+                        Name    = data,
+                        Creator = who.Name,
+                        When    = DateTime.Now,
+                        X       = who.X,
+                        Y       = who.Y,
+                        Z       = who.Z,
+                        Pitch   = who.Pitch,
+                        Yaw     = who.Yaw
+                    });
+
+                app.NotifyAll(msgAdded, data, who.X, who.Y, who.Z, who.Yaw, who.Pitch);
+                Log.Info(Name, "Saved a jump for user '{0}' at {1}, {2}, {3} named '{4}'", who.Name, who.X, who.Y, who.Z, data);
+            }
+
+            return true;
         }
 
         bool cmdDelJump(VPServices app, Avatar who, string data)
         {
-            var jumpsUrl = app.PublicUrl + webJumps;
-            var name     = data.ToLower();
-
-            // Reject null entries and reserved words
-            if ( name == "" )
+            if (data == "")
                 return false;
-            else if ( name == "random" )
-            {
-                app.Warn(who.Session, msgReserved);
-                return true;
-            }
-
-            var jump = getJump(name);
-            if ( jump == null )
-            {
-                app.Warn(who.Session, msgNonExistant, jumpsUrl);
-                return Log.Debug(Name, "{1} tried to delete non-existant jump {0}", name, who.Name);
-            }
             else
-                lock (app.DataMutex)
-                    connection.Delete(jump);
+                data = data.ToLower();
+            
+            if (data == "random")
+                app.Warn(who.Session, errReserved);
+            else
+            {
+                var jump = getJump(data);
 
-            app.NotifyAll(msgDeleted, name);
-            return Log.Info(Name, "Deleted {0} jump for {1}", name, who.Name);
+                if (jump == null)
+                {
+                    app.Warn(who.Session, errNonExistant);
+                    Log.Debug(Name, "User '{0}' tried to delete non-existant jump '{1}'", who.Name, data); 
+                }
+                else
+                {
+                    lock (app.DataMutex)
+                        connection.Delete(jump);
+
+                    app.NotifyAll(msgDeleted, data);
+                    Log.Info(Name, "Deleted jump '{0}' for user '{1}'", data, who.Name);
+                }
+            }
+
+            return true;
         }
 
         bool cmdJumpList(VPServices app, Avatar who, string data)
         {
-            var jumpsUrl = app.PublicUrl + webJumps;
-
-            // No search; list URL only
             if ( data == "" )
-            {
-                app.Notify(who.Session, jumpsUrl);
-                return true;
-            }
+                return false;
 
             lock ( app.DataMutex )
             {
-                var query = from j in connection.Table<sqlJump>()
-                            where j.Name.Contains(data)
-                            select j;
+                var query = from    j in connection.Table<sqlJump>()
+                            where  (j.Name + j.Creator).Contains(data)
+                            select  j;
 
-                // No results
-                if ( query.Count() <= 0 )
+                if (query.Count() == 0)
+                    app.Warn(who.Session, errNotFound, data);
+                else
                 {
-                    app.Warn(who.Session, msgNoResults, jumpsUrl);
-                    return true;
-                }
+                    app.Bot.ConsoleMessage(who.Session, ChatEffect.BoldItalic, VPServices.ColorInfo, "", msgResults, data);
 
-                // Iterate results
-                app.Bot.ConsoleMessage(who.Session, ChatEffect.BoldItalic, VPServices.ColorInfo, "", msgResults, data);
-                foreach ( var q in query )
-                    app.Bot.ConsoleMessage(who.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msgResult, q.Name, q.Creator, q.When);
+                    foreach ( var q in query )
+                    {
+                        app.Bot.ConsoleMessage(who.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msgResult , q.Name);
+                        app.Bot.ConsoleMessage(who.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msgResult2, q.X, q.Y, q.Z, q.Pitch, q.Yaw);
+                        app.Bot.ConsoleMessage(who.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msgResult3, q.Creator, q.When);
+                    }
+                }
             }
 
             return true;
@@ -164,23 +167,21 @@ namespace VPServices.Services
 
         bool cmdJump(VPServices app, Avatar who, string data)
         {
-            var jumpsUrl = app.PublicUrl + webJumps;
-            var name     = data.ToLower();
-
-            // Reject null
-            if ( name == "" )
+            if ( data == "" )
                 return false;
+            else
+                data = data.ToLower();
 
-            lock ( app.DataMutex )
+            lock (app.DataMutex)
             {
-                var jump  = ( name == "random" )
-                        ? connection.Query<sqlJump>("SELECT * FROM Jumps ORDER BY RANDOM() LIMIT 1;").FirstOrDefault()
-                        : getJump(name);
+                var jump = ( data == "random" )
+                    ? connection.Query<sqlJump>("SELECT * FROM Jumps ORDER BY RANDOM() LIMIT 1;").FirstOrDefault()
+                    : getJump(data);
 
-                if ( jump != null )
+                if (jump != null)
                     app.Bot.Avatars.Teleport(who.Session, "", new Vector3(jump.X, jump.Y, jump.Z), jump.Yaw, jump.Pitch);
                 else
-                    app.Warn(who.Session, msgNonExistant, jumpsUrl); 
+                    app.Warn(who.Session, errNonExistant); 
             }
 
             return true;
