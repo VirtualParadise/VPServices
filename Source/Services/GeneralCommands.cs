@@ -114,9 +114,6 @@ namespace VPServices.Services
                     @"!hang"
                 ),
             });
-
-            app.Routes.Add(new WebRoute("Help", "^(help|commands)$", webHelp,
-                @"Provides documentation on using the bot in-world via chat"));
         }
 
         public void Migrate(VPServices app, int target) {  }
@@ -135,8 +132,6 @@ namespace VPServices.Services
         #region Services commands
         bool cmdHelp(VPServices app, Avatar who, string data)
         {
-            var helpUrl = app.PublicUrl + "help";
-
             if ( data != "" )
             {
                 // If given data, try to find specific command and print help in console for
@@ -307,28 +302,6 @@ namespace VPServices.Services
 
             app.Bot.Avatars.Teleport(who.Session, target);
             return true;
-        }
-        #endregion
-
-        #region Web routes
-        string webHelp(VPServices app, string data)
-        {
-            string listing = "# Bot commands available:\n";
-
-            foreach (var command in app.Commands)
-            {
-                listing +=
-@"## {0}
-
-* **Regex:** {1}
-* **Example:** {2}
-* **Time limit:** {3}
-* *{4}*
-
-".LFormat(command.Name, command.Regex, command.Example, command.TimeLimit, command.Help);
-            }
-
-            return app.MarkdownParser.Transform(listing);
         }
         #endregion
 

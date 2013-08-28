@@ -14,3 +14,5 @@
 - !jump/near
 - per plugin migration
 - better clearing/"expiry" of user objects upon unexpected disconnect
+- write a "searchengine" util for commands that do searching
+- single threaded architecture
