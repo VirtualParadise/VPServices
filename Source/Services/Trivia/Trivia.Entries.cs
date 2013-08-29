@@ -123,26 +123,18 @@ namespace VPServices.Services
     {
         public bool   Used;
 
-        [CsvField(Name = "Category")]
         public string Category { get; set; }
-        
-        [CsvField(Name = "Question")]
         public string Question { get; set; }
-        
-        [CsvField(Name = "Answer")]
         public string Answer   { get; set; }
-
-        [CsvField(Name = "Wrong")]
         public string Wrong    { get; set; }
 
         string canonical;
-        [CsvField(Name = "Canonical answer")]
         public string CanonicalAnswer
         {
             get { return canonical ?? Answer; }
             set
             {
-                if ( value.Trim() == "" )
+                if ( string.IsNullOrWhiteSpace(value) )
                     canonical = null;
                 else
                     canonical = value;
