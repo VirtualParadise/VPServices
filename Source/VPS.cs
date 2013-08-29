@@ -7,22 +7,13 @@ namespace VPServices
 {
     public partial class VPServices : IDisposable
     {
-        public static VPServices App;
-        public static Random     Rand = new Random();
-
-        public static Color ColorLesser = new Color(150,150,200);
-        public static Color ColorInfo   = new Color(50,50,100);
-        public static Color ColorWarn   = new Color(220,80,20);
-        public static Color ColorAlert  = new Color(255,0,0);
-
-        public Instance Bot;
-        public string   Owner;
-        public bool     Crash;
+        public static Random   Rand = new Random();
+        public static Instance Bot;
+        public static string   Owner;
+        public static bool     Crash;
 
         public static int Main(string[] args)
         {
-            int exit = 0;
-
             // Set up logger
             new ConsoleLogger();
             Console.WriteLine("### [{0}] Services is starting...", DateTime.Now);
@@ -39,13 +30,10 @@ namespace VPServices
             catch (Exception e)
             {
                 e.LogFullStackTrace();
-                exit = 1;
-            }
-            finally
-            {
-                App.Dispose();
+                return 1;
             }
 
+            App.Dispose();
             Console.WriteLine("### [{0}] Services is now exiting", DateTime.Now);
             return exit;
         }
