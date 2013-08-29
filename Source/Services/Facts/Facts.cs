@@ -37,6 +37,13 @@ namespace VPServices.Services
                     @"Explains a given topic",
                     "!what `topic`"
                 ),
+
+                new Command
+                (
+                    "Facts: List", "^(listfacts?|lf|facts?list)$", cmdFactList,
+                    @"Searches list of facts for topics matching search term",
+                    @"!lf `search term`"
+                ),
             });
 
             this.connection = app.Connection;
@@ -49,9 +56,13 @@ namespace VPServices.Services
         const string msgAdded       = "Added factoid for {1}topic '{0}'";
         const string msgOverwritten = "Overwritten previous factoid for {1}topic '{0}'";
         const string msgDeleted     = "Factoid deleted";
-        const string msgNonExistant = "No factoid for that topic was found";
-        const string msgBrokenAlias = "Could not resolve alias '@{0}' from topic '{1}'";
-        const string msgLocked      = "Topic locked by user ID {0}; can only be modified or deleted by them or the bot's owner";
+        const string msgResults     = "*** Search results for '{0}'";
+        const string msgResult      = "{0}{1} : {2}";
+        const string msgResult2     = "➜ defined on {0}";
+        const string errNonExistant = "No factoid for that topic was found";
+        const string errBrokenAlias = "Could not resolve alias '@{0}' from topic '{1}'";
+        const string errLocked      = "Topic locked by user ID {0}; can only be modified or deleted by them or the bot's owner";
+        const string errNotFound    = "Could not match any facts for '{0}'";
 
         SQLiteConnection connection; 
         #endregion
@@ -74,7 +85,7 @@ namespace VPServices.Services
             if ( old != null && old.Locked && !who.Name.IEquals(app.Owner) )
             if (old.WhoID != who.Id)
             {
-                app.Warn(who.Session, msgLocked, old.WhoID);
+                app.Warn(who.Session, errLocked, old.WhoID);
                 return true;
             }
           
@@ -101,7 +112,7 @@ namespace VPServices.Services
 
             if (fact == null)
             {
-                app.Warn(who.Session, msgNonExistant);
+                app.Warn(who.Session, errNonExistant);
                 return true;
             }
 
@@ -109,7 +120,7 @@ namespace VPServices.Services
             if ( fact.Locked && !who.Name.IEquals(app.Owner) )
             if (fact.WhoID != who.Id)
             {
-                app.Warn(who.Session, msgLocked, fact.WhoID);
+                app.Warn(who.Session, errLocked, fact.WhoID);
                 return true;
             }
 
@@ -127,7 +138,7 @@ namespace VPServices.Services
             // Undefined topics
             if (fact == null)
             {
-                app.Warn(who.Session, msgNonExistant);
+                app.Warn(who.Session, errNonExistant);
                 return true;
             }
             
@@ -139,7 +150,7 @@ namespace VPServices.Services
                 
                 if (alias == null)
                 {
-                    app.Warn(who.Session, msgBrokenAlias, aliasTopic, data);
+                    app.Warn(who.Session, errBrokenAlias, aliasTopic, data);
                     return true;
                 }
 
@@ -148,6 +159,36 @@ namespace VPServices.Services
             }
 
             app.NotifyAll(msgFact, fact.Topic, fact.Description);
+            return true;
+        }
+
+        bool cmdFactList(VPServices app, Avatar who, string data)
+        {
+            if (data == "")
+                return false;
+
+            lock (app.DataMutex)
+            {
+                var query = from   f in connection.Table<sqlFact>()
+                            where  f.Topic.Contains(data)
+                            select f;
+
+                if (query.Count() == 0)
+                    app.Warn(who.Session, errNotFound, data);
+                else
+                {
+                    app.Bot.ConsoleMessage(who.Session, ChatEffect.BoldItalic, VPServices.ColorInfo, "", msgResults, data);
+
+                    foreach ( var q in query )
+                    {
+                        var locked = q.Locked ? " (locked)" : "";
+
+                        app.Bot.ConsoleMessage(who.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msgResult , q.Topic, locked, q.Description);
+                        app.Bot.ConsoleMessage(who.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msgResult2, q.When);
+                    }
+                }
+            }
+
             return true;
         }
         #endregion

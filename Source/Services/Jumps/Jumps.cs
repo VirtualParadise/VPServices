@@ -138,10 +138,10 @@ namespace VPServices.Services
 
         bool cmdJumpList(VPServices app, Avatar who, string data)
         {
-            if ( data == "" )
+            if (data == "")
                 return false;
 
-            lock ( app.DataMutex )
+            lock (app.DataMutex)
             {
                 var query = from    j in connection.Table<sqlJump>()
                             where  (j.Name + j.Creator).Contains(data)
@@ -167,14 +167,14 @@ namespace VPServices.Services
 
         bool cmdJump(VPServices app, Avatar who, string data)
         {
-            if ( data == "" )
+            if (data == "")
                 return false;
             else
                 data = data.ToLower();
 
             lock (app.DataMutex)
             {
-                var jump = ( data == "random" )
+                var jump = (data == "random")
                     ? connection.Query<sqlJump>("SELECT * FROM Jumps ORDER BY RANDOM() LIMIT 1;").FirstOrDefault()
                     : getJump(data);
 
