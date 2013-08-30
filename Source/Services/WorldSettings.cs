@@ -17,7 +17,7 @@ namespace VPServices.Services
             get { return "World Settings"; }
         }
 
-        public void Load (VPServices app, Instance bot)
+        public void Load (VPServices app, World bot)
         {
             bot.Data.GetWorldSetting += onWorldSetting;
 
@@ -43,7 +43,7 @@ namespace VPServices.Services
         const string msgResult   = "{0} : {1}";
         const string errNotFound = "Could not match any world setting for '{0}'; try `!worldsettings`";
 
-        void onWorldSetting(Instance sender, string key, string value)
+        void onWorldSetting(World sender, string key, string value)
         {
             Log.Fine(Name, "Retrieved world setting: {0} : {1}", key, value);
             Data[key] = value;

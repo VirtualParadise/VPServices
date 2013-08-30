@@ -6,7 +6,7 @@ using VPServices.Services;
 
 namespace VPServices
 {
-    public partial class VPServices : IDisposable
+    public class ServiceManager
     {
         /// <summary>
         /// Global list of all loaded services

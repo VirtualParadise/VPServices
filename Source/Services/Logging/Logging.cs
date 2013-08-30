@@ -19,7 +19,7 @@ namespace VPServices.Services
             get { return "Logging"; }
         }
 
-        public void Load(VPServices app, Instance bot)
+        public void Load(VPServices app, World bot)
         {
             bot.Property.ObjectCreate += (s,i,o) => { objectEvent(o, sqlBuildType.Create); };
             bot.Property.ObjectChange += (s,i,o) => { objectEvent(o, sqlBuildType.Modify); };
@@ -48,7 +48,7 @@ namespace VPServices.Services
                 });
         }
 
-        void onObjDelete(Instance sender, int sessionId, int objectId)
+        void onObjDelete(World sender, int sessionId, int objectId)
         {
             lock (VPServices.App.DataMutex)
                 connection.Insert( new sqlBuildHistory

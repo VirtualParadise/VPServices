@@ -12,7 +12,7 @@ namespace VPServices.Services
     public class RKill : IService
     {
         public string Name { get { return "RKill"; } }
-        public void Init(VPServices app, Instance bot)
+        public void Init(VPServices app, World bot)
         {
             app.Commands.AddRange(new[] {
                 new Command

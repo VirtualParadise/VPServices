@@ -17,7 +17,7 @@ namespace VPServices.Services
             get { return "General commands"; }
         }
 
-        public void Init(VPServices app, Instance bot)
+        public void Init(VPServices app, World bot)
         {
             app.Commands.AddRange(new[] {
                 new Command

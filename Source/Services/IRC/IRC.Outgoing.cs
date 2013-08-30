@@ -6,7 +6,7 @@ namespace VPServices.Services
 {
     partial class IRC : IService
     {
-        void onWorldChat(Instance sender, Avatar user, string message)
+        void onWorldChat(World sender, Avatar user, string message)
         {
             // No chat if not connected
             if (!irc.IsConnected)
@@ -21,7 +21,7 @@ namespace VPServices.Services
                     irc.SendMessage(SendType.Message, config.Channel, user.Name + ": " +  msg );
         }
 
-        void onWorldConsole(Instance sender, ConsoleMessage console)
+        void onWorldConsole(World sender, ConsoleMessage console)
         {
             // No chat if not connected
             if (!irc.IsConnected)
@@ -41,7 +41,7 @@ namespace VPServices.Services
                 irc.SendMessage(SendType.Message, config.Channel, "C* " + console.Name + " " +  msg );
         }
 
-        void onWorldEnter(Instance sender, Avatar avatar)
+        void onWorldEnter(World sender, Avatar avatar)
         {
             if (!irc.IsConnected)
                 return;
@@ -60,7 +60,7 @@ namespace VPServices.Services
             irc.SendMessage(SendType.Action, config.Channel, msg);
         }
 
-        void onWorldLeave(Instance sender, Avatar avatar)
+        void onWorldLeave(World sender, Avatar avatar)
         {
             if (!irc.IsConnected)
                 return;

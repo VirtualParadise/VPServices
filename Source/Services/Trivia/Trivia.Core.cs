@@ -28,7 +28,7 @@ namespace VPServices.Services
         VPServices app;
 
         public string Name { get { return "Trivia"; } }
-        public void Load(VPServices app, Instance bot)
+        public void Load(VPServices app, World bot)
         {
             this.app = app;
             addCommands ();
@@ -86,7 +86,7 @@ namespace VPServices.Services
         #endregion
 
         #region Event handlers
-        void onChat(Instance bot, Avatar user, string message)
+        void onChat(World bot, Avatar user, string message)
         {
             lock ( mutex )
             {

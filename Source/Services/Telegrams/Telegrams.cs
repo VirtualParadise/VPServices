@@ -14,7 +14,7 @@ namespace VPServices.Services
             get { return "Telegrams"; }
         }
 
-        public void Load(VPServices app, Instance bot)
+        public void Load(VPServices app, World bot)
         {
             VPServices.App.Commands.AddRange(new[] {
                 new Command
@@ -109,7 +109,7 @@ namespace VPServices.Services
         /// Marks all telegrams of a leaving avatar as "unaware", so tha they can again
         /// be reminded on re-entry
         /// </summary>
-        void onLeave(Instance sender, Avatar who)
+        void onLeave(World sender, Avatar who)
         {
             var grams = getUnread(who.Name);
 
@@ -125,7 +125,7 @@ namespace VPServices.Services
                 return connection.Query<sqlTelegram>("SELECT * FROM Telegrams WHERE Read = ? AND Target = ? COLLATE NOCASE", false, target);
         }
 
-        void checkTelegrams(Instance bot, int session, string name)
+        void checkTelegrams(World bot, int session, string name)
         {
             var safeName = name.ToLower();
             var grams    = getUnread(name);

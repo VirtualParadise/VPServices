@@ -15,7 +15,7 @@ namespace VPServices.Services
             get { return "Greetings"; }
         }
 
-        public void Load(VPServices app, Instance bot)
+        public void Load(VPServices app, World bot)
         {
             app.Commands.AddRange(new[] {
                 new Command
@@ -90,7 +90,7 @@ namespace VPServices.Services
         #endregion
 
         #region Event handlers
-        void doGreet(Instance bot, Avatar who, bool entering)
+        void doGreet(World bot, Avatar who, bool entering)
         {
             // No greetings within 10 seconds of bot load, to prevent flooding of entries
             // on initial user list load

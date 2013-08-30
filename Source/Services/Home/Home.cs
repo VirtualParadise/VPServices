@@ -16,7 +16,7 @@ namespace VPServices.Services
             get { return "Home"; }
         }
 
-        public void Load(VPServices app, Instance bot)
+        public void Load(VPServices app, World bot)
         {
             app.Commands.AddRange(new[] {
                 new Command
@@ -119,7 +119,7 @@ namespace VPServices.Services
         #endregion
 
         #region Event handlers
-        void onEnter(Instance sender, Avatar who)
+        void onEnter(World sender, Avatar who)
         {
             // Do not teleport users home within 10 seconds of bot's startup
             if ( VPServices.App.LastConnect.SecondsToNow() < 10 )
@@ -138,7 +138,7 @@ namespace VPServices.Services
                 cmdGoHome(VPServices.App, who, true);
         }
 
-        void onLeave(Instance sender, Avatar who)
+        void onLeave(World sender, Avatar who)
         {
             // Keep track of LastExit to prevent annoying users
             who.SetSetting(settingLastExit, DateTime.Now);

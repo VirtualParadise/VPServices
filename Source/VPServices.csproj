@@ -67,6 +67,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
+    <Compile Include="Managers\InstanceManager.cs" />
     <Compile Include="Services\Facts\Facts.cs" />
     <Compile Include="Services\Facts\Facts.Migrations.cs" />
     <Compile Include="Services\Home\Home.Migrations.cs" />
@@ -76,22 +77,25 @@
     <Compile Include="Services\IRC\IRC.Incoming.cs" />
     <Compile Include="Services\Rkill.cs" />
     <Compile Include="Services\Todo\Todo.Migrations.cs" />
+    <Compile Include="Types\World.cs" />
+    <Compile Include="Types\User.cs" />
+    <Compile Include="Utilities\BoolParser.cs" />
     <Compile Include="VPS.Migrations.cs" />
     <Compile Include="Services\Jumps\Jumps.Migrations.cs" />
     <Compile Include="Services\Telegrams\Telegrams.Migrations.cs" />
     <Compile Include="VPS.Events.cs" />
     <Compile Include="Services\Logging\Logging.Migrations.cs" />
-    <Compile Include="VPS.Data.cs" />
+    <Compile Include="Managers\DataManager.cs" />
     <Compile Include="Services\Greetings.cs" />
     <Compile Include="Services\Trivia\Trivia.Commands.cs" />
     <Compile Include="Services\IRC\IRC.Commands.cs" />
     <Compile Include="Services\Todo\Todo.cs" />
     <Compile Include="Services\Trivia\Trivia.Core.cs" />
     <Compile Include="Services\Trivia\Trivia.Entries.cs" />
-    <Compile Include="VPS.Settings.cs" />
+    <Compile Include="Managers\SettingsManager.cs" />
     <Compile Include="Services\Home\Home.cs" />
     <Compile Include="Services\GeneralCommands.cs" />
-    <Compile Include="VPS.Users.cs" />
+    <Compile Include="Managers\UserManager.cs" />
     <Compile Include="VPS.Commands.cs" />
     <Compile Include="Types\IService.cs" />
     <Compile Include="Services\Logging\Logging.cs" />
@@ -103,15 +107,12 @@
     <Compile Include="Services\Jumps\Jumps.cs" />
     <Compile Include="Services\Telegrams\Telegrams.cs" />
     <Compile Include="Services\WorldSettings.cs" />
-    <Compile Include="VPS.Services.cs" />
+    <Compile Include="Managers\ServiceManager.cs" />
     <Compile Include="VPS.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VPS.Network.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Managers\" />
-    <Folder Include="Utilities\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

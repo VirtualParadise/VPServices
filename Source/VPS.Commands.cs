@@ -32,7 +32,7 @@ namespace VPServices
         /// <summary>
         /// Parses incoming chat for a command and runs it
         /// </summary>
-        void parseCommand(Instance sender, Avatar user, string message)
+        void parseCommand(World sender, Avatar user, string message)
         {
             // Accept only commands
             if ( !message.StartsWith("!") )
