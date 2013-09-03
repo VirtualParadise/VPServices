@@ -4,7 +4,7 @@ using AvatarArgs = VP.InstanceAvatars.AvatarArgs;
 
 namespace VPServices
 {
-    public partial class VPServices : IDisposable
+    public class EventManager
     {
         public delegate void ChatArgs(World bot, Avatar user, string message);
 

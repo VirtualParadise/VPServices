@@ -9,5 +9,7 @@ namespace VPServices
 {
     class World
     {
+        public Instance Bot;
+
     }
 }

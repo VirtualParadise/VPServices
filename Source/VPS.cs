@@ -1,15 +1,16 @@
 ﻿using System;
-using System.Text.RegularExpressions;
-using System.Threading;
-using VP;
 
 namespace VPServices
 {
     public partial class VPServices : IDisposable
     {
-        public static DataManager     Data;
-        public static SettingsManager Settings;
-        public static UserManager     Users;
+        public static CommandManager  Commands = new CommandManager();
+        public static DataManager     Data     = new DataManager();
+        public static EventManager    Events   = new EventManager();
+        public static ServiceManager  Services = new ServiceManager();
+        public static SettingsManager Settings = new SettingsManager();
+        public static UserManager     Users    = new UserManager();
+        public static WorldManager    Worlds   = new WorldManager();
 
         static bool exiting;
 
@@ -26,11 +27,9 @@ namespace VPServices
 
         public static void Setup(string[] args)
         {
-            Log.Loggers.Add( new ConsoleLogger() );
+            Log.QuickSetup();
 
-            Settings = new SettingsManager(args);
-            Data     = new DataManager();
-            Users    = new UserManager();
+            Settings.Setup(args);
         }
 
         public static void Loop()
@@ -47,12 +46,7 @@ namespace VPServices
         /// </summary>
         public static void TakeDown()
         {
-            Commands.Clear();
-
-            ClearEvents();
-            ClearServices();
-            CloseDatabase();
-            Bot.Dispose();
+            
         }
     }
 }

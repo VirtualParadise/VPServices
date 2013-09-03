@@ -15,7 +15,7 @@ namespace VPServices
 
         IniConfigSource ini;
 
-        public SettingsManager(string[] args)
+        public void Setup(string[] args)
         {
             setupArgs(args);
             setupIni();
