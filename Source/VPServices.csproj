@@ -40,8 +40,14 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\CsvHelper.2.2.2\lib\net40-client\CsvHelper.dll</HintPath>
     </Reference>
-    <Reference Include="Meebey.SmartIrc4net">
-      <HintPath>Libraries\Meebey.SmartIrc4net.dll</HintPath>
+    <Reference Include="libVPNET">
+      <HintPath>..\packages\libVPNET.0.2.1-pre\lib\net40\libVPNET.dll</HintPath>
+    </Reference>
+    <Reference Include="NetIrc2">
+      <HintPath>..\packages\NetIrc2.1.0.0.0\lib\NetIrc2.dll</HintPath>
+    </Reference>
+    <Reference Include="Nexus">
+      <HintPath>..\packages\Nexus.2.1.0\lib\net40\Nexus.dll</HintPath>
     </Reference>
     <Reference Include="Nini, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -52,17 +58,13 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Toolbox.Extensions, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Toolbox.Extensions, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Toolbox.0.1.1\lib\net40\Toolbox.Extensions.dll</HintPath>
+      <HintPath>..\packages\Toolbox.0.2.0\lib\net40\Toolbox.Extensions.dll</HintPath>
     </Reference>
-    <Reference Include="Toolbox.Logger, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Toolbox.Logger, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Toolbox.0.1.1\lib\net40\Toolbox.Logger.dll</HintPath>
-    </Reference>
-    <Reference Include="VP.NET">
-      <HintPath>Libraries\VP.NET.dll</HintPath>
+      <HintPath>..\packages\Toolbox.0.2.0\lib\net40\Toolbox.Logger.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -102,7 +104,6 @@
     <Compile Include="Types\IService.cs" />
     <Compile Include="Services\Logging\Logging.cs" />
     <Compile Include="Services\IRC\IRC.Core.cs" />
-    <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="Services\SwordFight\SwordFight.cs" />
     <Compile Include="Services\JoinsInvites.cs" />
