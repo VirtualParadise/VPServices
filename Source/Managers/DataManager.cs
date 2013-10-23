@@ -9,12 +9,12 @@ namespace VPServices
 
         public SQLiteConnection SQL;
 
-        public DataManager()
+        public void Setup()
         {
             var db  = VPServices.Settings.Core.Get("Database", "VPServices.db");
                 SQL = new SQLiteConnection(db, true);
 
-            Log.Info(tag, "Set up '{0}' as database", db);
+            Log.Info(tag, "Using database '{0}'", db);
         }
 
         public void Takedown()

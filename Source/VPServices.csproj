@@ -84,7 +84,7 @@
     <Compile Include="Types\User.cs" />
     <Compile Include="Utilities\BoolParser.cs" />
     <Compile Include="Utilities\Respond.cs" />
-    <Compile Include="VPS.Migrations.cs" />
+    <Compile Include="Migrations.cs" />
     <Compile Include="Services\Jumps\Jumps.Migrations.cs" />
     <Compile Include="Services\Telegrams\Telegrams.Migrations.cs" />
     <Compile Include="Managers\EventManager.cs" />
@@ -111,7 +111,7 @@
     <Compile Include="Services\Telegrams\Telegrams.cs" />
     <Compile Include="Services\WorldSettings.cs" />
     <Compile Include="Managers\ServiceManager.cs" />
-    <Compile Include="VPS.cs" />
+    <Compile Include="VPServices.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

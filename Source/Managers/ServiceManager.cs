@@ -63,5 +63,26 @@ namespace VPServices
                 Log.Fine("Services", "Loaded service '{0}'", service.Name);
             }
         }
+
+        /// <summary>
+        /// Iterates through all services and invokes any migrations they contain
+        /// TODO: Use this
+        /// </summary>
+        public void MigrateServices()
+        {
+            var migration = CoreSettings.GetInt("Version", 0);
+
+            if ( migration >= MigrationVersion )
+                return;
+
+            foreach ( var service in Services )
+                for ( var i = migration; i < MigrationVersion; i++ )
+                {
+                    service.Migrate(this, i + 1);
+                    Log.Fine("Services", "Migrated '{0}' to version {1}", service.Name, i + 1);
+                }
+
+            Log.Debug("Services", "All services migrated to version {0}", MigrationVersion);
+        } 
     }
 }

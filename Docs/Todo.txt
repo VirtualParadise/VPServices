@@ -17,3 +17,5 @@
 - write a "searchengine" util for commands that do searching
 - single threaded architecture
 - command switch util
+- session numbers in join/invite request messages
+- !invite everyone

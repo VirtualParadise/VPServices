@@ -1,33 +1,25 @@
 ﻿using System;
 using VP;
-using AvatarArgs = VP.InstanceAvatars.AvatarArgs;
 
 namespace VPServices
 {
+    public delegate void ServicesChatArgs(World world, Avatar user, string message);
+    public delegate void ServicesAvatarArgs(World world, Avatar user);
+
     public class EventManager
     {
-        public delegate void ChatArgs(World bot, Avatar user, string message);
+        public event ServicesAvatarArgs AvatarEnter;
+        public event ServicesAvatarArgs AvatarLeave;
+        public event ServicesAvatarArgs AvatarChange;
+        public event ServicesChatArgs   Chat;
 
-        public event AvatarArgs AvatarEnter;
-        public event AvatarArgs AvatarLeave;
-        public event AvatarArgs AvatarChange;
-        public event ChatArgs   Chat;
-
-        public void SetupEvents()
+        public void Setup()
         {
-            Bot.Avatars.Enter  += onAvatarAdd;
-            Bot.Avatars.Leave  += onAvatarLeave;
-            Bot.Avatars.Change += onAvatarsChange;
-            Bot.Chat           += onChat;
+            
         }
 
-        public void ClearEvents()
+        public void TakeDown()
         {
-            Bot.Avatars.Enter  -= onAvatarAdd;
-            Bot.Avatars.Leave  -= onAvatarLeave;
-            Bot.Avatars.Change -= onAvatarsChange;
-            Bot.Chat           -= onChat;
-
             AvatarEnter  = null;
             AvatarLeave  = null;
             AvatarChange = null;
