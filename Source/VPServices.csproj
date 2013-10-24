@@ -40,8 +40,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\CsvHelper.2.2.2\lib\net40-client\CsvHelper.dll</HintPath>
     </Reference>
-    <Reference Include="libVPNET">
-      <HintPath>..\packages\libVPNET.0.2.1-pre\lib\net40\libVPNET.dll</HintPath>
+    <Reference Include="libVPNET, Version=0.3.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\libVPNET.0.3.0-pre\lib\net40\libVPNET.dll</HintPath>
     </Reference>
     <Reference Include="NetIrc2">
       <HintPath>..\packages\NetIrc2.1.0.0.0\lib\NetIrc2.dll</HintPath>
@@ -51,7 +52,7 @@
     </Reference>
     <Reference Include="Nini, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Libraries\Nini.dll</HintPath>
+      <HintPath>..\Libraries\Nini.dll</HintPath>
     </Reference>
     <Reference Include="SQLite">
       <HintPath>Libraries\SQLite.dll</HintPath>
@@ -68,48 +69,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Managers\MessageManager.cs" />
     <Compile Include="Utilities\Constants.cs" />
     <Compile Include="Managers\WorldManager.cs" />
-    <Compile Include="Services\Facts\Facts.cs" />
-    <Compile Include="Services\Facts\Facts.Migrations.cs" />
-    <Compile Include="Services\Home\Home.Migrations.cs" />
-    <Compile Include="Services\IRC\IRC.Events.cs" />
-    <Compile Include="Services\IRC\IRC.Constants.cs" />
-    <Compile Include="Services\IRC\IRC.Outgoing.cs" />
-    <Compile Include="Services\IRC\IRC.Incoming.cs" />
-    <Compile Include="Services\Rkill.cs" />
-    <Compile Include="Services\Todo\Todo.Migrations.cs" />
     <Compile Include="Types\Command.cs" />
     <Compile Include="Types\World.cs" />
     <Compile Include="Types\User.cs" />
     <Compile Include="Utilities\BoolParser.cs" />
-    <Compile Include="Utilities\Respond.cs" />
-    <Compile Include="Migrations.cs" />
-    <Compile Include="Services\Jumps\Jumps.Migrations.cs" />
-    <Compile Include="Services\Telegrams\Telegrams.Migrations.cs" />
-    <Compile Include="Managers\EventManager.cs" />
-    <Compile Include="Services\Logging\Logging.Migrations.cs" />
     <Compile Include="Managers\DataManager.cs" />
-    <Compile Include="Services\Greetings.cs" />
-    <Compile Include="Services\Trivia\Trivia.Commands.cs" />
-    <Compile Include="Services\IRC\IRC.Commands.cs" />
-    <Compile Include="Services\Todo\Todo.cs" />
-    <Compile Include="Services\Trivia\Trivia.Core.cs" />
-    <Compile Include="Services\Trivia\Trivia.Entries.cs" />
     <Compile Include="Managers\SettingsManager.cs" />
-    <Compile Include="Services\Home\Home.cs" />
-    <Compile Include="Services\GeneralCommands.cs" />
     <Compile Include="Managers\UserManager.cs" />
     <Compile Include="Managers\CommandManager.cs" />
     <Compile Include="Types\IService.cs" />
-    <Compile Include="Services\Logging\Logging.cs" />
-    <Compile Include="Services\IRC\IRC.Core.cs" />
     <None Include="packages.config" />
-    <None Include="Services\SwordFight\SwordFight.cs" />
-    <Compile Include="Services\JoinsInvites.cs" />
-    <Compile Include="Services\Jumps\Jumps.cs" />
-    <Compile Include="Services\Telegrams\Telegrams.cs" />
-    <Compile Include="Services\WorldSettings.cs" />
     <Compile Include="Managers\ServiceManager.cs" />
     <Compile Include="VPServices.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

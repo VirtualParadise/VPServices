@@ -34,10 +34,6 @@ namespace VPServices
         /// How many seconds after invoking is this command disabled
         /// </summary>
         public int TimeLimit;
-        /// <summary>
-        /// Timestamp command was last invoked
-        /// </summary>
-        public DateTime LastInvoked = TDateTime.UnixEpoch;
 
         public Command(string name, string rgx, CommandHandler handler, string help, string example = "")
         {

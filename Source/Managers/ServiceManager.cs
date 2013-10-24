@@ -8,81 +8,53 @@ namespace VPServices
 {
     public class ServiceManager
     {
-        /// <summary>
-        /// Global list of all loaded services
-        /// </summary>
-        public List<IService> Services = new List<IService>();
+        const string tag = "Services";
 
-        /// <summary>
-        /// Fetches a service by type
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns>Service instance if available, null if not</returns>
+        List<IService> services = new List<IService>();
+
         public T GetService<T>()
             where T : class, IService
         {
             var type = typeof(T);
 
-            foreach (var service in Services)
-                if ( service.GetType().Equals(type) )
-                    return (T) service;
-
-            return null;
+            return (T) services.FirstOrDefault( s => s.GetType().Equals(type) );
         }
 
-        /// <summary>
-        /// Disposes all loaded services and clears list
-        /// </summary>
-        public void ClearServices()
-        {
-            foreach (var plugin in Services)
-                plugin.Dispose();
-
-            Services.Clear();
-        }
-
-        /// <summary>
-        /// Loads all services that implement the ServiceBase interface into Loaded
-        /// </summary>
-        public void LoadServices()
+        public void Setup()
         {
             //http://stackoverflow.com/questions/699852/how-to-find-all-the-classes-which-implement-a-given-interface
-            var type     = typeof(IService);
-            var services = from   t in Assembly.GetExecutingAssembly().GetTypes()
-                           where  t.GetInterfaces().Contains(type) && !t.IsInterface
-                           select Activator.CreateInstance(t) as IService;
+            var type      = typeof(IService);
+            var available = from   t in Assembly.GetExecutingAssembly().GetTypes()
+                            where  t.GetInterfaces().Contains(type) && !t.IsInterface
+                            select Activator.CreateInstance(t) as IService;
 
-            Services.AddRange(services);
-        }
-
-        public void InitServices()
-        {
-            foreach (var service in Services)
+            foreach (var service in services)
             {
-                service.Load(this, Bot);
-                Log.Fine("Services", "Loaded service '{0}'", service.Name);
-            }
-        }
+                var enabled = VPServices.Settings.Plugins.GetBoolean(service.Name, true);
 
-        /// <summary>
-        /// Iterates through all services and invokes any migrations they contain
-        /// TODO: Use this
-        /// </summary>
-        public void MigrateServices()
-        {
-            var migration = CoreSettings.GetInt("Version", 0);
-
-            if ( migration >= MigrationVersion )
-                return;
-
-            foreach ( var service in Services )
-                for ( var i = migration; i < MigrationVersion; i++ )
+                if (!enabled)
                 {
-                    service.Migrate(this, i + 1);
-                    Log.Fine("Services", "Migrated '{0}' to version {1}", service.Name, i + 1);
+                    Log.Debug(tag, "Skipping load of service '{0}' as it is disabled in the config", service.Name);
+                    continue;
                 }
 
-            Log.Debug("Services", "All services migrated to version {0}", MigrationVersion);
-        } 
+                service.Load();
+                Log.Fine(tag, "Loaded service '{0}'", service.Name);
+            }
+
+            Log.Debug(tag, "{0} services discovered and loaded", services.Count);
+        }
+
+        public void Takedown()
+        {
+            foreach (var service in services)
+            {
+                service.Unload();
+                Log.Fine(tag, "Unloaded service '{0}'", service.Name);
+            }
+
+            services.Clear();
+            Log.Debug(tag, "All services unloaded");
+        }
     }
 }

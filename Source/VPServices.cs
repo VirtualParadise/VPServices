@@ -8,11 +8,16 @@ namespace VPServices
 
         public static readonly CommandManager  Commands = new CommandManager();
         public static readonly DataManager     Data     = new DataManager();
-        public static readonly EventManager    Events   = new EventManager();
+        public static readonly MessageManager  Messages = new MessageManager();
         public static readonly ServiceManager  Services = new ServiceManager();
         public static readonly SettingsManager Settings = new SettingsManager();
         public static readonly UserManager     Users    = new UserManager();
         public static readonly WorldManager    Worlds   = new WorldManager();
+
+        public static string Name
+        {
+            get { return Settings.Network.Get("Name"); }
+        }
 
         static bool exiting;
 
@@ -23,7 +28,7 @@ namespace VPServices
             try { Setup(args); }
             catch (Exception e)
             {
-                Log.Severe(tag, "Services setup failed");
+                Log.Severe(tag, "Failure in setup phase");
                 Log.LogFullStackTrace(e);
                 Exit();
             }
@@ -49,20 +54,32 @@ namespace VPServices
 
             Settings.Setup(args);
             Data.Setup();
-
+            Users.Setup();
+            Messages.Setup();
             Commands.Setup();
-            Events.Setup();
+            Services.Setup();
+            Worlds.Setup();
         }
 
         public static void Loop()
         {
-            if (!exiting)
-                Loop();
+            while (!exiting)
+            {
+                Worlds.Update();
+            }
         }
 
         public static void Exit()
         {
             exiting = true;
+
+            Users.Takedown();
+            Worlds.Takedown();
+
+            Services.Takedown();
+            Commands.Takedown();
+            Data.Takedown();
+            Messages.Takedown();
         }
     }
 }

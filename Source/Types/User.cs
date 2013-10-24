@@ -2,13 +2,34 @@
 using System.Collections.Generic;
 using System.Linq;
 using VP;
+using SQLite;
 
 namespace VPServices
 {
-    class User
+    public class User
     {
+        const string tag = "User";
+
+        public string Name
+        {
+            get { return Avatar.Name; }
+        }
+
+        public int Session
+        {
+            get { return Avatar.Session; }
+        }
+
         public Avatar Avatar;
         public World  World;
+
+        public User(Avatar avatar, World world)
+        {
+            this.Avatar = avatar;
+            this.World  = world;
+
+            Log.Fine(tag, "Created user for avatar '{0}' SID#{1} in world {2}", avatar.Name, avatar.Session, World.Name);
+        }
 
         public Dictionary<string, string> GetSettings()
         {
@@ -76,9 +97,20 @@ namespace VPServices
             });
         }
 
-        public void DeleteSetting(this Avatar user, string key)
+        public void DeleteSetting(string key)
         {
-            VPServices.Data.SQL.Execute("DELETE FROM UserSettings WHERE UserID = ? AND Name = ?", user.Id, key);
+            VPServices.Data.SQL.Execute("DELETE FROM UserSettings WHERE UserID = ? AND Name = ?", Avatar.Id, key);
         }
+    }
+
+    [Table("UserSettings")]
+    class sqlUserSettings
+    {
+        [Indexed]
+        public int    UserID { get; set; }
+        [Indexed]
+        public string Name   { get; set; }
+        [MaxLength(100000)]
+        public string Value  { get; set; }
     }
 }

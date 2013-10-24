@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using VP;
 
 namespace VPServices
 {
@@ -11,20 +10,42 @@ namespace VPServices
         const string tag     = "Commands";
         const string pattern = "^!(?<cmd>[a-z]+)( (?<data>.+))?$";
 
-        List<Command> list = new List<Command>();
+        List<Command> commands = new List<Command>();
 
         public void Setup()
         {
-            VPServices.Worlds.Added   += w => { w.Bot.Chat += parse; };
-            VPServices.Worlds.Removed += w => { w.Bot.Chat -= parse; };
+            VPServices.Messages.Incoming += parse;
         }
 
-        void parse(Instance bot, ChatMessage chat)
+        public void Takedown()
         {
-            var match = Regex.Match(chat.Message, pattern, RegexOptions.IgnoreCase);
-            var user  = VPServices.Users.BySession(chat.Session);
+            commands.Clear();
+            Log.Debug(tag, "All commands cleared");
+        }
 
-            if (user == null || !match.Success)
+        public void Add(Command command)
+        {
+            if ( commands.Any( c => c.Name.IEquals(command.Name) ) )
+                return;
+
+            commands.Add(command);
+            Log.Fine(tag, "Added command '{0}' with regex '{1}'", command.Name, command.Regex);
+        }
+
+        public void Remove(Command command)
+        {
+            if ( !commands.Any( c => c.Name.IEquals(command.Name) ) )
+                return;
+
+            commands.Remove(command);
+            Log.Fine(tag, "Removed command '{0}' with regex '{1}'", command.Name, command.Regex);
+        }
+
+        void parse(User user, string message)
+        {
+            var match = Regex.Match(message, pattern, RegexOptions.IgnoreCase);
+
+            if (!match.Success)
                 return;
 
             var cmd    = match.Groups["cmd"].Value;
@@ -33,39 +54,36 @@ namespace VPServices
 
             if (target == null)
             {
-                App.Warn(user.Session, "Invalid command; try !help");
+                VPServices.Messages.Send(user, Colors.Warn, "Invalid command; try !help");
                 return;
             }
 
-            foreach (var cmd in list)
-                if ( TRegex.IsMatch(invocation, cmd.Regex) )
+            foreach (var command in commands)
+                if ( TRegex.IsMatch(cmd, command.Regex) )
                 {
-                    Log.Fine(tag, "User '{0}' firing command '{1}'", chat.Name, cmd.Name);
-                    cmd.LastInvoked = DateTime.Now;
+                    Log.Fine(tag, "User '{0}' SID#{1} firing command '{2}'", user.Name, user.Session, command.Name);
                             
-                    var success = cmd.Handler(this, user, data);
+                    var success = command.Handler(user, data);
                     if (!success)
                     {
-                        App.Warn(user.Session, "Invalid command use; please see example:");
-                        Bot.ConsoleMessage(user.Session, ChatEffect.Italic, ColorWarn, "", cmd.Example);
+                        VPServices.Messages.Send(user, Colors.Warn, "Invalid command use; please see example:");
+                        VPServices.Messages.Send(user, Colors.Warn, "", command.Example);
                     }
 
                     return;
                 }
 
-            Log.Debug("Commands", "Unknown: {0}", invocation);
+            Log.Debug(tag, "Unknown: {0}", cmd);
             return;
         }
 
         Command get(string needle)
         {
-            var query = from   c in list
+            var query = from   c in commands
                         where  TRegex.IsMatch(needle, c.Regex)
                         select c;
 
             return query.FirstOrDefault();
         }
-    }
-
-    
+    }    
 }
