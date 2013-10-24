@@ -45,7 +45,8 @@ namespace VPServices
             finally { Exit(); }
 
         exit:
-            Console.WriteLine("### [{0}] Services is now exiting", DateTime.Now);
+            Takedown();
+            Console.WriteLine("### [{0}] Services is finished", DateTime.Now);
         }
 
         public static void Setup(string[] args)
@@ -69,10 +70,8 @@ namespace VPServices
             }
         }
 
-        public static void Exit()
+        public static void Takedown()
         {
-            exiting = true;
-
             Users.Takedown();
             Worlds.Takedown();
 
@@ -80,6 +79,13 @@ namespace VPServices
             Commands.Takedown();
             Data.Takedown();
             Messages.Takedown();
+            Log.Debug(tag, "Full takedown complete");
+        }
+
+        public static void Exit()
+        {
+            exiting = true;
+            Log.Info(tag, "Services is now exiting...");
         }
     }
 }

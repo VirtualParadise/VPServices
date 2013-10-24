@@ -43,5 +43,10 @@ namespace VPServices
             Help      = help;
             Example   = example;
         }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

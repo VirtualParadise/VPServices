@@ -28,7 +28,7 @@ namespace VPServices
             this.Avatar = avatar;
             this.World  = world;
 
-            Log.Fine(tag, "Created user for avatar '{0}' SID#{1} in world {2}", avatar.Name, avatar.Session, World.Name);
+            Log.Fine(tag, "Created user for avatar '{0}' SID#{1} in world {2}", avatar, avatar.Session, World);
         }
 
         public Dictionary<string, string> GetSettings()
@@ -100,6 +100,11 @@ namespace VPServices
         public void DeleteSetting(string key)
         {
             VPServices.Data.SQL.Execute("DELETE FROM UserSettings WHERE UserID = ? AND Name = ?", Avatar.Id, key);
+        }
+
+        public override string ToString()
+        {
+            return Name;
         }
     }
 

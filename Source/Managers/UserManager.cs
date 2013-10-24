@@ -60,8 +60,9 @@ namespace VPServices
 
         public void Takedown()
         {
-            foreach (var user in users)
-                Leave(user, false);
+            if (Leave != null)
+                foreach (var user in users)
+                    Leave(user, false);
 
             Enter  = null;
             Leave  = null;
@@ -73,7 +74,7 @@ namespace VPServices
 
         public User[] ByName(string name)
         {
-            return (User[]) users.Where( u => u.Name.IEquals(name) );
+            return users.Where( u => u.Name.IEquals(name) ).ToArray();
         }
 
         public User BySession(int session)
@@ -91,7 +92,7 @@ namespace VPServices
             var user  = new User(avatar, world);
             users.Add(user);
 
-            Log.Debug(tag, "User '{0}' has entered world '{1}'", user.Name, world.Name);
+            Log.Debug(tag, "User '{0}' has entered world '{1}'", user, world);
             if (Enter != null)
                 Enter(user);
         }
@@ -106,7 +107,7 @@ namespace VPServices
 
             users.Remove(user);
 
-            Log.Debug(tag, "User '{0}' has left world '{1}'", user.Name, world.Name);
+            Log.Debug(tag, "User '{0}' has left world '{1}'", user, world);
             if (Leave != null)
                 Leave(user, false);
         }
@@ -138,7 +139,7 @@ namespace VPServices
                     Leave(user, true);
             }
 
-            Log.Fine(tag, "Cleared all known users of world '{0}' due to disconnect", world.Name);
+            Log.Fine(tag, "Cleared all known users of world '{0}' due to disconnect", world);
         }
     }
 }

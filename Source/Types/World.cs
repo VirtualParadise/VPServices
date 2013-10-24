@@ -74,6 +74,11 @@ namespace VPServices
         {
             Bot.Dispose();
         }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 
     public enum WorldState

@@ -28,7 +28,7 @@ namespace VPServices
                             where  t.GetInterfaces().Contains(type) && !t.IsInterface
                             select Activator.CreateInstance(t) as IService;
 
-            foreach (var service in services)
+            foreach (var service in available)
             {
                 var enabled = VPServices.Settings.Plugins.GetBoolean(service.Name, true);
 
@@ -39,6 +39,7 @@ namespace VPServices
                 }
 
                 service.Load();
+                services.Add(service);
                 Log.Fine(tag, "Loaded service '{0}'", service.Name);
             }
 

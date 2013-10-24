@@ -79,7 +79,7 @@ namespace VPServices
 
                 if (world.State == WorldState.Disconnected && world.LastAttempt.SecondsToNow() > 20)
                 {
-                    Log.Debug(tag, "World '{0}' is not connected; connecting...", world.Name);
+                    Log.Debug(tag, "World '{0}' is not connected; connecting...", world);
                     world.Connect();
 
                     continue;

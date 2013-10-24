@@ -32,7 +32,7 @@ namespace VPServices
    
             user.World.Bot.ConsoleMessage(user.Session, ChatEffect.None, color, VPServices.Name, message);
 
-            Log.Fine(tag, "To '{0}@{1}' SID#{2}: {3}", user.Name, user.World.Name, user.Session, message);
+            Log.Fine(tag, "To '{0}@{1}' SID#{2}: {3}", user, user.World, user.Session, message);
             if (Outgoing != null)
                 Outgoing(user, msg.LFormat(subst));
         }
@@ -44,7 +44,7 @@ namespace VPServices
             if (user == null)
                 return;
 
-            Log.Fine(tag, "From '{0}@{1}' SID#{2}: {3}", chat.Name, user.World.Name, chat.Session, chat.Message);
+            Log.Fine(tag, "From '{0}@{1}' SID#{2}: {3}", user, user.World, chat.Session, chat.Message);
             if (Incoming != null)
                 Incoming(user, chat.Message);
         }

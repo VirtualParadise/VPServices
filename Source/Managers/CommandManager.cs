@@ -23,13 +23,16 @@ namespace VPServices
             Log.Debug(tag, "All commands cleared");
         }
 
-        public void Add(Command command)
+        public void Add(params Command[] toAdd)
         {
-            if ( commands.Any( c => c.Name.IEquals(command.Name) ) )
-                return;
+            foreach (var command in toAdd)
+            {
+                if ( commands.Any( c => c.Name.IEquals(command.Name) ) )
+                    return;
 
-            commands.Add(command);
-            Log.Fine(tag, "Added command '{0}' with regex '{1}'", command.Name, command.Regex);
+                commands.Add(command);
+                Log.Fine(tag, "Added command '{0}' with regex '{1}'", command, command.Regex);
+            }
         }
 
         public void Remove(Command command)
@@ -38,7 +41,7 @@ namespace VPServices
                 return;
 
             commands.Remove(command);
-            Log.Fine(tag, "Removed command '{0}' with regex '{1}'", command.Name, command.Regex);
+            Log.Fine(tag, "Removed command '{0}' with regex '{1}'", command, command.Regex);
         }
 
         void parse(User user, string message)
@@ -50,40 +53,19 @@ namespace VPServices
 
             var cmd    = match.Groups["cmd"].Value;
             var data   = match.Groups["data"].Value;
-            var target = get(cmd);
+            var target = commands.Where( c => TRegex.IsMatch(cmd, c.Regex) ).FirstOrDefault();
 
             if (target == null)
-            {
-                VPServices.Messages.Send(user, Colors.Warn, "Invalid command; try !help");
                 return;
-            }
 
-            foreach (var command in commands)
-                if ( TRegex.IsMatch(cmd, command.Regex) )
-                {
-                    Log.Fine(tag, "User '{0}' SID#{1} firing command '{2}'", user.Name, user.Session, command.Name);
+            Log.Fine(tag, "User '{0}' SID#{1} firing command '{2}'", user, user.Session, target);
                             
-                    var success = command.Handler(user, data);
-                    if (!success)
-                    {
-                        VPServices.Messages.Send(user, Colors.Warn, "Invalid command use; please see example:");
-                        VPServices.Messages.Send(user, Colors.Warn, "", command.Example);
-                    }
-
-                    return;
-                }
-
-            Log.Debug(tag, "Unknown: {0}", cmd);
-            return;
-        }
-
-        Command get(string needle)
-        {
-            var query = from   c in commands
-                        where  TRegex.IsMatch(needle, c.Regex)
-                        select c;
-
-            return query.FirstOrDefault();
+            var success = target.Handler(user, data);
+            if (!success)
+            {
+                VPServices.Messages.Send(user, Colors.Warn, "Invalid command use; please see example:");
+                VPServices.Messages.Send(user, Colors.Warn, "", target.Example);
+            }
         }
     }    
 }
