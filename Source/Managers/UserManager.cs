@@ -18,11 +18,6 @@ namespace VPServices
 
         List<User> users = new List<User>();
 
-        public User[] All
-        {
-            get { return users.ToArray(); }
-        }
-
         public void Setup()
         {
             VPServices.Worlds.Added += w => {
@@ -70,6 +65,11 @@ namespace VPServices
 
             users.Clear();
             Log.Info(tag, "All users cleared");
+        }
+
+        public User[] GetAll()
+        {
+            return users.ToArray();
         }
 
         public User[] ByName(string name)

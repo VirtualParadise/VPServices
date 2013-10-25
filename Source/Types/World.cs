@@ -8,17 +8,41 @@ namespace VPServices
     {
         const string tag = "World";
 
-        public string     Name;
-        public bool       Enabled     = true;
-        public Instance   Bot;
-        public DateTime   LastAttempt = TDateTime.UnixEpoch;
-        public DateTime   LastConnect = TDateTime.UnixEpoch;
-        public WorldState State       = WorldState.Disconnected;
+        public readonly Instance Bot = new Instance();
+        public readonly string   Name;
+
+        public bool Enabled = true;
+
+        WorldState state = WorldState.Disconnected;
+        /// <summary>
+        /// Gets the connection state of this world
+        /// </summary>
+        public WorldState State
+        {
+            get { return state; }
+        }
+
+        DateTime lastAttempt = TDateTime.UnixEpoch;
+        /// <summary>
+        /// Gets the timestamp of the last connection attempt of this world
+        /// </summary>
+        public DateTime LastAttempt
+        {
+            get { return lastAttempt; }
+        }
+
+        DateTime lastConnect = TDateTime.UnixEpoch;
+        /// <summary>
+        /// Gets the timestamp of the last successful connection to this world
+        /// </summary>
+        public DateTime LastConnect
+        {
+            get { return lastConnect; }
+        }
 
         public World(string name)
         {
             Name = name;
-            Bot  = new Instance();
             Bot.UniverseDisconnect += onDisconnect;
             Bot.WorldDisconnect    += onDisconnect;
 
@@ -27,13 +51,13 @@ namespace VPServices
 
         public async void Connect()
         {
-            State = WorldState.Connecting;
+            state = WorldState.Connecting;
 
             await Task.Run( () => {
                 var username = VPServices.Settings.Network.Get("Username");
                 var password = VPServices.Settings.Network.Get("Password");
                 var botname  = VPServices.Settings.Network.Get("Name");
-                LastAttempt  = DateTime.Now;
+                lastAttempt  = DateTime.Now;
 
                 try
                 {
@@ -55,19 +79,20 @@ namespace VPServices
                             break;
                     }
 
-                    State = WorldState.Disconnected;
+                    state = WorldState.Disconnected;
                     return;
                 }
 
-                Log.Fine(tag, "Connected to '{0}'", Name);
-                LastConnect = DateTime.Now;
-                State       = WorldState.Connected;
+                Log.Debug(tag, "Connected to '{0}'", Name);
+                lastConnect = DateTime.Now;
+                state       = WorldState.Connected;
             });
         }
 
         void onDisconnect(Instance sender, int error)
         {
-            State = WorldState.Disconnected;
+            Log.Warn(tag, "Lost connection to '{0}', winsock error {1}", Name, error);
+            state = WorldState.Disconnected;
         }
 
         public void Dispose()

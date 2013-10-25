@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using System;
 
 namespace VPServices.Services
 {
@@ -9,21 +10,27 @@ namespace VPServices.Services
             get { return "Admin"; }
         }
 
-        static readonly Command cmdExit = new Command("Exit", "exit", onExit,
-            "Causes VPServices to fully exit from all worlds");
-
-        static readonly Command cmdMsg = new Command("Message", "msg", onMsg,
-            "Sends a cross-world message to all sessions of a given name",
-            "!msg Target: Hello world!");
-
-        public void Load()
+        public Command[] Commands
         {
-            VPServices.Commands.Add(cmdExit, cmdMsg);
+            get { return new[] {
+                new Command("Exit", "exit", onExit,
+                "Causes VPServices to fully exit from all worlds"),
+
+                new Command("Message", "msg", onMsg,
+                "Sends a cross-world message to all sessions of a given name",
+                "!msg Target: Hello world!"),
+
+                new Command("Debug", "debug", onDebug,
+                "Prints a full debug report in the console"),
+
+                new Command("Test", "test", onDebug,
+                "This command should be disabled") { Enabled = false },
+            }; }
         }
 
-        public void Unload()
-        {
-        }
+        public void Load() { }
+
+        public void Unload() { }
 
         static bool onExit(User who, string data)
         {
@@ -53,6 +60,56 @@ namespace VPServices.Services
                     VPServices.Messages.Send(user, Colors.Info, "You have a message from user {0}@{1}:", source, source.World);
                     VPServices.Messages.Send(user, Colors.Info, "\"{0}\"", message);
                 }
+            }
+
+            return true;
+        }
+
+        static bool onDebug(User source, string data)
+        {
+            TConsole.WriteLineColored(ConsoleColor.White, ConsoleColor.Black, "### Debug report");
+
+            TConsole.WriteLineColored(ConsoleColor.Gray, ConsoleColor.Black, "# Commands");
+            var commands = VPServices.Commands.GetAll();
+
+            foreach (var svc in commands)
+            {
+                Console.WriteLine("Service '{0}' provides the commands:", svc.Key.Name);
+
+                foreach (var cmd in svc.Value)
+                    Console.WriteLine("\t{0} - Regex '{1}', enabled: {2}", cmd, cmd.Regex, cmd.Enabled);
+            }
+
+
+            TConsole.WriteLineColored(ConsoleColor.Gray, ConsoleColor.Black, "# Services");
+            var services = VPServices.Services.GetAll();
+
+            foreach (var svc in services)
+                Console.WriteLine("Service '{0}' is available", svc.Name);
+            
+
+            TConsole.WriteLineColored(ConsoleColor.Gray, ConsoleColor.Black, "# Users");
+            var users = VPServices.Users.GetAll();
+            
+            foreach (var user in users)
+            {
+                Console.WriteLine("User '{0}@{1}' SID#{2}", user, user.World, user.Session);
+                Console.WriteLine("Position {0}, settings:", user.Avatar.Position);
+                var settings = user.GetSettings();
+
+                foreach (var setting in settings)
+                    Console.WriteLine("\t{0} - {1}", setting.Key, setting.Value);
+            }
+
+
+            TConsole.WriteLineColored(ConsoleColor.Gray, ConsoleColor.Black, "# Worlds");
+            var worlds = VPServices.Worlds.GetAll();
+            
+            foreach (var world in worlds)
+            {
+                Console.WriteLine("{0} - State: {1}, enabled: {2}", world, world.State, world.Enabled);
+                Console.WriteLine("\tLast attempted connect: {0}", world.LastAttempt);
+                Console.WriteLine("\tLast successful connect: {0}", world.LastConnect);
             }
 
             return true;

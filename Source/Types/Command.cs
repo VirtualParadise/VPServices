@@ -11,29 +11,29 @@ namespace VPServices
     public class Command
     {
         /// <summary>
-        /// Canonical command name
+        /// Gets the canonical name of this command
         /// </summary>
-        public string Name;
+        public readonly string Name;
         /// <summary>
-        /// Regex pattern that matches this command
+        /// Gets the regex pattern that matches this command
         /// </summary>
-        public string Regex;
+        public readonly string Regex;
         /// <summary>
-        /// Handler to call when this command is invoked
+        /// Gets the handler to call when this command is invoked
         /// </summary>
-        public CommandHandler Handler;
+        public readonly CommandHandler Handler;
         /// <summary>
-        /// Help string for this command
+        /// Gets the help string for this command
         /// </summary>
-        public string Help;
+        public readonly string Help;
         /// <summary>
-        /// Example string for this command
+        /// Gets the example string for this command
         /// </summary>
-        public string Example;
+        public readonly string Example;
         /// <summary>
-        /// How many seconds after invoking is this command disabled
+        /// Gets or sets if this command is enabled
         /// </summary>
-        public int TimeLimit;
+        public bool Enabled;
 
         public Command(string name, string rgx, CommandHandler handler, string help, string example = "")
         {

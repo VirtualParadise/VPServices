@@ -70,6 +70,11 @@ namespace VPServices
             return worlds.FirstOrDefault(w => w.Bot == bot);
         }
 
+        public World[] GetAll()
+        {
+            return worlds.ToArray();
+        }
+
         public void Update()
         {
             foreach (var world in worlds)

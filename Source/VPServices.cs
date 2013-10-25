@@ -14,18 +14,13 @@ namespace VPServices
         public static readonly UserManager     Users    = new UserManager();
         public static readonly WorldManager    Worlds   = new WorldManager();
 
-        public static string Name
-        {
-            get { return Settings.Network.Get("Name"); }
-        }
-
         static bool exiting;
 
-        public static void Main(string[] args)
+        static void Main(string[] args)
         {
             Console.WriteLine("### [{0}] Services is starting...", DateTime.Now);
 
-            try { Setup(args); }
+            try { setup(args); }
             catch (Exception e)
             {
                 Log.Severe(tag, "Failure in setup phase");
@@ -36,7 +31,7 @@ namespace VPServices
             if (exiting) 
                 goto exit;
             
-            try { Loop(); }
+            try { loop(); }
             catch (Exception e)
             {
                 Log.Severe(tag, "Failure in the main loop");
@@ -45,11 +40,12 @@ namespace VPServices
             finally { Exit(); }
 
         exit:
-            Takedown();
+            Log.Info(tag, "Services is now exiting...");
+            takedown();
             Console.WriteLine("### [{0}] Services is finished", DateTime.Now);
         }
 
-        public static void Setup(string[] args)
+        static void setup(string[] args)
         {
             Log.QuickSetup();
 
@@ -62,15 +58,13 @@ namespace VPServices
             Worlds.Setup();
         }
 
-        public static void Loop()
+        static void loop()
         {
             while (!exiting)
-            {
                 Worlds.Update();
-            }
         }
 
-        public static void Takedown()
+        static void takedown()
         {
             Users.Takedown();
             Worlds.Takedown();
@@ -85,7 +79,6 @@ namespace VPServices
         public static void Exit()
         {
             exiting = true;
-            Log.Info(tag, "Services is now exiting...");
         }
     }
 }

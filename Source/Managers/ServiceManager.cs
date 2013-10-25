@@ -6,19 +6,16 @@ using VPServices.Services;
 
 namespace VPServices
 {
+    public delegate void ServiceArgs(IService service);
+
     public class ServiceManager
     {
         const string tag = "Services";
 
+        public event ServiceArgs Loaded;
+        public event ServiceArgs Unloaded;
+
         List<IService> services = new List<IService>();
-
-        public T GetService<T>()
-            where T : class, IService
-        {
-            var type = typeof(T);
-
-            return (T) services.FirstOrDefault( s => s.GetType().Equals(type) );
-        }
 
         public void Setup()
         {
@@ -41,6 +38,9 @@ namespace VPServices
                 service.Load();
                 services.Add(service);
                 Log.Fine(tag, "Loaded service '{0}'", service.Name);
+
+                if (Loaded != null)
+                    Loaded(service);
             }
 
             Log.Debug(tag, "{0} services discovered and loaded", services.Count);
@@ -52,10 +52,18 @@ namespace VPServices
             {
                 service.Unload();
                 Log.Fine(tag, "Unloaded service '{0}'", service.Name);
+
+                if (Unloaded != null)
+                    Unloaded(service);
             }
 
             services.Clear();
-            Log.Debug(tag, "All services unloaded");
+            Log.Info(tag, "All services unloaded");
+        }
+
+        public IService[] GetAll()
+        {
+            return services.ToArray();
         }
     }
 }

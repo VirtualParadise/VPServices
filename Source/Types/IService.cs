@@ -8,6 +8,11 @@
         string Name { get; }
 
         /// <summary>
+        /// Returns a list of commands that this service wants to handle
+        /// </summary>
+        Command[] Commands { get; }
+
+        /// <summary>
         /// Called when Services is loading this service. Should initialize any resources
         /// and register all commands and events
         /// </summary>

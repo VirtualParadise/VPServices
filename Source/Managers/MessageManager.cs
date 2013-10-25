@@ -29,8 +29,9 @@ namespace VPServices
         public void Send(User user, ColorRgb color, string msg, params object[] subst)
         {
             var message = msg.LFormat(subst);
-   
-            user.World.Bot.ConsoleMessage(user.Session, ChatEffect.None, color, VPServices.Name, message);
+            var name    = VPServices.Settings.Network.Get("Name");
+
+            user.World.Bot.ConsoleMessage(user.Session, ChatEffect.None, color, name, message);
 
             Log.Fine(tag, "To '{0}@{1}' SID#{2}: {3}", user, user.World, user.Session, message);
             if (Outgoing != null)

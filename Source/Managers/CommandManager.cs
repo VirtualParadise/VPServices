@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using VPServices.Services;
 
 namespace VPServices
 {
@@ -10,41 +11,39 @@ namespace VPServices
         const string tag     = "Commands";
         const string pattern = "^!(?<cmd>[a-z]+)( (?<data>.+))?$";
 
-        List<Command> commands = new List<Command>();
+        Dictionary<IService, Command[]> commands = new Dictionary<IService, Command[]>();
 
         public void Setup()
         {
-            VPServices.Messages.Incoming += parse;
+            VPServices.Messages.Incoming += onChat;
+            VPServices.Services.Loaded   += onServiceLoad;
+            VPServices.Services.Unloaded += onServiceUnload;
         }
 
         public void Takedown()
         {
             commands.Clear();
-            Log.Debug(tag, "All commands cleared");
+            Log.Info(tag, "All commands cleared");
         }
 
-        public void Add(params Command[] toAdd)
+        public Dictionary<IService, Command[]> GetAll()
         {
-            foreach (var command in toAdd)
-            {
-                if ( commands.Any( c => c.Name.IEquals(command.Name) ) )
-                    return;
-
-                commands.Add(command);
-                Log.Fine(tag, "Added command '{0}' with regex '{1}'", command, command.Regex);
-            }
+            return new Dictionary<IService, Command[]>(commands);
         }
 
-        public void Remove(Command command)
+        void onServiceLoad(IService service)
         {
-            if ( !commands.Any( c => c.Name.IEquals(command.Name) ) )
-                return;
-
-            commands.Remove(command);
-            Log.Fine(tag, "Removed command '{0}' with regex '{1}'", command, command.Regex);
+            commands.Add(service, service.Commands);
+            Log.Fine(tag, "Added {0} commands from loaded service '{1}'", service.Commands.Length, service.Name);
         }
 
-        void parse(User user, string message)
+        void onServiceUnload(IService service)
+        {
+            commands.Remove(service);
+            Log.Fine(tag, "Removed {0} commands from loaded service '{1}'", service.Commands.Length, service.Name);
+        }
+
+        void onChat(User user, string message)
         {
             var match = Regex.Match(message, pattern, RegexOptions.IgnoreCase);
 
@@ -53,7 +52,11 @@ namespace VPServices
 
             var cmd    = match.Groups["cmd"].Value;
             var data   = match.Groups["data"].Value;
-            var target = commands.Where( c => TRegex.IsMatch(cmd, c.Regex) ).FirstOrDefault();
+            var query  = from   s in commands
+                         from   c in s.Value
+                         where  TRegex.IsMatch(cmd, c.Regex)
+                         select c;
+            var target = query.FirstOrDefault();
 
             if (target == null)
                 return;
@@ -64,7 +67,7 @@ namespace VPServices
             if (!success)
             {
                 VPServices.Messages.Send(user, Colors.Warn, "Invalid command use; please see example:");
-                VPServices.Messages.Send(user, Colors.Warn, "", target.Example);
+                VPServices.Messages.Send(user, Colors.Warn, "{0}", target.Example);
             }
         }
     }    
