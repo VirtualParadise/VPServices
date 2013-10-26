@@ -27,19 +27,15 @@ namespace VPServices
                 Log.LogFullStackTrace(e);
                 Exit();
             }
-            
-            if (exiting) 
-                goto exit;
-            
-            try { loop(); }
-            catch (Exception e)
-            {
-                Log.Severe(tag, "Failure in the main loop");
-                Log.LogFullStackTrace(e);
-            }
-            finally { Exit(); }
 
-        exit:
+            if (!exiting)
+                try { loop(); }
+                catch (Exception e)
+                {
+                    Log.Severe(tag, "Failure in the main loop");
+                    Log.LogFullStackTrace(e);
+                }
+
             Log.Info(tag, "Services is now exiting...");
             takedown();
             Console.WriteLine("### [{0}] Services is finished", DateTime.Now);

@@ -46,10 +46,10 @@ namespace VPServices
             var file = Args.Get("ini", defaultIni);
             Log.Info(tag, "Using global ini file '{0}'", file);
 
-            ini        = new IniConfigSource(file);
-            Core       = ini.Configs["Core"]    ?? ini.Configs.Add("Core");
-            Network    = ini.Configs["Network"] ?? ini.Configs.Add("Network");
-            Plugins    = ini.Configs["Plugins"] ?? ini.Configs.Add("Plugins");
+            ini     = new IniConfigSource(file);
+            Core    = ini.Configs["Core"]    ?? ini.Configs.Add("Core");
+            Network = ini.Configs["Network"] ?? ini.Configs.Add("Network");
+            Plugins = ini.Configs["Plugins"] ?? ini.Configs.Add("Plugins");
 
             if ( !File.Exists(file) )
                 throw new NotImplementedException("TODO: Create ini and exit");
