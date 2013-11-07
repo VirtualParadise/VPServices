@@ -44,9 +44,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\libVPNET.0.3.0-pre\lib\net40\libVPNET.dll</HintPath>
     </Reference>
-    <Reference Include="NetIrc2">
-      <HintPath>..\packages\NetIrc2.1.0.0.0\lib\NetIrc2.dll</HintPath>
-    </Reference>
     <Reference Include="Nexus">
       <HintPath>..\packages\Nexus.2.1.0\lib\net40\Nexus.dll</HintPath>
     </Reference>
