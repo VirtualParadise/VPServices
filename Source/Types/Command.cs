@@ -34,6 +34,10 @@ namespace VPServices
         /// Gets or sets if this command is enabled
         /// </summary>
         public bool Enabled = true;
+        /// <summary>
+        /// Gets or sets the rights ranks allowed to use this command
+        /// </summary>
+        public string[] Rights;
 
         public Command(string name, string rgx, CommandHandler handler, string help, string example = "")
         {

@@ -51,6 +51,9 @@ namespace VPServices
             foreach ( var service in loaded.ToArray() )
                 unload(service);
 
+            Loaded   = null;
+            Unloaded = null;
+
             loaded.Clear();
             services.Clear();
             Log.Info(tag, "All services unloaded");

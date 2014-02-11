@@ -21,7 +21,10 @@ namespace VPServices.Services
                     "This command should be disabled") { Enabled = false },
 
                 new Command("Crash", "crash", onCrash,
-                    "This command should crash the commandmanager"),
+                    "This command should crash the commandmanager")
+                    {
+                        Rights = new[] { Rights.Admin }
+                    },
             }; }
         }
 
@@ -63,12 +66,6 @@ namespace VPServices.Services
 
         bool onCrash(User who, string data)
         {
-            if ( !who.HasRight(Rights.Admin) )
-            {
-                VPServices.Messages.Send(who, Colors.Warn, "You do not have the right to use that command");
-                return true;
-            }
-
             throw new Exception("Forced crash");
         }
     }

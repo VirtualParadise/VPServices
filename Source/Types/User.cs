@@ -20,6 +20,19 @@ namespace VPServices
             get { return Avatar.Session; }
         }
 
+        public string[] Rights
+        {
+            get
+            {
+                var rights = VPServices.Settings.Rights[Name];
+
+                if (rights == null)
+                    return null;
+                else
+                    return rights.TerseSplit(',');
+            }
+        }
+
         public Avatar Avatar;
         public World  World;
 
@@ -29,18 +42,6 @@ namespace VPServices
             this.World  = world;
 
             Log.Fine(tag, "Created user for avatar '{0}' SID#{1} in world {2}", avatar, avatar.Session, World);
-        }
-
-        public bool HasRight(string rank)
-        {
-            var rights = VPServices.Settings.Rights[rank];
-
-            if (rights == null)
-                return false;
-
-            var rightsUsers = rights.TerseSplit(',');
-
-            return rightsUsers.Contains(Name, StringComparer.OrdinalIgnoreCase);
         }
 
         public Dictionary<string, string> GetSettings()

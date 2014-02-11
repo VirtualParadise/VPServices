@@ -16,28 +16,56 @@ namespace VPServices.Services
             get { return new[] {
                 new Command("Add world", "^addworld", (w,d) => onWorld(w,d,true),
                     "Adds a world for VPServices to begin servicing. Admin users only.",
-                    "!addworld World"),
+                    "!addworld World")
+                    {
+                        Rights = new[] { Rights.Admin }
+                    },
 
                 new Command("Remove world", "^(del(ete)?|rem(ove)?)world", (w,d) => onWorld(w,d,false),
                     "Stops VPServices from servicing the given world. Admin users only.",
-                    "!delworld World"),
+                    "!delworld World")
+                    {
+                        Rights = new[] { Rights.Admin }
+                    },
 
                 new Command("Load service", "^loadservice", (w,d) => onService(w,d,true),
                     "Loads a service for Services to provide. Admin users only.",
-                    "!loadservice Service"),
+                    "!loadservice Service")
+                    {
+                        Rights = new[] { Rights.Admin }
+                    },
 
                 new Command("Unload service", "^unloadservice", (w,d) => onService(w,d,false),
                     "Unloads a service from being provided by Services. Admin users only.",
-                    "!unloadservice Service"),
+                    "!unloadservice Service")
+                    {
+                        Rights = new[] { Rights.Admin }
+                    },
 
                 new Command("Exit", "^exit$", onExit,
                     "Causes VPServices to fully exit from all worlds. Admin users only.")
-                {
-                    Enabled = bool.Parse( VPServices.Services.GetSettings(this)["CanExit"] ?? "true" )
-                },
+                    {
+                        Enabled = bool.Parse( VPServices.Services.GetSettings(this)["CanExit"] ?? "true" ),
+                        Rights  = new[] { Rights.Admin }
+                    },
 
-                new Command("Debug", "debug", onDebug,
-                    "Prints a full debug report in the console. Moderator users only."),
+                new Command("Restart", "^restart$", onRestart,
+                    "Fully restarts VPServices")
+                    {
+                        Rights  = new[] { Rights.Admin }
+                    },
+
+                new Command("Reload", "^reload$", onReload,
+                    "Causes VPServices to reload its ini configuration")
+                    {
+                        Rights  = new[] { Rights.Admin, Rights.Moderator }
+                    },
+
+                new Command("Debug", "^debug", onDebug,
+                    "Prints a full debug report in the console. Moderator users only.")
+                    {
+                        Rights = new[] { Rights.Admin, Rights.Moderator }
+                    },
             }; }
         }
 
@@ -47,12 +75,6 @@ namespace VPServices.Services
 
         bool onWorld(User who, string data, bool adding)
         {
-            if ( !who.HasRight(Rights.Admin) )
-            {
-                VPServices.Messages.Send(who, Colors.Warn, "You do not have the right to use that command");
-                return true;
-            }
-
             if ( string.IsNullOrWhiteSpace(data) )
                 return false;
 
@@ -76,12 +98,6 @@ namespace VPServices.Services
 
         bool onService(User who, string data, bool loading)
         {
-            if ( !who.HasRight(Rights.Admin) )
-            {
-                VPServices.Messages.Send(who, Colors.Warn, "You do not have the right to use that command");
-                return true;
-            }
-
             if ( string.IsNullOrWhiteSpace(data) )
                 return false;
 
@@ -113,23 +129,27 @@ namespace VPServices.Services
 
         bool onExit(User who, string data)
         {
-            if ( who.HasRight(Rights.Admin) )
-                VPServices.Exit();
-            else
-                VPServices.Messages.Send(who, Colors.Warn, "You do not have the right to use that command");
+            VPServices.Exit();
+            return true;
+        }
 
+        bool onReload(User who, string data)
+        {
+            VPServices.Settings.Reload();
+            VPServices.Messages.Send(who, Colors.Info, "Configuration has been reloaded");
+
+            return true;
+        }
+
+        bool onRestart(User who, string data)
+        {
+            VPServices.Restart();
             return true;
         }
 
         bool onDebug(User who, string data)
         {
-            if ( !( who.HasRight(Rights.Moderator) || who.HasRight(Rights.Admin) ) )
-            {
-                VPServices.Messages.Send(who, Colors.Warn, "You need to be a moderator+ to use that command");
-                return true;
-            }
-            else
-                VPServices.Messages.Send(who, Colors.Info, "Please see console for debug report");
+            VPServices.Messages.Send(who, Colors.Info, "Please see console for debug report");
 
             TConsole.WriteLineColored(ConsoleColor.White, ConsoleColor.Black, "### Debug report");
 

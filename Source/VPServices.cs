@@ -14,13 +14,19 @@ namespace VPServices
         public static readonly UserManager     Users    = new UserManager();
         public static readonly WorldManager    Worlds   = new WorldManager();
 
+        static string[] args;
+
         static bool exiting;
+        static bool restarting;
 
         static void Main(string[] args)
         {
             Console.WriteLine("### [{0}] Services is starting...", DateTime.Now);
+            Log.QuickSetup();
+            VPServices.args = args;
 
-            try { setup(args); }
+        begin:
+            try { setup(); }
             catch (Exception e)
             {
                 Log.Severe(tag, "Failure in setup phase");
@@ -39,12 +45,19 @@ namespace VPServices
             Log.Info(tag, "Services is now exiting...");
             takedown();
             Console.WriteLine("### [{0}] Services is finished", DateTime.Now);
+
+            if (restarting)
+            {
+                restarting = false;
+                exiting   = false;
+
+                Console.WriteLine("\n\n### [{0}] Services is reloading...", DateTime.Now);
+                goto begin;
+            }
         }
 
-        static void setup(string[] args)
+        static void setup()
         {
-            Log.QuickSetup();
-
             Settings.Setup(args);
             Data.Setup();
             Users.Setup();
@@ -56,7 +69,7 @@ namespace VPServices
 
         static void loop()
         {
-            while (!exiting)
+            while (!exiting && !restarting)
                 Worlds.Update();
         }
 
@@ -75,6 +88,11 @@ namespace VPServices
         public static void Exit()
         {
             exiting = true;
+        }
+
+        public static void Restart()
+        {
+            restarting = true;
         }
     }
 }

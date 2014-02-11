@@ -68,6 +68,19 @@ namespace VPServices
                 return;
             }
 
+            if (target.Rights != null)
+            {
+                var rights = user.Rights;
+                var canUse = rights.Intersect(target.Rights).Any();
+
+                if (!canUse)
+                {
+                    var needed = string.Join(",", target.Rights);
+                    VPServices.Messages.Send(user, Colors.Warn, "You do not have the right to use that command (required: {0})", needed);
+                    return;
+                }
+            }
+
             Log.Fine(tag, "User '{0}' SID#{1} firing command '{2}'", user, user.Session, target);
             
             try
