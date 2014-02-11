@@ -1,30 +1,21 @@
 ﻿using Args;
-using CodeBits;
+using IniParser;
 using System;
 using System.Text;
 using VPServices.Types;
+using IniParser.Model;
 
 namespace VPServices
 {
     public class SettingsManager
     {
-        const string tag         = "Settings";
-        const string defaultIni  = "Settings.ini";
-        const string defaultName = "Services";
+        const string tag = "Settings";
 
         public Arguments Args;
+        public IniData   Ini;
 
-        public IniFile.Section Core;
-        public IniFile.Section Network;
-        public IniFile.Section Plugins;
-
-        IniFile ini;
-
-        IniLoadSettings iniLoadSettings = new IniLoadSettings()
-        {
-            CaseSensitive = false,
-            Encoding      = Encoding.UTF8
-        };
+        public KeyDataCollection Core;
+        public KeyDataCollection Network;
 
         public void Setup(string[] args)
         {
@@ -36,11 +27,11 @@ namespace VPServices
         public void Reload()
         {
             Log.Debug(tag, "Using global ini file '{0}'", Args.Ini);
-            ini = new IniFile(Args.Ini, iniLoadSettings);
+            var parser = new FileIniDataParser();
 
-            Core    = ini["Core"];
-            Network = ini["Network"];
-            Plugins = ini["Plugins"];
+            Ini     = parser.ReadFile(Args.Ini, Encoding.UTF8);
+            Core    = Ini.Sections["Core"];
+            Network = Ini.Sections["Network"];
         }
 
         void setupArgs(string[] args)

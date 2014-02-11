@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IniParser.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -19,7 +20,7 @@ namespace VPServices
 
         public void Setup()
         {
-            //http://stackoverflow.com/questions/699852/how-to-find-all-the-classes-which-implement-a-given-interface
+            // http://stackoverflow.com/questions/699852/how-to-find-all-the-classes-which-implement-a-given-interface
             var type      = typeof(IService);
             var available = from   t in Assembly.GetExecutingAssembly().GetTypes()
                             where  t.GetInterfaces().Contains(type) && !t.IsInterface
@@ -27,7 +28,8 @@ namespace VPServices
 
             foreach (var service in available)
             {
-                var enabled = VPServices.Settings.Plugins.GetBoolean(service.Name, true);
+                var config  = GetSettings(service);
+                var enabled = bool.Parse(config["Enabled"] ?? "true");
 
                 if (!enabled)
                 {
@@ -64,6 +66,14 @@ namespace VPServices
         public IService[] GetAll()
         {
             return services.ToArray();
+        }
+
+        public KeyDataCollection GetSettings(IService service)
+        {
+            var configName = "Service." + service.Name;
+            VPServices.Settings.Ini.Sections.AddSection(configName);
+
+            return VPServices.Settings.Ini[configName];
         }
     }
 }

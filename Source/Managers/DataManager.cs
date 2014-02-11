@@ -11,7 +11,7 @@ namespace VPServices
 
         public void Setup()
         {
-            var db  = VPServices.Settings.Core.Get("Database", "VPServices.db");
+            var db  = VPServices.Settings.Core["Database"] ?? "VPServices.db";
                 SQL = new SQLiteConnection(db, true);
 
             Log.Info(tag, "Using database '{0}'", db);

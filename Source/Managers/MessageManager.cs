@@ -29,7 +29,7 @@ namespace VPServices
         public void Send(User user, ColorRgb color, string msg, params object[] subst)
         {
             var message = msg.LFormat(subst);
-            var name    = VPServices.Settings.Network.Get("Name");
+            var name    = VPServices.Settings.Network["Name"] ?? "Services";
 
             user.World.Bot.ConsoleMessage(user.Session, ChatEffect.None, color, name, message);
 

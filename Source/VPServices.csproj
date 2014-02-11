@@ -43,6 +43,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\CsvHelper.2.4.1\lib\net40-client\CsvHelper.dll</HintPath>
     </Reference>
+    <Reference Include="INIFileParser">
+      <HintPath>..\packages\ini-parser.2.0.2\lib\INIFileParser.dll</HintPath>
+    </Reference>
     <Reference Include="libVPNET, Version=0.3.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\libVPNET.0.3.5-pre\lib\net40\libVPNET.dll</HintPath>
@@ -65,7 +68,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CodeBits\IniFile.cs" />
     <Compile Include="Managers\MessageManager.cs" />
     <Compile Include="Services\Admin.cs" />
     <Compile Include="Types\Arguments.cs" />

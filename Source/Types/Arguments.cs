@@ -6,7 +6,7 @@ namespace VPServices.Types
     public class Arguments
     {
         [Description("Specifies INI file to use with Services")]
-        [DefaultValue("Services.ini")]
+        [DefaultValue("Settings.ini")]
         public string Ini { get; set; }
 
         [Description("Specifies the logging level to use throughout Services")]

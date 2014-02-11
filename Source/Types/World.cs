@@ -54,9 +54,9 @@ namespace VPServices
             state = WorldState.Connecting;
 
             await Task.Run( () => {
-                var username = VPServices.Settings.Network.Get("Username");
-                var password = VPServices.Settings.Network.Get("Password");
-                var botname  = VPServices.Settings.Network.Get("Name");
+                var username = VPServices.Settings.Network["Username"] ?? "Unknown";
+                var password = VPServices.Settings.Network["Password"] ?? "Unknown";
+                var botname  = VPServices.Settings.Network["Name"];
                 lastAttempt  = DateTime.Now;
 
                 try

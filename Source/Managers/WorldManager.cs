@@ -18,7 +18,7 @@ namespace VPServices
 
         public void Setup()
         {
-            var worlds    = VPServices.Settings.Network.Get("Worlds");
+            var worlds    = VPServices.Settings.Network["Worlds"] ?? "VP-Build";
             var worldList = worlds.TerseSplit(',');
 
             if (worldList.Length == 0)

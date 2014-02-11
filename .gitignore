@@ -24,3 +24,4 @@ Build/*.db
 Build/Libraries/sqlite3.dll
 packages/
 Source/CodeBits/
+Build/libvpsdk.so
