@@ -13,3 +13,4 @@
 - command switch util
 - session numbers in join/invite request messages
 - !invite everyone
+- rank jump popularity by usage

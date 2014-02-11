@@ -1,11 +1,26 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30110.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPServices", "Source\VPServices.csproj", "{185C1F00-9F11-4986-A49C-0CB97E0BDE37}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{41E3514A-6B1B-4B0C-858D-ADC0C1DD722E}"
 	ProjectSection(SolutionItems) = preProject
 		Docs\Todo.txt = Docs\Todo.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{34A3D30F-CC0D-4E75-B635-F3979D112EC3}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{E083F5F5-890F-46E4-89CF-B1ACAB605BF2}"
+	ProjectSection(SolutionItems) = preProject
+		Build\Settings - Test.ini = Build\Settings - Test.ini
+		Build\Settings.ini = Build\Settings.ini
 	EndProjectSection
 EndProject
 Global

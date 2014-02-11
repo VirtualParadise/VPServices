@@ -36,38 +36,39 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Args">
+      <HintPath>..\packages\Args.1.1.1\lib\Net40\Args.dll</HintPath>
+    </Reference>
     <Reference Include="CsvHelper, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\CsvHelper.2.2.2\lib\net40-client\CsvHelper.dll</HintPath>
+      <HintPath>..\packages\CsvHelper.2.4.1\lib\net40-client\CsvHelper.dll</HintPath>
     </Reference>
-    <Reference Include="libVPNET, Version=0.3.0.0, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="libVPNET, Version=0.3.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\libVPNET.0.3.0-pre\lib\net40\libVPNET.dll</HintPath>
+      <HintPath>..\packages\libVPNET.0.3.5-pre\lib\net40\libVPNET.dll</HintPath>
     </Reference>
     <Reference Include="Nexus">
       <HintPath>..\packages\Nexus.2.1.0\lib\net40\Nexus.dll</HintPath>
-    </Reference>
-    <Reference Include="Nini, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Libraries\Nini.dll</HintPath>
     </Reference>
     <Reference Include="SQLite">
       <HintPath>Libraries\SQLite.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="Toolbox.Extensions, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Toolbox.Extensions, Version=0.2.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Toolbox.0.2.0\lib\net40\Toolbox.Extensions.dll</HintPath>
+      <HintPath>..\packages\Toolbox.0.2.1\lib\net40\Toolbox.Extensions.dll</HintPath>
     </Reference>
-    <Reference Include="Toolbox.Logger, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Toolbox.Logger, Version=0.2.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Toolbox.0.2.0\lib\net40\Toolbox.Logger.dll</HintPath>
+      <HintPath>..\packages\Toolbox.0.2.1\lib\net40\Toolbox.Logger.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CodeBits\IniFile.cs" />
     <Compile Include="Managers\MessageManager.cs" />
     <Compile Include="Services\Admin.cs" />
+    <Compile Include="Types\Arguments.cs" />
     <Compile Include="Utilities\Constants.cs" />
     <Compile Include="Managers\WorldManager.cs" />
     <Compile Include="Types\Command.cs" />
@@ -87,6 +88,13 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Import Project="..\packages\libVPNET.0.3.5-pre\build\net40\libVPNET.targets" Condition="Exists('..\packages\libVPNET.0.3.5-pre\build\net40\libVPNET.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\libVPNET.0.3.5-pre\build\net40\libVPNET.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libVPNET.0.3.5-pre\build\net40\libVPNET.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

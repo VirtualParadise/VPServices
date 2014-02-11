@@ -1,6 +1,8 @@
-﻿using Nini.Config;
+﻿using Args;
+using CodeBits;
 using System;
-using System.IO;
+using System.Text;
+using VPServices.Types;
 
 namespace VPServices
 {
@@ -10,49 +12,44 @@ namespace VPServices
         const string defaultIni  = "Settings.ini";
         const string defaultName = "Services";
 
-        public IConfig Args;
-        public IConfig Core;
-        public IConfig Network;
-        public IConfig Plugins;
+        public Arguments Args;
 
-        IniConfigSource ini;
+        public IniFile.Section Core;
+        public IniFile.Section Network;
+        public IniFile.Section Plugins;
+
+        IniFile ini;
+
+        IniLoadSettings iniLoadSettings = new IniLoadSettings()
+        {
+            CaseSensitive = false,
+            Encoding      = Encoding.UTF8
+        };
 
         public void Setup(string[] args)
         {
             setupArgs(args);
-            setupIni();
+            Reload();
             Log.Debug(tag, "Global settings and arguments loaded");
         }
 
         public void Reload()
         {
-            ini.Reload();
+            Log.Debug(tag, "Using global ini file '{0}'", Args.Ini);
+            ini = new IniFile(Args.Ini, iniLoadSettings);
+
+            Core    = ini["Core"];
+            Network = ini["Network"];
+            Plugins = ini["Plugins"];
         }
 
         void setupArgs(string[] args)
         {
-            var source = new ArgvConfigSource(args);
+            Args = Configuration.Configure<Arguments>().CreateAndBind(args);
 
-            source.AddSwitch("Args", "ini",      "i");
-            source.AddSwitch("Args", "loglevel", "l");
-
-            Args      = source.Configs["Args"];
-            Log.Level = TEnums.Parse<LogLevels>( Args.Get("loglevel", "Production") );
+            Log.Level = Args.LogLevel;
             Log.Debug(tag, "Logging set up at level {0}", Log.Level);
         }
 
-        void setupIni()
-        {
-            var file = Args.Get("ini", defaultIni);
-            Log.Info(tag, "Using global ini file '{0}'", file);
-
-            ini     = new IniConfigSource(file);
-            Core    = ini.Configs["Core"]    ?? ini.Configs.Add("Core");
-            Network = ini.Configs["Network"] ?? ini.Configs.Add("Network");
-            Plugins = ini.Configs["Plugins"] ?? ini.Configs.Add("Plugins");
-
-            if ( !File.Exists(file) )
-                throw new NotImplementedException("TODO: Create ini and exit");
-        }
     }
 }
