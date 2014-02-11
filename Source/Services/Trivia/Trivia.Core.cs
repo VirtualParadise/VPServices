@@ -125,6 +125,12 @@ namespace VPServices.Services
             var user   = app.GetUser(who);
             var points = user.GetSettingInt(keyTriviaPoints);
 
+            if (user.IsBot)
+            {
+                Log.Fine(tag, "Not awarding point to {0} as they are a bot", who);
+                return;
+            }
+
             points++;
             user.SetSetting(keyTriviaPoints, points);
             Log.Fine(tag, "{0} is now up to {1} points", who, points);
