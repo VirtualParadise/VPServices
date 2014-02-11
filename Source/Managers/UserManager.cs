@@ -36,6 +36,9 @@ namespace VPServices
 
                 w.Bot.UniverseDisconnect -= onDisconnect;
                 w.Bot.WorldDisconnect    -= onDisconnect;
+
+                removeByWorld(w);
+                Log.Fine(tag, "Cleared all known users of world '{0}' due to removal", w);
             };
 
             var sql = VPServices.Data.SQL.CreateTable<sqlUserSettings>();
@@ -80,6 +83,19 @@ namespace VPServices
         public User BySession(int session)
         {
             return users.FirstOrDefault( u => u.Session == session );
+        }
+
+        void removeByWorld(World world)
+        {
+            var affected = users.Where( u => u.World.Equals(world) ).ToArray();
+
+            foreach (var user in affected)
+            {
+                users.Remove(user);
+
+                if (Leave != null)
+                    Leave(user, true);
+            }
         }
 
         void onAvatarEnter(Instance bot, Avatar avatar)
@@ -128,17 +144,9 @@ namespace VPServices
 
         void onDisconnect(Instance sender, int error)
         {
-            var world    = VPServices.Worlds.Get(sender);
-            var affected = users.Where( u => u.World.Equals(world) ).ToArray();
-
-            foreach (var user in affected)
-            {
-                users.Remove(user);
-
-                if (Leave != null)
-                    Leave(user, true);
-            }
-
+            var world = VPServices.Worlds.Get(sender);
+            
+            removeByWorld(world);
             Log.Fine(tag, "Cleared all known users of world '{0}' due to disconnect", world);
         }
     }

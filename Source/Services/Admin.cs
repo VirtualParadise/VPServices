@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using System;
+using System.Linq;
 
 namespace VPServices.Services
 {
@@ -13,20 +14,102 @@ namespace VPServices.Services
         public Command[] Commands
         {
             get { return new[] {
-                new Command("Exit", "exit", onExit,
-                "Causes VPServices to fully exit from all worlds. Admin users only.")
+                new Command("Add world", "^addworld", (w,d) => onWorld(w,d,true),
+                    "Adds a world for VPServices to begin servicing. Admin users only.",
+                    "!addworld World"),
+
+                new Command("Remove world", "^(del(ete)?|rem(ove)?)world", (w,d) => onWorld(w,d,false),
+                    "Stops VPServices from servicing the given world. Admin users only.",
+                    "!delworld World"),
+
+                new Command("Load service", "^loadservice", (w,d) => onService(w,d,true),
+                    "Loads a service for Services to provide. Admin users only.",
+                    "!loadservice Service"),
+
+                new Command("Unload service", "^unloadservice", (w,d) => onService(w,d,false),
+                    "Unloads a service from being provided by Services. Admin users only.",
+                    "!unloadservice Service"),
+
+                new Command("Exit", "^exit$", onExit,
+                    "Causes VPServices to fully exit from all worlds. Admin users only.")
                 {
                     Enabled = bool.Parse( VPServices.Services.GetSettings(this)["CanExit"] ?? "true" )
                 },
 
                 new Command("Debug", "debug", onDebug,
-                "Prints a full debug report in the console. Moderator users only."),
+                    "Prints a full debug report in the console. Moderator users only."),
             }; }
         }
 
         public void Load() { }
 
         public void Unload() { }
+
+        bool onWorld(User who, string data, bool adding)
+        {
+            if ( !who.HasRight(Rights.Admin) )
+            {
+                VPServices.Messages.Send(who, Colors.Warn, "You do not have the right to use that command");
+                return true;
+            }
+
+            if ( string.IsNullOrWhiteSpace(data) )
+                return false;
+
+            if (adding)
+            {
+                if ( VPServices.Worlds.Add(data) )
+                    VPServices.Messages.Send(who, Colors.Info, "World '{0}' was added", data);
+                else
+                    VPServices.Messages.Send(who, Colors.Warn, "That world is already being serviced");
+            }
+            else
+            {
+                if ( VPServices.Worlds.Remove(data) )
+                    VPServices.Messages.Send(who, Colors.Info, "World '{0}' was removed", data);
+                else
+                    VPServices.Messages.Send(who, Colors.Warn, "That world is not being serviced");
+            }
+
+            return true;
+        }
+
+        bool onService(User who, string data, bool loading)
+        {
+            if ( !who.HasRight(Rights.Admin) )
+            {
+                VPServices.Messages.Send(who, Colors.Warn, "You do not have the right to use that command");
+                return true;
+            }
+
+            if ( string.IsNullOrWhiteSpace(data) )
+                return false;
+
+            var service = VPServices.Services.Get(data);
+
+            if (service == null)
+            {
+                VPServices.Messages.Send(who, Colors.Warn, "That service does not exist");
+                return true;
+            }
+
+            if (loading)
+            {
+                if ( VPServices.Services.Load(data) )
+                    VPServices.Messages.Send(who, Colors.Info, "Service '{0}' was loaded", service.Name);
+                else
+                    VPServices.Messages.Send(who, Colors.Warn, "That service is already loaded");
+            }
+            else
+            {
+                if (VPServices.Services.Unload(data) )
+                    VPServices.Messages.Send(who, Colors.Info, "Service '{0}' was removed", service.Name);
+                else
+                    VPServices.Messages.Send(who, Colors.Warn, "That service is not loaded");
+            }
+
+            return true;
+        }
 
         bool onExit(User who, string data)
         {
@@ -40,9 +123,9 @@ namespace VPServices.Services
 
         bool onDebug(User who, string data)
         {
-            if ( !who.HasRight(Rights.Moderator) )
+            if ( !( who.HasRight(Rights.Moderator) || who.HasRight(Rights.Admin) ) )
             {
-                VPServices.Messages.Send(who, Colors.Warn, "You need to be a moderator to use that command");
+                VPServices.Messages.Send(who, Colors.Warn, "You need to be a moderator+ to use that command");
                 return true;
             }
             else
@@ -64,11 +147,17 @@ namespace VPServices.Services
 
             TConsole.WriteLineColored(ConsoleColor.Gray, ConsoleColor.Black, "# Services");
             var services = VPServices.Services.GetAll();
+            var loaded   = VPServices.Services.GetAllLoaded();
 
             foreach (var svc in services)
-                Console.WriteLine("Service '{0}' is available", svc.Name);
-            
+            {
+                var extra = loaded.Contains(svc)
+                    ? "and loaded"
+                    : "but unloaded";
 
+                Console.WriteLine("Service '{0}' is available {1}", svc.Name, extra);
+            }
+            
             TConsole.WriteLineColored(ConsoleColor.Gray, ConsoleColor.Black, "# Users");
             var users = VPServices.Users.GetAll();
             

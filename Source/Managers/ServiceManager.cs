@@ -17,6 +17,7 @@ namespace VPServices
         public event ServiceArgs Unloaded;
 
         List<IService> services = new List<IService>();
+        List<IService> loaded   = new List<IService>();
 
         public void Setup()
         {
@@ -31,41 +32,98 @@ namespace VPServices
                 var config  = GetSettings(service);
                 var enabled = bool.Parse(config["Enabled"] ?? "true");
 
+                services.Add(service);
+
                 if (!enabled)
                 {
                     Log.Warn(tag, "Skipping load of service '{0}' as it is disabled in the config", service.Name);
                     continue;
                 }
-
-                service.Load();
-                services.Add(service);
-                Log.Fine(tag, "Loaded service '{0}'", service.Name);
-
-                if (Loaded != null)
-                    Loaded(service);
+                
+                load(service);
             }
 
-            Log.Debug(tag, "{0} services discovered and loaded", services.Count);
+            Log.Debug(tag, "{0} services discovered, {1} loaded", services.Count, loaded.Count);
         }
 
         public void Takedown()
         {
-            foreach (var service in services)
-            {
-                service.Unload();
-                Log.Fine(tag, "Unloaded service '{0}'", service.Name);
+            foreach (var service in loaded)
+                unload(service);
 
-                if (Unloaded != null)
-                    Unloaded(service);
-            }
-
+            loaded.Clear();
             services.Clear();
             Log.Info(tag, "All services unloaded");
+        }
+
+        public bool Load(string name)
+        {
+            var service = Get(name);
+
+            if (service == null)
+            {
+                Log.Warn(tag, "Tried to load non-existant service '{0}'", name);
+                return false;
+            }
+            
+            if ( loaded.Contains(service) )
+                return false;
+
+            return load(service);
+        }
+
+        bool load(IService service)
+        {
+            service.Load();
+            loaded.Add(service);
+            Log.Fine(tag, "Loaded service '{0}'", service.Name);
+                
+            if (Loaded != null)
+                Loaded(service);
+
+            return true;
+        }
+
+        public bool Unload(string name)
+        {
+            var service = GetLoaded(name);
+
+            if (service == null)
+                return false;
+
+            return unload(service);
+        }
+
+        bool unload(IService service)
+        {
+            service.Unload();
+            loaded.Remove(service);
+            Log.Fine(tag, "Unloaded service '{0}'", service.Name);
+
+            if (Unloaded != null)
+                Unloaded(service);
+
+            return true;
+        }
+
+        public IService Get(string name)
+        {
+            return services.FirstOrDefault( s => s.Name.IEquals(name) );
+        }
+
+        public IService GetLoaded(string name)
+        {
+            return loaded.FirstOrDefault( s => s.Name.IEquals(name) );
         }
 
         public IService[] GetAll()
         {
             return services.ToArray();
+        }
+
+        public IService[] GetAllLoaded()
+        {
+            return loaded.ToArray();
         }
 
         public KeyDataCollection GetSettings(IService service)

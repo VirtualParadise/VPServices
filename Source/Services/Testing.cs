@@ -14,11 +14,11 @@ namespace VPServices.Services
         {
             get { return new[] {
                 new Command("Message", "msg", onMsg,
-                "Sends a cross-world message to all sessions of a given name",
-                "!msg Target: Hello world!"),
+                    "Sends a cross-world message to all sessions of a given name",
+                    "!msg Target: Hello world!"),
 
                 new Command("Test", "test", onTest,
-                "This command should be disabled") { Enabled = false },
+                    "This command should be disabled") { Enabled = false },
             }; }
         }
 
