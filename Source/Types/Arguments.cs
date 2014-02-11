@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 
-namespace VPServices.Types
+namespace VPServices.Internal
 {
     public class Arguments
     {

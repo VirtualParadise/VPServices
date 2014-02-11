@@ -81,16 +81,16 @@ namespace VPServices.Services
             if (adding)
             {
                 if ( VPServices.Worlds.Add(data) )
-                    VPServices.Messages.Send(who, Colors.Info, "World '{0}' was added", data);
+                    who.Send.Info("World '{0}' was added", data);
                 else
-                    VPServices.Messages.Send(who, Colors.Warn, "That world is already being serviced");
+                    who.Send.Warn("That world is already being serviced");
             }
             else
             {
                 if ( VPServices.Worlds.Remove(data) )
-                    VPServices.Messages.Send(who, Colors.Info, "World '{0}' was removed", data);
+                    who.Send.Info("World '{0}' was removed", data);
                 else
-                    VPServices.Messages.Send(who, Colors.Warn, "That world is not being serviced");
+                    who.Send.Warn("That world is not being serviced");
             }
 
             return true;
@@ -105,23 +105,23 @@ namespace VPServices.Services
 
             if (service == null)
             {
-                VPServices.Messages.Send(who, Colors.Warn, "That service does not exist");
+                who.Send.Warn("That service does not exist");
                 return true;
             }
 
             if (loading)
             {
                 if ( VPServices.Services.Load(data) )
-                    VPServices.Messages.Send(who, Colors.Info, "Service '{0}' was loaded", service.Name);
+                    who.Send.Info("Service '{0}' was loaded", service.Name);
                 else
-                    VPServices.Messages.Send(who, Colors.Warn, "That service is already loaded");
+                    who.Send.Warn("That service is already loaded");
             }
             else
             {
                 if (VPServices.Services.Unload(data) )
-                    VPServices.Messages.Send(who, Colors.Info, "Service '{0}' was removed", service.Name);
+                    who.Send.Info("Service '{0}' was removed", service.Name);
                 else
-                    VPServices.Messages.Send(who, Colors.Warn, "That service is not loaded");
+                    who.Send.Warn("That service is not loaded");
             }
 
             return true;
@@ -136,7 +136,7 @@ namespace VPServices.Services
         bool onReload(User who, string data)
         {
             VPServices.Settings.Reload();
-            VPServices.Messages.Send(who, Colors.Info, "Configuration has been reloaded");
+            who.Send.Info("Configuration has been reloaded");
 
             return true;
         }
@@ -149,7 +149,7 @@ namespace VPServices.Services
 
         bool onDebug(User who, string data)
         {
-            VPServices.Messages.Send(who, Colors.Info, "Please see console for debug report");
+            who.Send.Info("Please see console for debug report");
 
             TConsole.WriteLineColored(ConsoleColor.White, ConsoleColor.Black, "### Debug report");
 
@@ -185,7 +185,7 @@ namespace VPServices.Services
             {
                 Console.WriteLine("User '{0}@{1}' SID#{2}", user, user.World, user.Session);
                 Console.WriteLine("Position {0}, settings:", user.Avatar.Position);
-                var settings = user.GetSettings();
+                var settings = user.Settings.GetAll();
 
                 foreach (var setting in settings)
                     Console.WriteLine("\t{0} - {1}", setting.Key, setting.Value);

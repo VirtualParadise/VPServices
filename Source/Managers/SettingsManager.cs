@@ -2,10 +2,9 @@
 using IniParser;
 using System;
 using System.Text;
-using VPServices.Types;
 using IniParser.Model;
 
-namespace VPServices
+namespace VPServices.Internal
 {
     public class SettingsManager
     {

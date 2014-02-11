@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using VPServices.Services;
 
-namespace VPServices
+namespace VPServices.Internal
 {
     public delegate void ServiceArgs(IService service);
 

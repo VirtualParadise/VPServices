@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using VPServices.Services;
 
-namespace VPServices
+namespace VPServices.Internal
 {
     public class CommandManager
     {
@@ -63,7 +63,7 @@ namespace VPServices
 
             if (!target.Enabled)
             {
-                VPServices.Messages.Send(user, Colors.Warn, "This command has been disabled by the operator");
+                user.Send.Warn("This command has been disabled by the operator");
                 Log.Debug(tag, "User '{0}' SID#{1} tried disabled command '{2}'", user, user.Session, target);
                 return;
             }
@@ -76,7 +76,7 @@ namespace VPServices
                 if (!canUse)
                 {
                     var needed = string.Join(",", target.Rights);
-                    VPServices.Messages.Send(user, Colors.Warn, "You do not have the right to use that command (required: {0})", needed);
+                    user.Send.Warn("You do not have the right to use that command (required: {0})", needed);
                     return;
                 }
             }
@@ -88,13 +88,13 @@ namespace VPServices
                 var success = target.Handler(user, data);
                 if (!success)
                 {
-                    VPServices.Messages.Send(user, Colors.Warn, "Invalid command use; please see example:");
-                    VPServices.Messages.Send(user, Colors.Warn, "{0}", target.Example);
+                    user.Send.Warn("Invalid command use; please see example:");
+                    user.Send.Warn("{0}", target.Example);
                 }
             }
             catch (Exception e)
             {
-                VPServices.Messages.Send(user, Colors.Alert, "Something went wrong, please notify the operator");
+                user.Send.Alert("Something went wrong, please notify the operator");
                 Log.Severe(tag, "Error executing command '{0}' for user '{1}@{2}'", cmd, user, user.World);
                 Log.LogFullStackTrace(e);
             }

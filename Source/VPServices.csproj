@@ -72,6 +72,9 @@
     <Compile Include="Services\Admin.cs" />
     <Compile Include="Services\Testing.cs" />
     <Compile Include="Types\Arguments.cs" />
+    <Compile Include="Types\WorldMessages.cs" />
+    <Compile Include="Types\UserMessages.cs" />
+    <Compile Include="Types\UserSettings.cs" />
     <Compile Include="Utilities\Constants.cs" />
     <Compile Include="Managers\WorldManager.cs" />
     <Compile Include="Types\Command.cs" />

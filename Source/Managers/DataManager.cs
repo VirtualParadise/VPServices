@@ -1,7 +1,7 @@
 ﻿using SQLite;
 using System;
 
-namespace VPServices
+namespace VPServices.Internal
 {
     public class DataManager
     {

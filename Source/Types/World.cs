@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Threading.Tasks;
 using VP;
+using VPServices.Internal;
 
 namespace VPServices
 {
     public class World : IDisposable
     {
         const string tag = "World";
+
+        public readonly WorldMessages Send;
 
         public readonly Instance Bot = new Instance();
         public readonly string   Name;
@@ -42,7 +45,9 @@ namespace VPServices
 
         public World(string name)
         {
-            Name = name;
+            this.Name = name;
+            this.Send = new WorldMessages(this);
+
             Bot.UniverseDisconnect += onDisconnect;
             Bot.WorldDisconnect    += onDisconnect;
 

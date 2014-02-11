@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using VP;
 
-namespace VPServices
+namespace VPServices.Internal
 {
     public delegate void UserArgs(User user);
     public delegate void UserLeaveArgs(User user, bool disconnection);

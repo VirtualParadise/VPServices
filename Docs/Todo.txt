@@ -15,4 +15,4 @@
 - !invite everyone
 - rank jump popularity by usage
 - per user and per world warn/info/lesser
-- move user SQL settings to container
+- "?" shortcut for factoid system (with target param)
