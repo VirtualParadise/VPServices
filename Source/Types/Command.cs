@@ -33,7 +33,7 @@ namespace VPServices
         /// <summary>
         /// Gets or sets if this command is enabled
         /// </summary>
-        public bool Enabled;
+        public bool Enabled = true;
 
         public Command(string name, string rgx, CommandHandler handler, string help, string example = "")
         {

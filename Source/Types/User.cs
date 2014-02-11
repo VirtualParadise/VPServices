@@ -1,8 +1,8 @@
-﻿using System;
+﻿using SQLite;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using VP;
-using SQLite;
 
 namespace VPServices
 {
@@ -29,6 +29,18 @@ namespace VPServices
             this.World  = world;
 
             Log.Fine(tag, "Created user for avatar '{0}' SID#{1} in world {2}", avatar, avatar.Session, World);
+        }
+
+        public bool HasRight(string rank)
+        {
+            var rights = VPServices.Settings.Rights[rank];
+
+            if (rights == null)
+                return false;
+
+            var rightsUsers = rights.TerseSplit(',');
+
+            return rightsUsers.Contains(Name, StringComparer.OrdinalIgnoreCase);
         }
 
         public Dictionary<string, string> GetSettings()

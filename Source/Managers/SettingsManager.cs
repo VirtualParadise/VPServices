@@ -16,6 +16,7 @@ namespace VPServices
 
         public KeyDataCollection Core;
         public KeyDataCollection Network;
+        public KeyDataCollection Rights;
 
         public void Setup(string[] args)
         {
@@ -32,6 +33,7 @@ namespace VPServices
             Ini     = parser.ReadFile(Args.Ini, Encoding.UTF8);
             Core    = Ini.Sections["Core"];
             Network = Ini.Sections["Network"];
+            Rights  = Ini.Sections["Rights"];
         }
 
         void setupArgs(string[] args)

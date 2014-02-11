@@ -61,6 +61,13 @@ namespace VPServices
             if (target == null)
                 return;
 
+            if (!target.Enabled)
+            {
+                VPServices.Messages.Send(user, Colors.Warn, "This command has been disabled by the operator");
+                Log.Debug(tag, "User '{0}' SID#{1} tried disabled command '{2}'", user, user.Session, target);
+                return;
+            }
+
             Log.Fine(tag, "User '{0}' SID#{1} firing command '{2}'", user, user.Session, target);
                             
             var success = target.Handler(user, data);

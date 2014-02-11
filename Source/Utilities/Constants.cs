@@ -9,4 +9,10 @@ namespace VPServices
         public static readonly ColorRgb Warn   = new ColorRgb(220,80,20);
         public static readonly ColorRgb Alert  = new ColorRgb(255,0,0);
     }
+
+    static class Rights
+    {
+        public const string Admin     = "Admin";
+        public const string Moderator = "Moderator";
+    }
 }

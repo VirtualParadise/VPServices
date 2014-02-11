@@ -33,7 +33,7 @@ namespace VPServices
 
                 if (!enabled)
                 {
-                    Log.Debug(tag, "Skipping load of service '{0}' as it is disabled in the config", service.Name);
+                    Log.Warn(tag, "Skipping load of service '{0}' as it is disabled in the config", service.Name);
                     continue;
                 }
 
