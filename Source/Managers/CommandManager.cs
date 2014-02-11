@@ -69,12 +69,21 @@ namespace VPServices
             }
 
             Log.Fine(tag, "User '{0}' SID#{1} firing command '{2}'", user, user.Session, target);
-                            
-            var success = target.Handler(user, data);
-            if (!success)
+            
+            try
             {
-                VPServices.Messages.Send(user, Colors.Warn, "Invalid command use; please see example:");
-                VPServices.Messages.Send(user, Colors.Warn, "{0}", target.Example);
+                var success = target.Handler(user, data);
+                if (!success)
+                {
+                    VPServices.Messages.Send(user, Colors.Warn, "Invalid command use; please see example:");
+                    VPServices.Messages.Send(user, Colors.Warn, "{0}", target.Example);
+                }
+            }
+            catch (Exception e)
+            {
+                VPServices.Messages.Send(user, Colors.Alert, "Something went wrong, please notify the operator");
+                Log.Severe(tag, "Error executing command '{0}' for user '{1}@{2}'", cmd, user, user.World);
+                Log.LogFullStackTrace(e);
             }
         }
     }    

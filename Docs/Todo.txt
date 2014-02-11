@@ -16,3 +16,4 @@
 - rank jump popularity by usage
 - per user and per world warn/info/lesser
 - move user SQL settings to container
+- move rights to Command class

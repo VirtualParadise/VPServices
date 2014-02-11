@@ -19,6 +19,9 @@ namespace VPServices.Services
 
                 new Command("Test", "test", onTest,
                     "This command should be disabled") { Enabled = false },
+
+                new Command("Crash", "crash", onCrash,
+                    "This command should crash the commandmanager"),
             }; }
         }
 
@@ -56,6 +59,17 @@ namespace VPServices.Services
         bool onTest(User who, string data)
         {
             throw new InvalidOperationException("This command is supposed to be disabled");
+        }
+
+        bool onCrash(User who, string data)
+        {
+            if ( !who.HasRight(Rights.Admin) )
+            {
+                VPServices.Messages.Send(who, Colors.Warn, "You do not have the right to use that command");
+                return true;
+            }
+
+            throw new Exception("Forced crash");
         }
     }
 }

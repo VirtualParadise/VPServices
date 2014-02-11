@@ -48,7 +48,7 @@ namespace VPServices
 
         public void Takedown()
         {
-            foreach (var service in loaded)
+            foreach ( var service in loaded.ToArray() )
                 unload(service);
 
             loaded.Clear();
