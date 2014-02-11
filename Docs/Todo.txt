@@ -14,5 +14,5 @@
 - session numbers in join/invite request messages
 - !invite everyone
 - rank jump popularity by usage
-- per user and per world warn/info/lesser
 - "?" shortcut for factoid system (with target param)
+- add fact alias recursion

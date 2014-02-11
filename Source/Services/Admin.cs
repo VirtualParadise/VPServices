@@ -14,36 +14,36 @@ namespace VPServices.Services
         public Command[] Commands
         {
             get { return new[] {
-                new Command("Add world", "^addworld", (w,d) => onWorld(w,d,true),
-                    "Adds a world for VPServices to begin servicing. Admin users only.",
+                new Command("Add world", "^addworld$", (w,d) => onWorld(w,d,true),
+                    "Adds a world for VPServices to begin servicing",
                     "!addworld World")
                     {
                         Rights = new[] { Rights.Admin }
                     },
 
-                new Command("Remove world", "^(del(ete)?|rem(ove)?)world", (w,d) => onWorld(w,d,false),
-                    "Stops VPServices from servicing the given world. Admin users only.",
+                new Command("Remove world", "^(del(ete)?|rem(ove)?)world$", (w,d) => onWorld(w,d,false),
+                    "Stops VPServices from servicing the given world",
                     "!delworld World")
                     {
                         Rights = new[] { Rights.Admin }
                     },
 
-                new Command("Load service", "^loadservice", (w,d) => onService(w,d,true),
-                    "Loads a service for Services to provide. Admin users only.",
+                new Command("Load service", "^loadservice$", (w,d) => onService(w,d,true),
+                    "Loads a service for Services to provide",
                     "!loadservice Service")
                     {
                         Rights = new[] { Rights.Admin }
                     },
 
-                new Command("Unload service", "^unloadservice", (w,d) => onService(w,d,false),
-                    "Unloads a service from being provided by Services. Admin users only.",
+                new Command("Unload service", "^unloadservice$", (w,d) => onService(w,d,false),
+                    "Unloads a service from being provided by Services",
                     "!unloadservice Service")
                     {
                         Rights = new[] { Rights.Admin }
                     },
 
                 new Command("Exit", "^exit$", onExit,
-                    "Causes VPServices to fully exit from all worlds. Admin users only.")
+                    "Causes VPServices to fully exit from all worlds")
                     {
                         Enabled = bool.Parse( VPServices.Services.GetSettings(this)["CanExit"] ?? "true" ),
                         Rights  = new[] { Rights.Admin }
@@ -61,8 +61,8 @@ namespace VPServices.Services
                         Rights  = new[] { Rights.Admin, Rights.Moderator }
                     },
 
-                new Command("Debug", "^debug", onDebug,
-                    "Prints a full debug report in the console. Moderator users only.")
+                new Command("Debug", "^debug$", onDebug,
+                    "Prints a full debug report in the console")
                     {
                         Rights = new[] { Rights.Admin, Rights.Moderator }
                     },

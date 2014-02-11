@@ -70,6 +70,7 @@
   <ItemGroup>
     <Compile Include="Managers\MessageManager.cs" />
     <Compile Include="Services\Admin.cs" />
+    <Compile Include="Services\Facts\Facts.cs" />
     <Compile Include="Services\Messaging.cs" />
     <Compile Include="Services\Testing.cs" />
     <Compile Include="Types\Arguments.cs" />

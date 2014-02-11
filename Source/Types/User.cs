@@ -22,6 +22,11 @@ namespace VPServices
             get { return Avatar.Name; }
         }
 
+        public int Id
+        {
+            get { return Avatar.Id; }
+        }
+
         public int Session
         {
             get { return Avatar.Session; }
