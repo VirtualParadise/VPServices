@@ -70,7 +70,7 @@
   <ItemGroup>
     <Compile Include="Managers\MessageManager.cs" />
     <Compile Include="Services\Admin.cs" />
-    <Compile Include="Services\Facts\Facts.cs" />
+    <Compile Include="Services\Facts.cs" />
     <Compile Include="Services\Messaging.cs" />
     <Compile Include="Services\Testing.cs" />
     <Compile Include="Types\Arguments.cs" />
@@ -90,6 +90,7 @@
     <Compile Include="Types\IService.cs" />
     <None Include="packages.config" />
     <Compile Include="Managers\ServiceManager.cs" />
+    <Compile Include="Utilities\SearchEngine.cs" />
     <Compile Include="VPServices.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

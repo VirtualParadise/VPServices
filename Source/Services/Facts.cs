@@ -56,13 +56,10 @@ namespace VPServices.Services
         const string msgAdded        = "Added factoid for {1}topic '{0}'";
         const string msgOverwritten  = "Overwritten previous factoid for {1}topic '{0}'";
         const string msgDeleted      = "Factoid deleted";
-        const string msgResults      = "*** Search results for '{0}'";
         const string msgResult       = "{0}{1} : {2}";
         const string msgResult2      = "➜ defined on {0}";
         const string errNonExistant  = "No factoid for that topic was found";
-        const string errBrokenAlias  = "Could not resolve alias '@{0}' from topic '{1}'";
         const string errLocked       = "Topic locked by user ID {0}; can only be modified or deleted by them, moderators or admins";
-        const string errNotFound     = "Could not match any facts for '{0}'";
 
         SQLiteConnection sql; 
         #endregion
@@ -174,19 +171,7 @@ namespace VPServices.Services
             }
             
             // Alias topics
-            if ( fact.Description.StartsWith("@") )
-            {
-                var aliasTopic = fact.Description.Substring(1);
-                var alias      = getFact(aliasTopic);
-                
-                if (alias == null)
-                {
-                    who.Send.Warn(errBrokenAlias, aliasTopic, topic);
-                    return true;
-                }
-                else
-                    fact = alias;
-            }
+            fact = resolveFact(fact);
 
             if (targeted)
                 who.World.Send.Info(msgFactTargeted, target, fact.Description);
@@ -197,8 +182,18 @@ namespace VPServices.Services
 
         bool cmdFactList(User who, string data)
         {
-            if ( string.IsNullOrWhiteSpace(data) )
-                return false;
+            return new SearchEngine<sqlFact>()
+            {
+                Query = "SELECT * FROM Facts",
+                Limit = 30,
+
+                Formatter = f => { return new[]
+                    {
+                        msgResult.LFormat(f.Topic, f.Locked ? " (locked)" : "", f.Description),
+                        msgResult2.LFormat(f.When)
+                    };
+                },
+            }.Execute(who, data, sql);
 
             //var query = from   f in sql.Table<sqlFact>()
             //            where  f.Topic.Contains(data)
@@ -218,8 +213,6 @@ namespace VPServices.Services
             //        app.Bot.ConsoleMessage(who.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msgResult2, q.When);
             //    }
             //}
-
-            return true;
         }
         #endregion
 
@@ -228,6 +221,29 @@ namespace VPServices.Services
         {
             return sql.Query<sqlFact>("SELECT * FROM Facts WHERE Topic = ? COLLATE NOCASE", topic).FirstOrDefault();
         }
+
+        sqlFact resolveFact(sqlFact fact, int recursion = 0)
+        {
+            if ( !fact.Description.StartsWith("@") )
+                return fact;
+            
+            if (recursion > 10)
+            {
+                Log.Warn(Name, "Hit resolve limit of 10 on aliased factoid '{0}'", fact.Topic);
+                return fact;
+            }
+
+            var aliasTopic = fact.Description.Substring(1);
+            var alias      = getFact(aliasTopic);
+                
+            if (alias == null)
+            {
+                Log.Warn(Name, "Could not resolve alias '{0}' on factoid '{1}'", aliasTopic, fact.Topic);
+                return fact;
+            }
+            else
+                return resolveFact(alias, recursion + 1);
+        }
         #endregion
     }
 
@@ -235,11 +251,15 @@ namespace VPServices.Services
     class sqlFact
     {
         [Indexed]
-        public string   Topic       { get; set; }
+        public string Topic { get; set; }
+
         [MaxLength(255)]
-        public string   Description { get; set; }
-        public int      WhoID       { get; set; }
-        public DateTime When        { get; set; }
-        public bool     Locked      { get; set; }
+        public string Description { get; set; }
+
+        public int WhoID { get; set; }
+
+        public DateTime When { get; set; }
+
+        public bool Locked { get; set; }
     }
 }
