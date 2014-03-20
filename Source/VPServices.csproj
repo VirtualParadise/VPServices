@@ -53,9 +53,6 @@
     <Reference Include="Nexus">
       <HintPath>..\packages\Nexus.2.1.0\lib\net40\Nexus.dll</HintPath>
     </Reference>
-    <Reference Include="SQLite">
-      <HintPath>Libraries\SQLite.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Toolbox.Extensions, Version=0.2.1.0, Culture=neutral, processorArchitecture=MSIL">
@@ -73,6 +70,8 @@
     <Compile Include="Services\Facts.cs" />
     <Compile Include="Services\Messaging.cs" />
     <Compile Include="Services\Testing.cs" />
+    <Compile Include="SQLite.cs" />
+    <Compile Include="SQLiteAsync.cs" />
     <Compile Include="Types\Arguments.cs" />
     <Compile Include="Types\WorldMessages.cs" />
     <Compile Include="Types\UserMessages.cs" />

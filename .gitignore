@@ -25,3 +25,5 @@ Build/Libraries/sqlite3.dll
 packages/
 Source/CodeBits/
 Build/libvpsdk.so
+Source/SQLite.cs
+Source/SQLiteAsync.cs
