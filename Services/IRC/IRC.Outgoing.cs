@@ -1,6 +1,6 @@
 ﻿using Meebey.SmartIrc4net;
 using System;
-using VP;
+using VpNet;
 
 namespace VPServices.Services
 {

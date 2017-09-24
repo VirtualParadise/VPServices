@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using SQLite;
-using VP;
+using VpNet;
 
 namespace VPServices.Services
 {

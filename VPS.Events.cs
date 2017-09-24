@@ -1,6 +1,6 @@
 ﻿using System;
-using VP;
-using AvatarArgs = VP.InstanceAvatars.AvatarArgs;
+using VpNet;
+using AvatarArgs = VpNet.InstanceAvatars.AvatarArgs;
 
 namespace VPServices
 {

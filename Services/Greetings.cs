@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using VP;
+using VpNet;
 using VPServices;
 
 namespace VPServices.Services

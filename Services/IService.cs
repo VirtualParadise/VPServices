@@ -1,5 +1,5 @@
 ﻿using System;
-using VP;
+using VpNet;
 
 namespace VPServices.Services
 {

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading;
-using VP;
+using VpNet;
 
 namespace VPServices
 {

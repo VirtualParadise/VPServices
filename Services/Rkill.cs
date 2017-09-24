@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using VP;
+using VpNet;
 using Nini.Config;
 
 namespace VPServices.Services

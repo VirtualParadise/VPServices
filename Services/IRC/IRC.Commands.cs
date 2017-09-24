@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using VP;
+using VpNet;
 
 namespace VPServices.Services
 {

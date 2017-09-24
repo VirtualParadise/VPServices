@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using VP;
+using VpNet;
 
 namespace VPServices.Services
 {
@@ -133,7 +133,7 @@ namespace VPServices.Services
         const string msgCommandExample = "Example: {0}";
 
         #region Services commands
-        bool cmdHelp(VPServices app, Avatar who, string data)
+        bool cmdHelp(VPServices app, Avatar<Vector3> who, string data)
         {
             var helpUrl = app.PublicUrl + "help";
 
@@ -144,10 +144,10 @@ namespace VPServices.Services
                 foreach ( var cmd in app.Commands )
                     if ( TRegex.IsMatch(data, cmd.Regex) )
                     {
-                        app.Bot.ConsoleMessage(who.Session, ChatEffect.BoldItalic, VPServices.ColorInfo, "", msgCommandTitle, cmd.Name);
-                        app.Bot.ConsoleMessage(who.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msgCommandRgx, cmd.Regex);
-                        app.Bot.ConsoleMessage(who.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msgCommandDesc, cmd.Help);
-                        app.Bot.ConsoleMessage(who.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msgCommandExample, cmd.Example);
+                        app.Bot.ConsoleMessage(who.Session, "", string.Format(msgCommandTitle, cmd.Name), VPServices.ColorInfo, TextEffectTypes.BoldItalic);
+                        app.Bot.ConsoleMessage(who.Session, "", string.Format(msgCommandRgx, cmd.Regex), VPServices.ColorInfo, TextEffectTypes.Italic);
+                        app.Bot.ConsoleMessage(who.Session, "", string.Format(msgCommandDesc, cmd.Help), VPServices.ColorInfo, TextEffectTypes.Italic);
+                        app.Bot.ConsoleMessage(who.Session, "", string.Format(msgCommandExample, cmd.Example), VPServices.ColorInfo, TextEffectTypes.Italic);
 
                         return true;
                     }
