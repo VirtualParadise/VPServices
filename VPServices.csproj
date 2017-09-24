@@ -53,14 +53,18 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Xml" />
     <Reference Include="Toolbox.Extensions">
       <HintPath>Libraries\Toolbox.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="Toolbox.Logger">
       <HintPath>Libraries\Toolbox.Logger.dll</HintPath>
     </Reference>
-    <Reference Include="VP.NET">
-      <HintPath>Libraries\VP.NET.dll</HintPath>
+    <Reference Include="VpNet, Version=1.0.8.1966, Culture=neutral, PublicKeyToken=59c6dba8997fd469, processorArchitecture=MSIL">
+      <HintPath>packages\VpNet.1.0.8.1966\lib\net40\VpNet.dll</HintPath>
+    </Reference>
+    <Reference Include="VpNet.VpConsoleServices, Version=1.0.8.1966, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\VpNet.VpConsoleServices.1.0.8.1966\lib\net40\VpNet.VpConsoleServices.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -95,6 +99,8 @@
     <Compile Include="Services\Logging\Logging.cs" />
     <Compile Include="Services\IRC\IRC.Core.cs" />
     <None Include="app.config" />
+    <None Include="libvpsdk.so" />
+    <None Include="packages.config" />
     <None Include="Services\SwordFight\SwordFight.cs" />
     <Compile Include="Services\JoinsInvites.cs" />
     <Compile Include="Services\Jumps\Jumps.cs" />
@@ -108,6 +114,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Docs\Todo.txt" />
+    <Content Include="VPSDK.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
