@@ -63,9 +63,6 @@
     <Reference Include="VpNet, Version=1.0.8.1966, Culture=neutral, PublicKeyToken=59c6dba8997fd469, processorArchitecture=MSIL">
       <HintPath>packages\VpNet.1.0.8.1966\lib\net40\VpNet.dll</HintPath>
     </Reference>
-    <Reference Include="VpNet.VpConsoleServices, Version=1.0.8.1966, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\VpNet.VpConsoleServices.1.0.8.1966\lib\net40\VpNet.VpConsoleServices.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Services\Rkill.cs" />
