@@ -1,80 +1,89 @@
 ﻿using System;
 using VpNet;
-using AvatarArgs = VpNet.InstanceAvatars.AvatarArgs;
 
 namespace VPServices
 {
     public partial class VPServices : IDisposable
     {
+        public delegate void AvatarArgs(Instance bot, Avatar<Vector3> user);
         public delegate void ChatArgs(Instance bot, Avatar<Vector3> user, string message);
 
         public event AvatarArgs AvatarEnter;
         public event AvatarArgs AvatarLeave;
         public event AvatarArgs AvatarChange;
-        public event ChatArgs   Chat;
+        public event ChatArgs Chat;
 
         public void SetupEvents()
         {
-            Bot.Avatars.Enter  += onAvatarAdd;
-            Bot.Avatars.Leave  += onAvatarLeave;
-            Bot.Avatars.Change += onAvatarsChange;
-            Bot.Chat           += onChat;
+            Bot.OnAvatarEnter += onAvatarAdd;
+            Bot.OnAvatarLeave += onAvatarLeave;
+            Bot.OnAvatarChange += onAvatarsChange;
+            Bot.OnChatMessage += onChat;
         }
 
         public void ClearEvents()
         {
-            Bot.Avatars.Enter  -= onAvatarAdd;
-            Bot.Avatars.Leave  -= onAvatarLeave;
-            Bot.Avatars.Change -= onAvatarsChange;
-            Bot.Chat           -= onChat;
+            Bot.OnAvatarEnter -= onAvatarAdd;
+            Bot.OnAvatarLeave -= onAvatarLeave;
+            Bot.OnAvatarChange -= onAvatarsChange;
+            Bot.OnChatMessage -= onChat;
 
-            AvatarEnter  = null;
-            AvatarLeave  = null;
+            AvatarEnter = null;
+            AvatarLeave = null;
             AvatarChange = null;
-            Chat         = null;
+            Chat = null;
         }
 
         #region Event handlers
-        void onAvatarAdd(Instance sender, Avatar<Vector3> avatar)
+        void onAvatarAdd(Instance sender, AvatarEnterEventArgsT<Avatar<Vector3>, Vector3> args)
         {
-            TConsole.WriteLineColored(ConsoleColor.Cyan, "*** {0} [SID#{1}] enters", avatar.Name, avatar.Session);
-            
-            lock (SyncMutex)
-                Users.Add(avatar);
+            sender.ConsoleMessage(string.Format("*** {0} [SID#{1}] enters", args.Avatar.Name, args.Avatar.Session), new Color(0, 0, 128));
 
-            if ( AvatarEnter != null )
-                AvatarEnter(sender, avatar);
+            lock (SyncMutex)
+                Users.Add(args.Avatar);
+
+            if (AvatarEnter != null)
+            {
+                AvatarEnter(sender, args.Avatar);
+            }
         }
 
-        void onAvatarLeave(Instance sender, Avatar<Vector3> avatar)
+        void onAvatarLeave(Instance sender, AvatarLeaveEventArgsT<Avatar<Vector3>, Vector3> args)
         {
-            TConsole.WriteLineColored(ConsoleColor.Cyan, "*** {0} [SID#{1}] leaves", avatar.Name, avatar.Session);
+            sender.ConsoleMessage(string.Format("*** {0} [SID#{1}] leaves", args.Avatar.Name, args.Avatar.Session), new Color(0, 0, 128));
 
-            var user = GetUser(avatar.Session);
-            if ( AvatarLeave != null )
-                AvatarLeave(sender, avatar);
+            var user = GetUser(args.Avatar.Session);
+
+            if (AvatarLeave != null)
+            {
+                AvatarLeave(sender, args.Avatar);
+            }
 
             lock (SyncMutex)
                 Users.Remove(user);
         }
 
-        void onAvatarsChange(Instance sender, Avatar<Vector3> avatar)
+        void onAvatarsChange(Instance sender, AvatarChangeEventArgsT<Avatar<Vector3>, Vector3> args)
         {
-            var user = GetUser(avatar.Session);
-            user.Position = avatar.Position;
+            var user = GetUser(args.Avatar.Session);
+            user.Position = args.Avatar.Position;
 
-            if ( AvatarChange != null )
-                AvatarChange(sender, avatar);
+            if (AvatarChange != null)
+            {
+                AvatarChange(sender, args.Avatar);
+            }
         } 
 
-        void onChat(Instance sender, ChatMessage chat)
+        void onChat(Instance sender, ChatMessageEventArgsT<Avatar<Vector3>, ChatMessage, Vector3, Color> args)
         {
-            var user = GetUser(chat.Session);
+            var user = GetUser(args.Avatar.Session);
             if ( user == null )
                 return;
 
-            if (Chat != null)
-                Chat(sender, user, chat.Message);
+            if (args.ChatMessage != null)
+            {
+                Chat(sender, user, args.ChatMessage.Message);
+            }
         }
         #endregion
     }
