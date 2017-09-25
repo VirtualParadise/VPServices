@@ -181,7 +181,7 @@ namespace VPServices.Services
                         : getJump(name);
 
                 if ( jump != null )
-                    app.Bot.Avatars.Teleport(who.Session, "", new Vector3(jump.X, jump.Y, jump.Z), jump.Yaw, jump.Pitch);
+                    app.Bot.TeleportAvatar(who.Session, "", new Vector3(jump.X, jump.Y, jump.Z), jump.Yaw, jump.Pitch);
                 else
                     app.Warn(who.Session, msgNonExistant, jumpsUrl); 
             }

@@ -9,6 +9,7 @@ namespace VPServices
         public DateTime LastConnect;
         public string   World;
 
+        string botName;
         string userName;
         string password;
 
@@ -21,7 +22,12 @@ namespace VPServices
             {
                 try
                 {
-                    Bot.Login(userName, password);
+                    // TODO: Async. Example:
+                    // vp.ConnectAsync();
+                    // vp.LoginAsync(user, password, botname);
+                    // vp.EnterAsync(world);
+
+                    Bot.Login(userName, password, botName);
                     LastConnect = DateTime.Now;
                     
                     // Disconnect events
@@ -49,7 +55,8 @@ namespace VPServices
                 try
                 {
                     Bot.Enter(World);
-                    Bot.GoTo(0, 10, 0);
+                    Avatar<Vector3> myAvatar = Bot.My();
+                    Bot.TeleportAvatar(myAvatar, new Vector3(0, 10, 0), new Vector3());
                     LastConnect = DateTime.Now;
                     return;
                 }

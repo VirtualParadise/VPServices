@@ -65,7 +65,6 @@ namespace VPServices.Services
         #region Command handlers
         void cmdGoHome(VPServices app, Avatar<Vector3> who, bool entering)
         {
-            AvatarPosition target;
             var query  = from   h in connection.Table<sqlHome>()
                          where  h.UserID == who.UserId
                          select h;
@@ -75,12 +74,15 @@ namespace VPServices.Services
                 return;
 
             if (home != null)
-                target = new AvatarPosition(home.X, home.Y, home.Z, home.Pitch, home.Yaw);
+            {
+                app.Bot.TeleportAvatar(who.Session, "", new Vector3(home.X, home.Y, home.Z), home.Yaw, home.Pitch);
+                Log.Debug(Name, "Teleported {0} home at {1:f3}, {2:f3}, {3:f3}", who.Name, home.X, home.Y, home.Z);
+            }
             else
-                target = AvatarPosition.GroundZero;
-
-            app.Bot.Avatars.Teleport(who.Session, "", target);
-            Log.Debug(Name, "Teleported {0} home at {1:f3}, {2:f3}, {3:f3}", who.Name, target.X, target.Y, target.Z);
+            {
+                app.Bot.TeleportAvatar(who.Session, "", new Vector3(), 0, 0);
+                Log.Debug(Name, "Teleported {0} home (to ground zero) at {1:f3}, {2:f3}, {3:f3}", who.Name, 0, 0, 0);
+            }
         }
 
         bool cmdSetHome(VPServices app, Avatar<Vector3> who, string data)
@@ -112,7 +114,7 @@ namespace VPServices.Services
         bool cmdBounce(VPServices app, Avatar<Vector3> who, string data)
         {
             who.SetSetting(settingBounce, true);
-            app.Bot.Avatars.Teleport(who.Session, app.World, who.Position);
+            app.Bot.TeleportAvatar(who.Session, app.World, who.Position, 0, 0);
 
             return Log.Info(Name, "Bounced user {0}", who.Name);
         } 

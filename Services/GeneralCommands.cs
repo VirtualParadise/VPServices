@@ -275,7 +275,7 @@ namespace VPServices.Services
                     break;
             }
 
-            VPServices.App.Bot.Avatars.Teleport(who.Session, "", location, who.Rotation.Z, who.Rotation.Y);
+            VPServices.App.Bot.TeleportAvatar(who.Session, "", location, who.Rotation.Z, who.Rotation.Y);
             return true;
         }
 
@@ -285,28 +285,19 @@ namespace VPServices.Services
             var randZ = VPServices.Rand.Next(-65535, 65535);
 
             app.Notify(who.Session, "Teleporting to {0}, 0, {1}", randX, randZ);
-            app.Bot.Avatars.Teleport(who.Session, "", new Vector3(randX, 0, randZ), who.Rotation.Z, who.Rotation.Y);
+            app.Bot.TeleportAvatar(who.Session, "", new Vector3(randX, 0, randZ), who.Rotation.Z, who.Rotation.Y);
             return true;
         } 
 
         bool cmdGroundZero(VPServices app, Avatar<Vector3> who, string data)
         {
-            app.Bot.Avatars.Teleport(who.Session, "", AvatarPosition.GroundZero);
+            app.Bot.TeleportAvatar(who.Session, "", new Vector3(), 0, 0);
             return true;
         } 
 
         bool cmdGround(VPServices app, Avatar<Vector3> who, string data)
         {
-            var target = new AvatarPosition
-            {
-                X     = who.Position.X,
-                Y     = 0.1f,
-                Z     = who.Position.Z,
-                Pitch = who.Rotation.Y,
-                Yaw   = who.Rotation.Z
-            };
-
-            app.Bot.Avatars.Teleport(who.Session, target);
+            app.Bot.TeleportAvatar(who.Session, "", new Vector3(who.Position.X, 0.1f, who.Position.Z), who.Rotation.Y, who.Rotation.Z);
             return true;
         }
         #endregion

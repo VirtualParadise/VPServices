@@ -66,17 +66,13 @@ namespace VPServices
             //    BotName =
             //}); CoreSettings.Get("Name", defaultName) );
 
+            botName = CoreSettings.Get("Name", defaultName);
             userName = NetworkSettings.Get("Username");
             password = NetworkSettings.Get("Password");
             World = NetworkSettings.Get("World");
             Owner = userName;
 
-            Bot = new Instance(new InstanceConfiguration<World>()
-            {
-                BotName = CoreSettings.Get("Name", defaultName),
-                UserName = userName,
-                Password = password
-            });
+            Bot = new Instance();
 
             // Connect to network
             ConnectToUniverse();
@@ -151,7 +147,7 @@ namespace VPServices
 
         public void Notify(int session, string msg, params object[] parts)
         {
-            Bot.ConsoleMessage(session, Bot.Name, string.Format(msg, parts), ColorInfo, TextEffectTypes.Italic);
+            Bot.ConsoleMessage(session, Bot.Configuration.BotName, string.Format(msg, parts), ColorInfo, TextEffectTypes.Italic);
         }
 
         public void NotifyAll(string msg, params object[] parts)
@@ -161,7 +157,7 @@ namespace VPServices
 
         public void Alert(int session, string msg, params object[] parts)
         {
-            Bot.ConsoleMessage(session, Bot.Name, string.Format(msg, parts), ColorAlert, TextEffectTypes.Bold);
+            Bot.ConsoleMessage(session, Bot.Configuration.BotName, string.Format(msg, parts), ColorAlert, TextEffectTypes.Bold);
         }
 
         public void AlertAll(string msg, params object[] parts)
@@ -171,7 +167,7 @@ namespace VPServices
 
         public void Warn(int session, string msg, params object[] parts)
         {
-            Bot.ConsoleMessage(session, Bot.Name, string.Format(msg, parts), ColorWarn, TextEffectTypes.Italic);
+            Bot.ConsoleMessage(session, Bot.Configuration.BotName, string.Format(msg, parts), ColorWarn, TextEffectTypes.Italic);
         }
 
         public void WarnAll(string msg, params object[] parts)

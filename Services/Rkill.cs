@@ -37,7 +37,7 @@ namespace VPServices.Services
 
         bool cmdRKill(VPServices app, Avatar<Vector3> who, string data)
         {
-            if (data != app.Bot.Name)
+            if (data != app.Bot.Configuration.BotName)
                 return true;
 
             if ( !config.GetBoolean("Enabled", false) )

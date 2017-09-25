@@ -32,7 +32,7 @@ namespace VPServices.Services
                 return;
 
             // Ignore Services bot messages
-            if (console.Name == sender.Name)
+            if (console.Name == sender.Configuration.BotName)
                 return;
 
             var msgRoll = console.Message.TerseSplit("\n");
