@@ -34,15 +34,15 @@ namespace VPServices.Services
 
         SQLiteConnection connection;
 
-        void objectEvent(VPObject o, sqlBuildType type)
+        void objectEvent(VpObject<Vector3> o, sqlBuildType type)
         {
             lock (VPServices.App.DataMutex)
                 connection.Insert( new sqlBuildHistory
                 {
                     ID   = o.Id,
-                    X    = o.Position.X,
-                    Y    = o.Position.Y,
-                    Z    = o.Position.Z,
+                    X    = (float)o.Position.X,
+                    Y    = (float)o.Position.Y,
+                    Z    = (float)o.Position.Z,
                     Type = type,
                     When = TDateTime.UnixTimestamp
                 });
