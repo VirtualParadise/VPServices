@@ -6,7 +6,7 @@ namespace VPServices
 {
     public partial class VPServices : IDisposable
     {
-        public delegate void ChatArgs(Instance bot, Avatar user, string message);
+        public delegate void ChatArgs(Instance bot, Avatar<Vector3> user, string message);
 
         public event AvatarArgs AvatarEnter;
         public event AvatarArgs AvatarLeave;
@@ -35,7 +35,7 @@ namespace VPServices
         }
 
         #region Event handlers
-        void onAvatarAdd(Instance sender, Avatar avatar)
+        void onAvatarAdd(Instance sender, Avatar<Vector3> avatar)
         {
             TConsole.WriteLineColored(ConsoleColor.Cyan, "*** {0} [SID#{1}] enters", avatar.Name, avatar.Session);
             
@@ -46,7 +46,7 @@ namespace VPServices
                 AvatarEnter(sender, avatar);
         }
 
-        void onAvatarLeave(Instance sender, Avatar avatar)
+        void onAvatarLeave(Instance sender, Avatar<Vector3> avatar)
         {
             TConsole.WriteLineColored(ConsoleColor.Cyan, "*** {0} [SID#{1}] leaves", avatar.Name, avatar.Session);
 
@@ -58,7 +58,7 @@ namespace VPServices
                 Users.Remove(user);
         }
 
-        void onAvatarsChange(Instance sender, Avatar avatar)
+        void onAvatarsChange(Instance sender, Avatar<Vector3> avatar)
         {
             var user = GetUser(avatar.Session);
             user.Position = avatar.Position;

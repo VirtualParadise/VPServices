@@ -9,7 +9,7 @@ namespace VPServices.Services
     /// </summary>
     class WorldSettings : IService
     {
-        public Dictionary<string, string> Data = new Dictionary<string, string>();
+        public VpNet.Dictionary<string, string> Data = new VpNet.Dictionary<string, string>();
 
         public string Name { get { return "World Settings"; } }
         public void   Init (VPServices app, Instance bot)

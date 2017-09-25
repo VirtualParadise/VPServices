@@ -46,12 +46,12 @@ namespace VPServices.Services
         const string msgNoTelegrams  = "You have no telegrams to read";
         const string msgTelegramSent = "Your telegram to {0} has been sent";
 
-        Dictionary<string, bool> told = new Dictionary<string, bool>();
+        VpNet.Dictionary<string, bool> told = new VpNet.Dictionary<string, bool>();
         SQLiteConnection         connection; 
         #endregion
         
         #region Command handlers
-        bool cmdSendTelegram(VPServices app, Avatar who, string data)
+        bool cmdSendTelegram(VPServices app, Avatar<Vector3> who, string data)
         {
             var matches = Regex.Match(data, "^(.+?): (.+)$");
             if ( !matches.Success )
@@ -75,7 +75,7 @@ namespace VPServices.Services
             return Log.Info(Name, "Recorded from {0} for {1}", who.Name, target);
         }
 
-        bool cmdReadTelegrams(VPServices app, Avatar who, string data)
+        bool cmdReadTelegrams(VPServices app, Avatar<Vector3> who, string data)
         {
             var grams = getUnread(who.Name);
 
@@ -90,9 +90,9 @@ namespace VPServices.Services
                 connection.BeginTransaction();
                 foreach ( var gram in grams )
                 {
-                    app.Bot.ConsoleMessage(who.Session, ChatEffect.Bold, VPServices.ColorAlert, "", msgTelegram, gram.Source, gram.When);
-                    app.Bot.ConsoleMessage(who.Session, ChatEffect.None, VPServices.ColorAlert, "", gram.Message);
-                    app.Bot.ConsoleMessage(who.Session, ChatEffect.None, VPServices.ColorAlert, "", "");
+                    app.Bot.ConsoleMessage(who.Session, "", string.Format(msgTelegram, gram.Source, gram.When), VPServices.ColorAlert, TextEffectTypes.Bold);
+                    app.Bot.ConsoleMessage(who.Session, "", gram.Message, VPServices.ColorAlert);
+                    app.Bot.ConsoleMessage(who.Session, "", "", VPServices.ColorAlert);
                     gram.Read = true;
                     connection.Update(gram);
                 }
@@ -109,7 +109,7 @@ namespace VPServices.Services
         /// Marks all telegrams of a leaving avatar as "unaware", so tha they can again
         /// be reminded on re-entry
         /// </summary>
-        void onLeave(Instance sender, Avatar who)
+        void onLeave(Instance sender, Avatar<Vector3> who)
         {
             var grams = getUnread(who.Name);
 

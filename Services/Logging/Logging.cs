@@ -62,7 +62,7 @@ namespace VPServices.Services
                 });
         }
 
-        void userEvent(Avatar avatar, sqlUserType type)
+        void userEvent(Avatar<Vector3> avatar, sqlUserType type)
         {
             if ( VPServices.App.LastConnect.SecondsToNow() < 10 )
                 return;
@@ -70,7 +70,7 @@ namespace VPServices.Services
             lock (VPServices.App.DataMutex)
                 connection.Insert ( new sqlUserHistory
                 {
-                    ID   = avatar.Id,
+                    ID   = avatar.UserId,
                     Name = avatar.Name,
                     Type = type,
                     When = TDateTime.UnixTimestamp

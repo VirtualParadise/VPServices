@@ -45,7 +45,7 @@ namespace VPServices.Services
         #region Core game logic
         void gameBegin(TriviaEntry entry)
         {
-            app.Bot.ConsoleBroadcast(ChatEffect.Bold, VPServices.ColorInfo, entry.Category + ":", entry.Question);
+            app.Bot.ConsoleMessage("", $"{entry.Category}:{entry.Question}", VPServices.ColorInfo, TextEffectTypes.Bold);
             app.Chat         += onChat;
             inProgress        = true;
             progressSince     = DateTime.Now;
@@ -86,7 +86,7 @@ namespace VPServices.Services
         #endregion
 
         #region Event handlers
-        void onChat(Instance bot, Avatar user, string message)
+        void onChat(Instance bot, Avatar<Vector3> user, string message)
         {
             lock ( mutex )
             {
@@ -106,12 +106,10 @@ namespace VPServices.Services
 
                 var welldone = welldones.Skip(VPServices.Rand.Next(welldones.Length)).Take(1).Single();
 
-                if ( match[0].IEquals(entryInPlay.CanonicalAnswer) )
-                    app.Bot.ConsoleBroadcast(ChatEffect.Bold, VPServices.ColorInfo, "Triviamaster",
-                        msgAccepted, entryInPlay.CanonicalAnswer, welldone, user.Name);
+                if (match[0].IEquals(entryInPlay.CanonicalAnswer))
+                    app.Bot.ConsoleMessage("Triviamaster", string.Format(msgAccepted, entryInPlay.CanonicalAnswer, welldone, user.Name), VPServices.ColorInfo, TextEffectTypes.Bold);
                 else
-                    app.Bot.ConsoleBroadcast(ChatEffect.Bold, VPServices.ColorInfo, "Triviamaster",
-                        msgAcceptedFrom, entryInPlay.CanonicalAnswer, match[0], welldone, user.Name);
+                    app.Bot.ConsoleMessage("Triviamaster", string.Format(msgAcceptedFrom, entryInPlay.CanonicalAnswer, match[0], welldone, user.Name), VPServices.ColorInfo, TextEffectTypes.Bold);
 
                 Log.Debug(tag, "Correct answer '{0}' by {1}", match[0], user.Name);
                 awardPoint(user.Name);

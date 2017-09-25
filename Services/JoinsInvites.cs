@@ -65,7 +65,7 @@ namespace VPServices.Services
         public void Dispose() { }
 
         #region Command handlers
-        bool onRequest(VPServices app, Avatar source, string targetName, bool invite)
+        bool onRequest(VPServices app, Avatar<Vector3> source, string targetName, bool invite)
         {
             // Ignore if self
             if ( source.Name.IEquals(targetName) )
@@ -113,7 +113,7 @@ namespace VPServices.Services
             return true;
         }
 
-        bool onResponse(VPServices app, Avatar targetAv, bool yes)
+        bool onResponse(VPServices app, Avatar<Vector3> targetAv, bool yes)
         {
             var sourceReq = isRequested(targetAv.Name);
 

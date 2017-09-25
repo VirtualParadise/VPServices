@@ -35,7 +35,7 @@ namespace VPServices.Services
 
         IConfig config;
 
-        bool cmdRKill(VPServices app, Avatar who, string data)
+        bool cmdRKill(VPServices app, Avatar<Vector3> who, string data)
         {
             if (data != app.Bot.Name)
                 return true;

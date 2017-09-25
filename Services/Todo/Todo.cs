@@ -78,7 +78,7 @@ namespace VPServices.Services
         #endregion
 
         #region Command handlers
-        bool cmdAddTodo(VPServices app, Avatar who, string data)
+        bool cmdAddTodo(VPServices app, Avatar<Vector3> who, string data)
         {
             if ( string.IsNullOrWhiteSpace(data) )
                 return false;
@@ -89,7 +89,7 @@ namespace VPServices.Services
                     What  = data,
                     When  = DateTime.Now,
                     Who   = who.Name,
-                    WhoID = who.Id,
+                    WhoID = who.UserId,
                     Done  = false
                 });
 
@@ -97,7 +97,7 @@ namespace VPServices.Services
             return Log.Info(Name, "Saved a todo for {0}: {1}", who.Name, data);
         }
 
-        bool cmdFinishTodo(VPServices app, Avatar who, string data)
+        bool cmdFinishTodo(VPServices app, Avatar<Vector3> who, string data)
         {
             var ids = data.TerseSplit(",");
 
@@ -127,7 +127,7 @@ namespace VPServices.Services
             return true;
         }
 
-        bool cmdDeleteTodo(VPServices app, Avatar who, string data)
+        bool cmdDeleteTodo(VPServices app, Avatar<Vector3> who, string data)
         {
             var ids = data.TerseSplit(",");
 
@@ -157,7 +157,7 @@ namespace VPServices.Services
             return true;
         }
 
-        bool cmdListTodo(VPServices app, Avatar who, string data)
+        bool cmdListTodo(VPServices app, Avatar<Vector3> who, string data)
         {
             var todoUrl = app.PublicUrl + webTodo;
 
@@ -184,21 +184,21 @@ namespace VPServices.Services
                 }
 
                 // Iterate results
-                app.Bot.ConsoleMessage(who.Session, ChatEffect.BoldItalic, VPServices.ColorInfo, "", msgResults, data);
+                app.Bot.ConsoleMessage(who.Session, "", string.Format(msgResults, data), VPServices.ColorInfo, TextEffectTypes.BoldItalic);
                 foreach ( var q in query )
                 {
                     var done  = q.Done ? '✓' : '✗';
                     var color = q.Done ? VPServices.ColorLesser : VPServices.ColorInfo;
                     app.Bot.ConsoleMessage(who.Session, "", "");
-                    app.Bot.ConsoleMessage(who.Session, ChatEffect.Italic, color, "", msgResultA, done, q.ID, q.What);
-                    app.Bot.ConsoleMessage(who.Session, ChatEffect.Italic, color, "", msgResultB, q.Who, q.When);
+                    app.Bot.ConsoleMessage(who.Session, "", string.Format(msgResultA, done, q.ID, q.What), color, TextEffectTypes.Italic);
+                    app.Bot.ConsoleMessage(who.Session, "", string.Format(msgResultB, q.Who, q.When), color, TextEffectTypes.Italic);
                 } 
             }
 
             return true;
         }
 
-        bool cmdGetTodo(VPServices app, Avatar who, string data)
+        bool cmdGetTodo(VPServices app, Avatar<Vector3> who, string data)
         {
             lock ( app.DataMutex )
             {

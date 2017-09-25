@@ -32,7 +32,7 @@ namespace VPServices
         /// <summary>
         /// Parses incoming chat for a command and runs it
         /// </summary>
-        void parseCommand(Instance sender, Avatar user, string message)
+        void parseCommand(Instance sender, Avatar<Vector3> user, string message)
         {
             // Accept only commands
             if ( !message.StartsWith("!") )
@@ -70,7 +70,7 @@ namespace VPServices
                             if (!success)
                             {
                                 App.Warn(user.Session, "Invalid command use; please see example:");
-                                Bot.ConsoleMessage(user.Session, ChatEffect.Italic, ColorWarn, "", cmd.Example);
+                                Bot.ConsoleMessage(user.Session, "", cmd.Example, ColorWarn, TextEffectTypes.Italic);
                             }
                         }
                         catch (Exception e)
@@ -93,7 +93,7 @@ namespace VPServices
         }
     }
 
-    public delegate bool CommandHandler(VPServices app, Avatar who, string data);
+    public delegate bool CommandHandler(VPServices app, Avatar<Vector3> who, string data);
 
     /// <summary>
     /// Defines a text command, fired by !(regex)

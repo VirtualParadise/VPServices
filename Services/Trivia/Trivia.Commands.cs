@@ -37,7 +37,7 @@ namespace VPServices.Services
             });
         }
 
-        bool cmdBeginTrivia(VPServices app, Avatar who, string data)
+        bool cmdBeginTrivia(VPServices app, Avatar<Vector3> who, string data)
         {
             if ( entries == null )
             {
@@ -69,7 +69,7 @@ namespace VPServices.Services
             return true;
         }
 
-        bool cmdReloadTrivia(VPServices app, Avatar who, string data)
+        bool cmdReloadTrivia(VPServices app, Avatar<Vector3> who, string data)
         {
             entries = null;
             if ( !loadTrivia() )
@@ -80,7 +80,7 @@ namespace VPServices.Services
             return true;
         }
 
-        bool cmdShowUrl(VPServices app, Avatar who, string data)
+        bool cmdShowUrl(VPServices app, Avatar<Vector3> who, string data)
         {
             app.Notify(who.Session, app.PublicUrl + "scores");
 

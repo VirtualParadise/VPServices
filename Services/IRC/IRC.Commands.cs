@@ -6,7 +6,7 @@ namespace VPServices.Services
 {
     partial class IRC : IService
     {
-        bool cmdIRCConnect(VPServices app, Avatar who, string data)
+        bool cmdIRCConnect(VPServices app, Avatar<Vector3> who, string data)
         {
             lock (mutex)
             {
@@ -21,7 +21,7 @@ namespace VPServices.Services
             }
         }
 
-        bool cmdIRCDisconnect(VPServices app, Avatar who, string data)
+        bool cmdIRCDisconnect(VPServices app, Avatar<Vector3> who, string data)
         {
             lock (mutex)
             {
@@ -36,7 +36,7 @@ namespace VPServices.Services
             }
         }
 
-        bool cmdMute(VPServices app, Avatar who, string target, bool muting)
+        bool cmdMute(VPServices app, Avatar<Vector3> who, string target, bool muting)
         {
             // Mute IRC
             if (target == "")

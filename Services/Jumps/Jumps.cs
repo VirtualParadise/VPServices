@@ -68,7 +68,7 @@ namespace VPServices.Services
         #endregion
 
         #region Command handlers
-        bool cmdAddJump(VPServices app, Avatar who, string data)
+        bool cmdAddJump(VPServices app, Avatar<Vector3> who, string data)
         {
             var name = data.ToLower();
 
@@ -93,18 +93,18 @@ namespace VPServices.Services
                     Name    = name,
                     Creator = who.Name,
                     When    = DateTime.Now,
-                    X       = who.X,
-                    Y       = who.Y,
-                    Z       = who.Z,
-                    Pitch   = who.Pitch,
-                    Yaw     = who.Yaw
+                    X       = (float)who.Position.X,
+                    Y       = (float)who.Position.Y,
+                    Z       = (float)who.Position.Z,
+                    Pitch   = (float)who.Rotation.Y,
+                    Yaw     = (float)who.Rotation.Z
                 });
 
-            app.NotifyAll(msgAdded, name, who.X, who.Y, who.Z, who.Yaw, who.Pitch);
-            return Log.Info(Name, "Saved a jump for {0} at {1}, {2}, {3} for {4}", who.Name, who.X, who.Y, who.Z, name);
+            app.NotifyAll(msgAdded, name, who.Position.X, who.Position.Y, who.Position.Z, who.Rotation.Z, who.Rotation.Y);
+            return Log.Info(Name, "Saved a jump for {0} at {1}, {2}, {3} for {4}", who.Name, who.Position.X, who.Position.Y, who.Position.Z, name);
         }
 
-        bool cmdDelJump(VPServices app, Avatar who, string data)
+        bool cmdDelJump(VPServices app, Avatar<Vector3> who, string data)
         {
             var jumpsUrl = app.PublicUrl + webJumps;
             var name     = data.ToLower();
@@ -132,7 +132,7 @@ namespace VPServices.Services
             return Log.Info(Name, "Deleted {0} jump for {1}", name, who.Name);
         }
 
-        bool cmdJumpList(VPServices app, Avatar who, string data)
+        bool cmdJumpList(VPServices app, Avatar<Vector3> who, string data)
         {
             var jumpsUrl = app.PublicUrl + webJumps;
 
@@ -157,15 +157,15 @@ namespace VPServices.Services
                 }
 
                 // Iterate results
-                app.Bot.ConsoleMessage(who.Session, ChatEffect.BoldItalic, VPServices.ColorInfo, "", msgResults, data);
+                app.Bot.ConsoleMessage(who.Session, "", string.Format(msgResults, data), VPServices.ColorInfo, TextEffectTypes.BoldItalic);
                 foreach ( var q in query )
-                    app.Bot.ConsoleMessage(who.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msgResult, q.Name, q.Creator, q.When);
+                    app.Bot.ConsoleMessage(who.Session, "", string.Format( msgResult, q.Name, q.Creator, q.When), VPServices.ColorInfo, TextEffectTypes.Italic);
             }
 
             return true;
         }
 
-        bool cmdJump(VPServices app, Avatar who, string data)
+        bool cmdJump(VPServices app, Avatar<Vector3> who, string data)
         {
             var jumpsUrl = app.PublicUrl + webJumps;
             var name     = data.ToLower();

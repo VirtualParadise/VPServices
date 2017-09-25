@@ -163,7 +163,7 @@ namespace VPServices.Services
             }
         }
 
-        bool cmdVersion(VPServices app, Avatar who, string data)
+        bool cmdVersion(VPServices app, Avatar<Vector3> who, string data)
         {
             var asm      = Assembly.GetExecutingAssembly().Location;
             var fileDate = File.GetLastWriteTime(asm);
@@ -176,7 +176,7 @@ namespace VPServices.Services
         const string msgDataNoResults = "No user data is stored for you";
         const string msgDataResult    = "{0}: {1}";
 
-        bool cmdData(VPServices app, Avatar who, string data)
+        bool cmdData(VPServices app, Avatar<Vector3> who, string data)
         {
             var settings = who.GetSettings();
 
@@ -186,16 +186,16 @@ namespace VPServices.Services
                 return true;
             }
 
-            app.Bot.ConsoleMessage(who.Session, ChatEffect.BoldItalic, VPServices.ColorInfo, "", msgDataResults);
+            app.Bot.ConsoleMessage(who.Session, "", msgDataResults, VPServices.ColorInfo, TextEffectTypes.BoldItalic);
             foreach (var s in settings)
-                app.Bot.ConsoleMessage(who.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msgDataResult, s.Key, s.Value);
+                app.Bot.ConsoleMessage(who.Session, "", string.Format(msgDataResult, s.Key, s.Value), VPServices.ColorInfo, TextEffectTypes.Italic);
 
             return true;
         } 
         #endregion
 
         #region Debug commands
-        bool cmdCrash(VPServices app, Avatar who, string data)
+        bool cmdCrash(VPServices app, Avatar<Vector3> who, string data)
         {
             var owner = app.NetworkSettings.Get("Username");
 
@@ -206,7 +206,7 @@ namespace VPServices.Services
             return true;
         }
 
-        bool cmdHang(VPServices app, Avatar who, string data)
+        bool cmdHang(VPServices app, Avatar<Vector3> who, string data)
         {
             var owner = app.NetworkSettings.Get("Username");
 
@@ -219,7 +219,7 @@ namespace VPServices.Services
             }
         }
 
-        bool cmdSay(VPServices app, Avatar who, string data)
+        bool cmdSay(VPServices app, Avatar<Vector3> who, string data)
         {
             var matches = Regex.Match(data, "^(.+?): (.+)$");
             if ( !matches.Success )
@@ -227,16 +227,17 @@ namespace VPServices.Services
 
             var target = matches.Groups[1].Value.Trim();
             var msg    = matches.Groups[2].Value.Trim();
-            app.Bot.ConsoleBroadcast(ChatEffect.None, new Color(128,128,128), "\"{0}\"".LFormat(target), msg);
+            app.Bot.ConsoleMessage("\"{0}\"".LFormat(target, msg), new Color(128,128,128));
             return true;
         }
         #endregion
 
         #region Teleport commands
-        bool cmdCoords(VPServices app, Avatar who, string data)
+        bool cmdCoords(VPServices app, Avatar<Vector3> who, string data)
         {
             // TODO: move this to the SDK
-            var compass = (who.Yaw % 360 + 360) % 360;
+            // Note, this was who.Yaw before refactoring
+            var compass = (who.Rotation.Z % 360 + 360) % 360;
             string compassPoint = "???";
 
             if      ( compass <= 22.5 )            compassPoint = "south";
@@ -249,11 +250,11 @@ namespace VPServices.Services
             else if ( compass <= 22.5 + (45 * 7) ) compassPoint = "south-east";
             else if ( compass <= 360 )             compassPoint = "south";
 
-            app.Notify(who.Session, "You are at X: {0:f4} Y: {1:f4}a Z: {2:f4}, facing {3} ({4:f0}), pitch {5:f0}", who.X, who.Y, who.Z, compassPoint, who.Yaw, who.Pitch);
+            app.Notify(who.Session, "You are at X: {0:f4} Y: {1:f4}a Z: {2:f4}, facing {3} ({4:f0}), pitch {5:f0}", who.Position.X, who.Position.Y, who.Position.Z, compassPoint, who.Rotation.Z, who.Rotation.Y);
             return true;
         }
 
-        bool cmdOffset(Avatar who, string data, offsetBy offsetBy)
+        bool cmdOffset(Avatar<Vector3> who, string data, offsetBy offsetBy)
         {
             float   by;
             Vector3 location;
@@ -264,45 +265,45 @@ namespace VPServices.Services
             {
                 default:
                 case offsetBy.X:
-                    location = new Vector3(who.X + by, who.Y, who.Z);
+                    location = new Vector3(who.Position.X + by, who.Position.Y, who.Position.Z);
                     break;
                 case offsetBy.Y:
-                    location = new Vector3(who.X, who.Y + by, who.Z);
+                    location = new Vector3(who.Position.X, who.Position.Y + by, who.Position.Z);
                     break;
                 case offsetBy.Z:
-                    location = new Vector3(who.X, who.Y, who.Z + by);
+                    location = new Vector3(who.Position.X, who.Position.Y, who.Position.Z + by);
                     break;
             }
 
-            VPServices.App.Bot.Avatars.Teleport(who.Session, "", location, who.Yaw, who.Pitch);
+            VPServices.App.Bot.Avatars.Teleport(who.Session, "", location, who.Rotation.Z, who.Rotation.Y);
             return true;
         }
 
-        bool cmdRandomPos(VPServices app, Avatar who, string data)
+        bool cmdRandomPos(VPServices app, Avatar<Vector3> who, string data)
         {
             var randX = VPServices.Rand.Next(-65535, 65535);
             var randZ = VPServices.Rand.Next(-65535, 65535);
 
             app.Notify(who.Session, "Teleporting to {0}, 0, {1}", randX, randZ);
-            app.Bot.Avatars.Teleport(who.Session, "", new Vector3(randX, 0, randZ), who.Yaw, who.Pitch);
+            app.Bot.Avatars.Teleport(who.Session, "", new Vector3(randX, 0, randZ), who.Rotation.Z, who.Rotation.Y);
             return true;
         } 
 
-        bool cmdGroundZero(VPServices app, Avatar who, string data)
+        bool cmdGroundZero(VPServices app, Avatar<Vector3> who, string data)
         {
             app.Bot.Avatars.Teleport(who.Session, "", AvatarPosition.GroundZero);
             return true;
         } 
 
-        bool cmdGround(VPServices app, Avatar who, string data)
+        bool cmdGround(VPServices app, Avatar<Vector3> who, string data)
         {
             var target = new AvatarPosition
             {
-                X     = who.X,
+                X     = who.Position.X,
                 Y     = 0.1f,
-                Z     = who.Z,
-                Pitch = who.Pitch,
-                Yaw   = who.Yaw
+                Z     = who.Position.Z,
+                Pitch = who.Rotation.Y,
+                Yaw   = who.Rotation.Z
             };
 
             app.Bot.Avatars.Teleport(who.Session, target);

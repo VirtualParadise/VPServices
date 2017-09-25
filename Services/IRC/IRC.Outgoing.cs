@@ -6,7 +6,7 @@ namespace VPServices.Services
 {
     partial class IRC : IService
     {
-        void onWorldChat(Instance sender, Avatar user, string message)
+        void onWorldChat(Instance sender, Avatar<Vector3> user, string message)
         {
             // No chat if not connected
             if (!irc.IsConnected)
@@ -41,7 +41,7 @@ namespace VPServices.Services
                 irc.SendMessage(SendType.Message, config.Channel, "C* " + console.Name + " " +  msg );
         }
 
-        void onWorldEnter(Instance sender, Avatar avatar)
+        void onWorldEnter(Instance sender, Avatar<Vector3> avatar)
         {
             if (!irc.IsConnected)
                 return;
@@ -60,7 +60,7 @@ namespace VPServices.Services
             irc.SendMessage(SendType.Action, config.Channel, msg);
         }
 
-        void onWorldLeave(Instance sender, Avatar avatar)
+        void onWorldLeave(Instance sender, Avatar<Vector3> avatar)
         {
             if (!irc.IsConnected)
                 return;
@@ -79,4 +79,34 @@ namespace VPServices.Services
             irc.SendMessage(SendType.Action, config.Channel, msg);
         }
     }
+
+    //public class ConsoleMessage : ChatMessage
+    //{
+    //    public ChatType Type;
+    //    public ChatEffect Effect;
+    //    public Color Color;
+    //}
+
+    //public class ChatMessage
+    //{
+    //    public string Name;
+    //    public string Message;
+    //    public int Session;
+    //}
+
+    //public enum ChatType
+    //{
+    //    Normal = 0,
+    //    ConsoleMessage = 1,
+    //    Private = 2
+    //}
+
+    //[Flags]
+    //public enum ChatEffect
+    //{
+    //    None = 0,
+    //    Bold = 1,
+    //    Italic = 2,
+    //    BoldItalic = 3
+    //}
 }

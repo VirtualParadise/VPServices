@@ -89,7 +89,7 @@ namespace VPServices.Services
                     Topic       = topic,
                     Description = what,
                     When        = DateTime.Now,
-                    WhoID       = who.Id,
+                    WhoID       = who.UserId,
                     Locked      = locked
                 });
             }
@@ -110,7 +110,7 @@ namespace VPServices.Services
 
             // Only allow deletion of locked factoid if owner or bot owner
             if ( fact.Locked && !who.Name.IEquals(app.Owner) )
-            if (fact.WhoID != who.Id)
+            if (fact.WhoID != who.UserId)
             {
                 app.Warn(who.Session, msgLocked, fact.WhoID);
                 return true;
