@@ -17,10 +17,23 @@ namespace VPServices
         /// </summary>
         public void SetupCommands()
         {
-            Chat += parseCommand;
-            Chat += (s, a, m) =>
+            //Chat += parseCommand;
+            //Chat += (s, a, m) =>
+            //{
+            //    TConsole.WriteLineColored(ConsoleColor.White, " {0} | {1}", a.Name.PadRight(16), m);
+            //};
+
+            Bot.OnChatMessage += (s, c) =>
             {
-                TConsole.WriteLineColored(ConsoleColor.White, " {0} | {1}", a.Name.PadRight(16), m);
+                if (string.IsNullOrWhiteSpace(c.Avatar.Name))
+                {
+                    TConsole.WriteLineColored(ConsoleColor.White, "Console: {0}", c.ChatMessage.Message);
+                }
+                else
+                {
+                    parseCommand(s, c.Avatar, c.ChatMessage.Message);
+                    TConsole.WriteLineColored(ConsoleColor.White, " {0} | {1}", c.Avatar.Name.PadRight(16), c.ChatMessage.Message);
+                }
             };
 
             //Bot. += (s, c) =>

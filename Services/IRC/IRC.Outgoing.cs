@@ -7,19 +7,19 @@ namespace VPServices.Services
 {
     partial class IRC : IService
     {
-        void onWorldChat(Instance sender, Avatar<Vector3> user, string message)
+        void onWorldChat(Instance sender, ChatMessageEventArgsT<Avatar<Vector3>, ChatMessage, Vector3, Color> args) //Avatar<Vector3> user, string message)
         {
             // No chat if not connected
             if (!irc.IsConnected)
                 return;
 
-            var msgRoll = message.TerseSplit("\n");
+            var msgRoll = args.ChatMessage.Message.TerseSplit("\n");
 
             foreach (var msg in msgRoll)
                 if ( msg.StartsWith("/me ") )
-                    irc.SendMessage(SendType.Action, config.Channel, user.Name + " " + msg.Substring(4) );
+                    irc.SendMessage(SendType.Action, config.Channel, args.Avatar.Name + " " + msg.Substring(4) );
                 else
-                    irc.SendMessage(SendType.Message, config.Channel, user.Name + ": " +  msg );
+                    irc.SendMessage(SendType.Message, config.Channel, args.Avatar.Name + ": " +  msg );
         }
 
         void onWorldConsole(Instance sender, IChatMessage<Color> console)

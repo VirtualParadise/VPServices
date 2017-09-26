@@ -1,15 +1,17 @@
-﻿using VPServices;
+﻿using VpNet;
+using VPServices;
 
 namespace VPServices.Services
 {
 	partial class IRC : IService
     {
-        void setupEvents(VPServices app)
+        void setupEvents(VPServices app, Instance bot)
         {
             // VP (outgoing) events
             app.AvatarEnter += onWorldEnter;
             app.AvatarLeave += onWorldLeave;
-            app.Chat        += onWorldChat;
+            bot.OnChatMessage += onWorldChat;
+            //app.Chat        += onWorldChat;
 
             // IRC (incoming) events
             irc.OnChannelMessage += onIRCMessage;

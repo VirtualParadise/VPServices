@@ -92,7 +92,7 @@ namespace VPServices
             Log.Info("Network", "Connected to {0}", World);
 
             CoreSettings.Set("Version", MigrationVersion);
-            Bot.ConsoleMessage("", "Services is now online; say !help for information", ColorInfo);
+            var result = Bot.ConsoleMessage("", "Services is now online; say !help for information", ColorInfo);
         }
 
         /// <summary>
@@ -100,8 +100,6 @@ namespace VPServices
         /// </summary>
         public void UpdateLoop()
         {
-            Bot.Wait(0);
-
             if (Crash)
             {
                 Crash = false;

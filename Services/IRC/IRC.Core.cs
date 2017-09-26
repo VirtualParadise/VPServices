@@ -44,7 +44,7 @@ namespace VPServices.Services
                 ),
             });
             
-            setupEvents(app);
+            setupEvents(app, bot);
             loadSettings(app);
             this.app = app;
 

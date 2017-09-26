@@ -26,12 +26,14 @@ namespace VPServices.Services
         Task       task;
         DateTime   progressSince;
         VPServices app;
+        Instance bot;
 
         public string Name { get { return "Trivia"; } }
         public void Init(VPServices app, Instance bot)
         {
             this.app = app;
-            addCommands ();
+            this.bot = bot;
+            addCommands(bot);
             addWebRoutes();
         }
         
@@ -46,7 +48,7 @@ namespace VPServices.Services
         void gameBegin(TriviaEntry entry)
         {
             app.Bot.ConsoleMessage("", $"{entry.Category}:{entry.Question}", VPServices.ColorInfo, TextEffectTypes.Bold);
-            app.Chat         += onChat;
+            bot.OnChatMessage += onChat;
             inProgress        = true;
             progressSince     = DateTime.Now;
             entryInPlay       = entry;
@@ -80,16 +82,18 @@ namespace VPServices.Services
             if ( !inProgress ) return;
 
             inProgress = false;
-            app.Chat  -= onChat;
+            bot.OnChatMessage -= onChat;
             Log.Fine(tag, "Game has ended");
         } 
         #endregion
 
         #region Event handlers
-        void onChat(Instance bot, Avatar<Vector3> user, string message)
+        void onChat(Instance bot, ChatMessageEventArgsT<Avatar<Vector3>, ChatMessage, Vector3, Color> args)
         {
             lock ( mutex )
             {
+                string message = args.ChatMessage.Message;
+
                 string[] match;
                 string[] wrongMatch;
 
@@ -98,7 +102,7 @@ namespace VPServices.Services
 
                 if ( entryInPlay.Wrong != null && TRegex.TryMatch(message, entryInPlay.Wrong, out wrongMatch) )
                 {
-                    Log.Debug(tag, "Given answer '{0}' by {1} matched, but turned out to be wrong; rejecting", wrongMatch[0], user.Name);
+                    Log.Debug(tag, "Given answer '{0}' by {1} matched, but turned out to be wrong; rejecting", wrongMatch[0], args.Avatar.Name);
                     return;
                 }
 
@@ -107,12 +111,12 @@ namespace VPServices.Services
                 var welldone = welldones.Skip(VPServices.Rand.Next(welldones.Length)).Take(1).Single();
 
                 if (match[0].IEquals(entryInPlay.CanonicalAnswer))
-                    app.Bot.ConsoleMessage("Triviamaster", string.Format(msgAccepted, entryInPlay.CanonicalAnswer, welldone, user.Name), VPServices.ColorInfo, TextEffectTypes.Bold);
+                    app.Bot.ConsoleMessage("Triviamaster", string.Format(msgAccepted, entryInPlay.CanonicalAnswer, welldone, args.Avatar.Name), VPServices.ColorInfo, TextEffectTypes.Bold);
                 else
-                    app.Bot.ConsoleMessage("Triviamaster", string.Format(msgAcceptedFrom, entryInPlay.CanonicalAnswer, match[0], welldone, user.Name), VPServices.ColorInfo, TextEffectTypes.Bold);
+                    app.Bot.ConsoleMessage("Triviamaster", string.Format(msgAcceptedFrom, entryInPlay.CanonicalAnswer, match[0], welldone, args.Avatar.Name), VPServices.ColorInfo, TextEffectTypes.Bold);
 
-                Log.Debug(tag, "Correct answer '{0}' by {1}", match[0], user.Name);
-                awardPoint(user.Name);
+                Log.Debug(tag, "Correct answer '{0}' by {1}", match[0], args.Avatar.Name);
+                awardPoint(args.Avatar.Name);
             }
         } 
         #endregion

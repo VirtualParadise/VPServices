@@ -6,19 +6,19 @@ namespace VPServices
     public partial class VPServices : IDisposable
     {
         public delegate void AvatarArgs(Instance bot, Avatar<Vector3> user);
-        public delegate void ChatArgs(Instance bot, Avatar<Vector3> user, string message);
+        //public delegate void ChatArgs(Instance bot, Avatar<Vector3> user, string message);
 
         public event AvatarArgs AvatarEnter;
         public event AvatarArgs AvatarLeave;
         public event AvatarArgs AvatarChange;
-        public event ChatArgs Chat;
+        //public event ChatArgs Chat;
 
         public void SetupEvents()
         {
             Bot.OnAvatarEnter += onAvatarAdd;
             Bot.OnAvatarLeave += onAvatarLeave;
             Bot.OnAvatarChange += onAvatarsChange;
-            Bot.OnChatMessage += onChat;
+            //Bot.OnChatMessage += onChat;
         }
 
         public void ClearEvents()
@@ -26,12 +26,12 @@ namespace VPServices
             Bot.OnAvatarEnter -= onAvatarAdd;
             Bot.OnAvatarLeave -= onAvatarLeave;
             Bot.OnAvatarChange -= onAvatarsChange;
-            Bot.OnChatMessage -= onChat;
+            //Bot.OnChatMessage -= onChat;
 
             AvatarEnter = null;
             AvatarLeave = null;
             AvatarChange = null;
-            Chat = null;
+            //Chat = null;
         }
 
         #region Event handlers
@@ -74,17 +74,17 @@ namespace VPServices
             }
         } 
 
-        void onChat(Instance sender, ChatMessageEventArgsT<Avatar<Vector3>, ChatMessage, Vector3, Color> args)
-        {
-            var user = GetUser(args.Avatar.Session);
-            if ( user == null )
-                return;
+        //void onChat(Instance sender, ChatMessageEventArgsT<Avatar<Vector3>, ChatMessage, Vector3, Color> args)
+        //{
+        //    var user = GetUser(args.Avatar.Session);
+        //    if ( user == null )
+        //        return;
 
-            if (args.ChatMessage != null)
-            {
-                Chat(sender, user, args.ChatMessage.Message);
-            }
-        }
+        //    if (args.ChatMessage != null)
+        //    {
+        //        Chat(sender, user, args.ChatMessage.Message);
+        //    }
+        //}
         #endregion
     }
 }

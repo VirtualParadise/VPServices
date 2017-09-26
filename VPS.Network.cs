@@ -57,7 +57,8 @@ namespace VPServices
                 {
                     var enter = Bot.EnterAsync(World).Result;
                     Avatar<Vector3> myAvatar = Bot.My();
-                    Bot.TeleportAvatar(myAvatar, new Vector3(0, 10, 0), new Vector3());
+                    Bot.Say("Hey!");
+                    Bot.UpdateAvatar(new Vector3(0, 0, 0));
                     LastConnect = DateTime.Now;
                     return;
                 }

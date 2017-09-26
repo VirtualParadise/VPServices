@@ -32,7 +32,9 @@ namespace VPServices.Services
                 ),
             });
 
-            app.Chat        += (b,a,c) => { checkTelegrams(b, a.Session, a.Name); };
+            bot.OnChatMessage += (b, a) => { checkTelegrams(b, a.Avatar.Session, a.Avatar.Name); };
+
+            //app.Chat        += (b,a,c) => { checkTelegrams(b, a.Session, a.Name); };
             app.AvatarEnter += (b,c)   => { checkTelegrams(b, c.Session, c.Name); };
             app.AvatarLeave += onLeave;
             this.connection  = app.Connection;
