@@ -25,14 +25,14 @@ namespace VPServices
 
             Bot.OnChatMessage += (s, c) =>
             {
-                if (string.IsNullOrWhiteSpace(c.Avatar.Name))
+                if (string.IsNullOrWhiteSpace(c.ChatMessage.Name))
                 {
                     TConsole.WriteLineColored(ConsoleColor.White, "Console: {0}", c.ChatMessage.Message);
                 }
                 else
                 {
                     parseCommand(s, c.Avatar, c.ChatMessage.Message);
-                    TConsole.WriteLineColored(ConsoleColor.White, " {0} | {1}", c.Avatar.Name.PadRight(16), c.ChatMessage.Message);
+                    TConsole.WriteLineColored(ConsoleColor.White, " {0} | {1}", c.ChatMessage.Name.PadRight(16), c.ChatMessage.Message);
                 }
             };
 
