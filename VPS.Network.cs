@@ -59,6 +59,7 @@ namespace VPServices
                     Avatar<Vector3> myAvatar = Bot.My();
                     Bot.Say("Hey!");
                     Bot.UpdateAvatar(new Vector3(0, 0, 0));
+                    //Bot.TeleportAvatar(myAvatar, new Vector3(0, 0, 0), new Vector3());
                     LastConnect = DateTime.Now;
                     return;
                 }
