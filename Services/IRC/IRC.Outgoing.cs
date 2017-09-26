@@ -1,6 +1,7 @@
 ﻿using Meebey.SmartIrc4net;
 using System;
 using VpNet;
+using VpNet.Interfaces;
 
 namespace VPServices.Services
 {
@@ -21,7 +22,7 @@ namespace VPServices.Services
                     irc.SendMessage(SendType.Message, config.Channel, user.Name + ": " +  msg );
         }
 
-        void onWorldConsole(Instance sender, ConsoleMessage console)
+        void onWorldConsole(Instance sender, IChatMessage<Color> console)
         {
             // No chat if not connected
             if (!irc.IsConnected)

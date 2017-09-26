@@ -52,7 +52,7 @@ namespace VPServices.Services
 
         void messageToVP(bool announce, string name, string message, params object[] parts)
         {
-            var fx    = announce ? ChatEffect.Italic : ChatEffect.None;
+            var fx    = announce ? TextEffectTypes.Italic : (TextEffectTypes)0;
             var color = announce ? VPServices.ColorInfo : colorChat;
             message   = message.LFormat(parts);
 
@@ -87,10 +87,10 @@ namespace VPServices.Services
 
                         messages.Add(buffer);
                         foreach (var line in messages)
-                            VPServices.App.Bot.ConsoleMessage(user.Session, fx, color, name, "{0}", line);
+                            VPServices.App.Bot.ConsoleMessage(user.Session, name, $"{line}", color, fx);
                     }
                     else
-                        VPServices.App.Bot.ConsoleMessage(user.Session, fx, color, name, "{0}", message);
+                        VPServices.App.Bot.ConsoleMessage(user.Session, name, $"{message}", color, fx);
                 }
             }
         }

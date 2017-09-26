@@ -23,10 +23,10 @@ namespace VPServices
                 TConsole.WriteLineColored(ConsoleColor.White, " {0} | {1}", a.Name.PadRight(16), m);
             };
 
-            Bot.Console += (s, c) =>
-            {
-                TConsole.WriteLineColored(ConsoleColor.White, "Console: {0} {1}", c.Name, c.Message);
-            };
+            //Bot. += (s, c) =>
+            //{
+            //    TConsole.WriteLineColored(ConsoleColor.White, "Console: {0} {1}", c.Name, c.Message);
+            //};
         }
 
         /// <summary>

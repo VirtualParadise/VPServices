@@ -14,7 +14,7 @@ namespace VPServices.Services
         public string Name { get { return "World Settings"; } }
         public void   Init (VPServices app, Instance bot)
         {
-            bot.Data.GetWorldSetting += onWorldSetting;
+            //bot.Configuration.World. += onWorldSetting;
 
             app.Routes.Add(new WebRoute("WorldSettings", "^worldsettings?$", webWorldSettings,
                 @"Provides a key-value list of the settings of the bot's world"));
@@ -27,11 +27,11 @@ namespace VPServices.Services
             Data.Clear();
         }
 
-        void onWorldSetting(Instance sender, string key, string value)
-        {
-            Log.Fine(Name, "Retrieved world setting: {0} : {1}", key, value);
-            Data[key] = value;
-        }
+        //void onWorldSetting(Instance sender, string key, string value)
+        //{
+        //    Log.Fine(Name, "Retrieved world setting: {0} : {1}", key, value);
+        //    Data[key] = value;
+        //}
 
         string webWorldSettings(VPServices app, string data)
         {
