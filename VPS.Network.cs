@@ -27,7 +27,8 @@ namespace VPServices
                     // vp.LoginAsync(user, password, botname);
                     // vp.EnterAsync(world);
 
-                    Bot.Login(userName, password, botName);
+                    var connect = Bot.ConnectAsync().Result;
+                    var login = Bot.LoginAsync(userName, password, botName).Result;
                     LastConnect = DateTime.Now;
                     
                     // Disconnect events
@@ -54,7 +55,7 @@ namespace VPServices
             {
                 try
                 {
-                    Bot.Enter(World);
+                    var enter = Bot.EnterAsync(World).Result;
                     Avatar<Vector3> myAvatar = Bot.My();
                     Bot.TeleportAvatar(myAvatar, new Vector3(0, 10, 0), new Vector3());
                     LastConnect = DateTime.Now;

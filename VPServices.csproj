@@ -21,7 +21,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
+    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>Build\</OutputPath>
@@ -60,8 +60,8 @@
     <Reference Include="Toolbox.Logger">
       <HintPath>Libraries\Toolbox.Logger.dll</HintPath>
     </Reference>
-    <Reference Include="VpNet, Version=1.0.8.1966, Culture=neutral, PublicKeyToken=59c6dba8997fd469, processorArchitecture=MSIL">
-      <HintPath>packages\VpNet.1.0.8.1966\lib\net40\VpNet.dll</HintPath>
+    <Reference Include="VpNet, Version=1.0.9.2432, Culture=neutral, PublicKeyToken=59c6dba8997fd469, processorArchitecture=MSIL">
+      <HintPath>packages\VpNet.1.0.9.2432-alpha6\lib\netstandard2.0\VpNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -96,7 +96,6 @@
     <Compile Include="Services\Logging\Logging.cs" />
     <Compile Include="Services\IRC\IRC.Core.cs" />
     <None Include="app.config" />
-    <None Include="libvpsdk.so" />
     <None Include="packages.config" />
     <None Include="Services\SwordFight\SwordFight.cs" />
     <Compile Include="Services\JoinsInvites.cs" />
@@ -111,7 +110,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Docs\Todo.txt" />
-    <Content Include="VPSDK.dll" />
+    <Content Include="Build\VPSDK.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

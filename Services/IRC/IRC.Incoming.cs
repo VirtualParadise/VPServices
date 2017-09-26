@@ -17,7 +17,7 @@ namespace VPServices.Services
             messageToVP(false, "", "{0} {1}", e.Data.Nick, e.ActionMessage);
         }
 
-        void onIRCJoin(object sender, JoinEventArgs e)
+        void onIRCJoin(object sender, Meebey.SmartIrc4net.JoinEventArgs e)
         {
             messageToVP(true, "", msgEntry, e.Who, e.Channel);
         }
