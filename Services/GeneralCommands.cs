@@ -225,10 +225,7 @@ namespace VPServices.Services
             if ( !matches.Success )
                 return false;
 
-            // TODO: Something funky going on spoofing double-quotes in ConsoleMessage name field when passing computed strings
-            // with escaped double-quotes. String literals seem to be OK here. Any attempt to use escaped quotes with computed string
-            // will result in a blank user in browser chat. Replaced this with single-quotes and will research more later.
-            app.Bot.ConsoleMessage($"'{matches.Groups[1].Value.Trim()}'", $"{matches.Groups[2].Value.Trim()}", new Color(128,128,128));
+            app.Bot.ConsoleMessage($"\"{matches.Groups[1].Value.Trim()}\"", $"{matches.Groups[2].Value.Trim()}", new Color(128,128,128));
             return true;
         }
 
