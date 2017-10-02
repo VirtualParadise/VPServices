@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using VpNet;
+using VPServices.Extensions;
 
 namespace VPServices.Services
 {
@@ -234,22 +235,9 @@ namespace VPServices.Services
         #region Teleport commands
         bool cmdCoords(VPServices app, Avatar<Vector3> who, string data)
         {
-            // TODO: move this to the SDK
-            // Note, this was who.Yaw before refactoring
-            var compass = (who.Rotation.X % 360 + 360) % 360;
-            string compassPoint = "???";
+            var compass = CompassExtensions.ToCompassTuple(who);
 
-            if      ( compass <= 22.5 )            compassPoint = "south";
-            else if ( compass <= 22.5 + (45 * 1) ) compassPoint = "south-west";
-            else if ( compass <= 22.5 + (45 * 2) ) compassPoint = "west";
-            else if ( compass <= 22.5 + (45 * 3) ) compassPoint = "north-west";
-            else if ( compass <= 22.5 + (45 * 4) ) compassPoint = "north";
-            else if ( compass <= 22.5 + (45 * 5) ) compassPoint = "north-east";
-            else if ( compass <= 22.5 + (45 * 6) ) compassPoint = "east";
-            else if ( compass <= 22.5 + (45 * 7) ) compassPoint = "south-east";
-            else if ( compass <= 360 )             compassPoint = "south";
-
-            app.Notify(who.Session, "You are at X: {0:f4} Y: {1:f4}a Z: {2:f4}, facing {3} ({4:f0}), pitch {5:f0}", who.Position.X, who.Position.Y, who.Position.Z, compassPoint, who.Rotation.X, who.Rotation.Y);
+            app.Notify(who.Session, "You are at X: {0:f4} Y: {1:f4}a Z: {2:f4}, facing {3} ({4:f0}), pitch {5:f0}", who.Position.X, who.Position.Y, who.Position.Z, compass.Direction, compass.Angle, who.Rotation.X);
             return true;
         }
 
@@ -274,7 +262,7 @@ namespace VPServices.Services
                     break;
             }
 
-            VPServices.App.Bot.TeleportAvatar(who.Session, "", location, who.Rotation.X, who.Rotation.Y);
+            VPServices.App.Bot.TeleportAvatar(who.Session, "", location, who.Rotation.Y, who.Rotation.X);
             return true;
         }
 
@@ -284,7 +272,7 @@ namespace VPServices.Services
             var randZ = VPServices.Rand.Next(-65535, 65535);
 
             app.Notify(who.Session, "Teleporting to {0}, 0, {1}", randX, randZ);
-            app.Bot.TeleportAvatar(who.Session, "", new Vector3(randX, 0, randZ), who.Rotation.X, who.Rotation.Y);
+            app.Bot.TeleportAvatar(who.Session, "", new Vector3(randX, 0, randZ), who.Rotation.Y, who.Rotation.X);
             return true;
         } 
 
@@ -296,7 +284,7 @@ namespace VPServices.Services
 
         bool cmdGround(VPServices app, Avatar<Vector3> who, string data)
         {
-            app.Bot.TeleportAvatar(who.Session, "", new Vector3(who.Position.X, 0.1f, who.Position.Z), who.Rotation.X, who.Rotation.Y);
+            app.Bot.TeleportAvatar(who.Session, "", new Vector3(who.Position.X, 0.1f, who.Position.Z), who.Rotation.Y, who.Rotation.X);
             return true;
         }
         #endregion
@@ -322,6 +310,5 @@ namespace VPServices.Services
             return app.MarkdownParser.Transform(listing);
         }
         #endregion
-
     }
 }

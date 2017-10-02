@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using VpNet;
+using VPServices.Extensions;
 
 namespace VPServices.Services
 {
@@ -88,6 +89,8 @@ namespace VPServices.Services
             }
 
             lock (app.DataMutex)
+                // Note: Jump DB and VP SDK define yaw and pitch on different axes -- to maintain backwards compatibility with old jumps,
+                // continue switching Yaw/Pitch axes to jump DB and just switch them back in code. Will look into fixing DB later.
                 connection.Insert( new sqlJump
                 {
                     Name    = name,
@@ -96,11 +99,13 @@ namespace VPServices.Services
                     X       = (float)who.Position.X,
                     Y       = (float)who.Position.Y,
                     Z       = (float)who.Position.Z,
-                    Pitch   = (float)who.Rotation.Y,
-                    Yaw     = (float)who.Rotation.X
+                    Pitch   = (float)who.Rotation.X,
+                    Yaw     = (float)who.Rotation.Y
                 });
 
-            app.NotifyAll(msgAdded, name, who.Position.X, who.Position.Y, who.Position.Z, who.Rotation.X, who.Rotation.Y);
+            var compass = CompassExtensions.ToCompassTuple(who);
+
+            app.NotifyAll(msgAdded, name, who.Position.X, who.Position.Y, who.Position.Z, compass.Angle, who.Rotation.X);
             return Log.Info(Name, "Saved a jump for {0} at {1}, {2}, {3} for {4}", who.Name, who.Position.X, who.Position.Y, who.Position.Z, name);
         }
 
@@ -181,7 +186,9 @@ namespace VPServices.Services
                         : getJump(name);
 
                 if ( jump != null )
-                    app.Bot.TeleportAvatar(who.Session, "", new Vector3(jump.X, jump.Y, jump.Z), jump.Yaw, jump.Pitch);
+                    // Note: Jump DB and VP SDK define yaw and pitch on different axes -- to maintain backwards compatibility with old jumps,
+                    // continue switching Yaw/Pitch axes to jump DB and just switch them back in code. Will look into fixing DB later.
+                    app.Bot.TeleportAvatar(who, "", new Vector3(jump.X, jump.Y, jump.Z), new Vector3(jump.Pitch, jump.Yaw, 0));
                 else
                     app.Warn(who.Session, msgNonExistant, jumpsUrl); 
             }
