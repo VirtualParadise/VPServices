@@ -114,7 +114,7 @@ namespace VPServices.Services
         bool cmdBounce(VPServices app, Avatar<Vector3> who, string data)
         {
             who.SetSetting(settingBounce, true);
-            app.Bot.TeleportAvatar(who.Session, app.World, who.Position, 0, 0);
+            app.Bot.TeleportAvatar(who, app.World, who.Position, who.Rotation);
 
             return Log.Info(Name, "Bounced user {0}", who.Name);
         } 
