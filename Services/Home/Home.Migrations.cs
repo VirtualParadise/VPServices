@@ -1,7 +1,7 @@
 ﻿using Nini.Config;
 using System;
 using System.Collections.Generic;
-using VP;
+using VpNet;
 
 namespace VPServices.Services
 {

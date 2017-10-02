@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using VP;
+using VpNet;
 using VPServices;
 
 namespace VPServices.Services
@@ -51,14 +51,14 @@ namespace VPServices.Services
         const string msgGreetMeNot = "You will no longer be announced on entry/exit";
 
         #region Public cross-plugin methods
-        public bool CanGreet(Avatar who)
+        public bool CanGreet(Avatar<Vector3> who)
         {
             return who.GetSettingBool(SettingGreetMe, true);
         }
         #endregion
 
         #region Command handlers
-        bool cmdToggle(VPServices app, Avatar who, string data, string key)
+        bool cmdToggle(VPServices app, Avatar<Vector3> who, string data, string key)
         {
             string msg    = null;
             bool   toggle;
@@ -90,7 +90,7 @@ namespace VPServices.Services
         #endregion
 
         #region Event handlers
-        void doGreet(Instance bot, Avatar who, bool entering)
+        void doGreet(Instance bot, Avatar<Vector3> who, bool entering)
         {
             // No greetings within 10 seconds of bot load, to prevent flooding of entries
             // on initial user list load
@@ -115,7 +115,7 @@ namespace VPServices.Services
                     if ( target.GetSettingBool(SettingShowGreets, true) )
                     {
                         var msg = entering ? msgEntry : msgExit;
-                        bot.ConsoleMessage(target.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msg, who.Name, app.World);
+                        bot.ConsoleMessage(target.Session, "", string.Format(msg, who.Name, app.World), VPServices.ColorInfo, TextEffectTypes.Italic);
                     }
                 }
             }

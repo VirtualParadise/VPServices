@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using SQLite;
-using VP;
+using VpNet;
 
 namespace VPServices.Services
 {
@@ -21,11 +21,11 @@ namespace VPServices.Services
 
         public void Init(VPServices app, Instance bot)
         {
-            bot.Property.ObjectCreate += (s,i,o) => { objectEvent(o, sqlBuildType.Create); };
-            bot.Property.ObjectChange += (s,i,o) => { objectEvent(o, sqlBuildType.Modify); };
-            bot.Property.ObjectDelete += onObjDelete;
-            app.AvatarEnter           += (s,a) => { userEvent(a, sqlUserType.Enter); };
-            app.AvatarLeave           += (s,a) => { userEvent(a, sqlUserType.Leave); };
+            bot.OnObjectCreate += (sender, args) => { objectEvent(args.VpObject, sqlBuildType.Create); };
+            bot.OnObjectChange += (sender, args) => { objectEvent(args.VpObject, sqlBuildType.Modify); };
+            bot.OnObjectDelete += onObjDelete;
+            app.AvatarEnter += (s,a) => { userEvent(a, sqlUserType.Enter); };
+            app.AvatarLeave += (s,a) => { userEvent(a, sqlUserType.Leave); };
 
             this.connection = app.Connection;
         }
@@ -34,26 +34,26 @@ namespace VPServices.Services
 
         SQLiteConnection connection;
 
-        void objectEvent(VPObject o, sqlBuildType type)
+        void objectEvent(VpObject<Vector3> o, sqlBuildType type)
         {
             lock (VPServices.App.DataMutex)
                 connection.Insert( new sqlBuildHistory
                 {
                     ID   = o.Id,
-                    X    = o.Position.X,
-                    Y    = o.Position.Y,
-                    Z    = o.Position.Z,
+                    X    = (float)o.Position.X,
+                    Y    = (float)o.Position.Y,
+                    Z    = (float)o.Position.Z,
                     Type = type,
                     When = TDateTime.UnixTimestamp
                 });
         }
 
-        void onObjDelete(Instance sender, int sessionId, int objectId)
+        void onObjDelete(Instance sender, ObjectDeleteArgsT<Avatar<Vector3>, VpObject<Vector3>, Vector3> args)
         {
             lock (VPServices.App.DataMutex)
                 connection.Insert( new sqlBuildHistory
                 {
-                    ID   = objectId,
+                    ID   = args.VpObject.Id,
                     X    = 0,
                     Y    = 0,
                     Z    = 0,
@@ -62,7 +62,7 @@ namespace VPServices.Services
                 });
         }
 
-        void userEvent(Avatar avatar, sqlUserType type)
+        void userEvent(Avatar<Vector3> avatar, sqlUserType type)
         {
             if ( VPServices.App.LastConnect.SecondsToNow() < 10 )
                 return;
@@ -70,7 +70,7 @@ namespace VPServices.Services
             lock (VPServices.App.DataMutex)
                 connection.Insert ( new sqlUserHistory
                 {
-                    ID   = avatar.Id,
+                    ID   = avatar.UserId,
                     Name = avatar.Name,
                     Type = type,
                     When = TDateTime.UnixTimestamp

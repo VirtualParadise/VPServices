@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using VP;
+using VpNet;
 
 namespace VPServices.Services
 {
@@ -20,7 +20,7 @@ namespace VPServices.Services
         const string keyMode       = "SwordFight";
 
         VPServices         app;
-        List<VPObject> spawned = new List<VPObject>();
+        List<VpObject<Vector3>> spawned = new List<VpObject<Vector3>>();
 
         public string Name { get { return "Sword fight"; } }
         public void Init(VPServices app, Instance bot)

@@ -1,27 +1,28 @@
 ﻿using Meebey.SmartIrc4net;
 using System;
-using VP;
+using VpNet;
+using VpNet.Interfaces;
 
 namespace VPServices.Services
 {
     partial class IRC : IService
     {
-        void onWorldChat(Instance sender, Avatar user, string message)
+        void onWorldChat(Instance sender, ChatMessageEventArgsT<Avatar<Vector3>, ChatMessage, Vector3, Color> args) //Avatar<Vector3> user, string message)
         {
             // No chat if not connected
             if (!irc.IsConnected)
                 return;
 
-            var msgRoll = message.TerseSplit("\n");
+            var msgRoll = args.ChatMessage.Message.TerseSplit("\n");
 
             foreach (var msg in msgRoll)
                 if ( msg.StartsWith("/me ") )
-                    irc.SendMessage(SendType.Action, config.Channel, user.Name + " " + msg.Substring(4) );
+                    irc.SendMessage(SendType.Action, config.Channel, args.Avatar.Name + " " + msg.Substring(4) );
                 else
-                    irc.SendMessage(SendType.Message, config.Channel, user.Name + ": " +  msg );
+                    irc.SendMessage(SendType.Message, config.Channel, args.Avatar.Name + ": " +  msg );
         }
 
-        void onWorldConsole(Instance sender, ConsoleMessage console)
+        void onWorldConsole(Instance sender, IChatMessage<Color> console)
         {
             // No chat if not connected
             if (!irc.IsConnected)
@@ -32,7 +33,7 @@ namespace VPServices.Services
                 return;
 
             // Ignore Services bot messages
-            if (console.Name == sender.Name)
+            if (console.Name == sender.Configuration.BotName)
                 return;
 
             var msgRoll = console.Message.TerseSplit("\n");
@@ -41,7 +42,7 @@ namespace VPServices.Services
                 irc.SendMessage(SendType.Message, config.Channel, "C* " + console.Name + " " +  msg );
         }
 
-        void onWorldEnter(Instance sender, Avatar avatar)
+        void onWorldEnter(Instance sender, Avatar<Vector3> avatar)
         {
             if (!irc.IsConnected)
                 return;
@@ -60,7 +61,7 @@ namespace VPServices.Services
             irc.SendMessage(SendType.Action, config.Channel, msg);
         }
 
-        void onWorldLeave(Instance sender, Avatar avatar)
+        void onWorldLeave(Instance sender, Avatar<Vector3> avatar)
         {
             if (!irc.IsConnected)
                 return;
@@ -79,4 +80,34 @@ namespace VPServices.Services
             irc.SendMessage(SendType.Action, config.Channel, msg);
         }
     }
+
+    //public class ConsoleMessage : ChatMessage
+    //{
+    //    public ChatType Type;
+    //    public ChatEffect Effect;
+    //    public Color Color;
+    //}
+
+    //public class ChatMessage
+    //{
+    //    public string Name;
+    //    public string Message;
+    //    public int Session;
+    //}
+
+    //public enum ChatType
+    //{
+    //    Normal = 0,
+    //    ConsoleMessage = 1,
+    //    Private = 2
+    //}
+
+    //[Flags]
+    //public enum ChatEffect
+    //{
+    //    None = 0,
+    //    Bold = 1,
+    //    Italic = 2,
+    //    BoldItalic = 3
+    //}
 }

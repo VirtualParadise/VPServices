@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using VP;
+using VpNet;
 
 namespace VPServices
 {
@@ -17,22 +17,35 @@ namespace VPServices
         /// </summary>
         public void SetupCommands()
         {
-            Chat += parseCommand;
-            Chat += (s, a, m) =>
+            //Chat += parseCommand;
+            //Chat += (s, a, m) =>
+            //{
+            //    TConsole.WriteLineColored(ConsoleColor.White, " {0} | {1}", a.Name.PadRight(16), m);
+            //};
+
+            Bot.OnChatMessage += (s, c) =>
             {
-                TConsole.WriteLineColored(ConsoleColor.White, " {0} | {1}", a.Name.PadRight(16), m);
+                if (string.IsNullOrWhiteSpace(c.ChatMessage.Name))
+                {
+                    TConsole.WriteLineColored(ConsoleColor.White, "Console: {0}", c.ChatMessage.Message);
+                }
+                else
+                {
+                    parseCommand(s, c.Avatar, c.ChatMessage.Message);
+                    TConsole.WriteLineColored(ConsoleColor.White, " {0} | {1}", c.ChatMessage.Name.PadRight(16), c.ChatMessage.Message);
+                }
             };
 
-            Bot.Console += (s, c) =>
-            {
-                TConsole.WriteLineColored(ConsoleColor.White, "Console: {0} {1}", c.Name, c.Message);
-            };
+            //Bot. += (s, c) =>
+            //{
+            //    TConsole.WriteLineColored(ConsoleColor.White, "Console: {0} {1}", c.Name, c.Message);
+            //};
         }
 
         /// <summary>
         /// Parses incoming chat for a command and runs it
         /// </summary>
-        void parseCommand(Instance sender, Avatar user, string message)
+        void parseCommand(Instance sender, Avatar<Vector3> user, string message)
         {
             // Accept only commands
             if ( !message.StartsWith("!") )
@@ -70,7 +83,7 @@ namespace VPServices
                             if (!success)
                             {
                                 App.Warn(user.Session, "Invalid command use; please see example:");
-                                Bot.ConsoleMessage(user.Session, ChatEffect.Italic, ColorWarn, "", cmd.Example);
+                                Bot.ConsoleMessage(user.Session, "", cmd.Example, ColorWarn, TextEffectTypes.Italic);
                             }
                         }
                         catch (Exception e)
@@ -93,7 +106,7 @@ namespace VPServices
         }
     }
 
-    public delegate bool CommandHandler(VPServices app, Avatar who, string data);
+    public delegate bool CommandHandler(VPServices app, Avatar<Vector3> who, string data);
 
     /// <summary>
     /// Defines a text command, fired by !(regex)

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using VP;
+using VpNet;
 
 namespace VPServices.Services
 {
@@ -65,7 +65,7 @@ namespace VPServices.Services
         public void Dispose() { }
 
         #region Command handlers
-        bool onRequest(VPServices app, Avatar source, string targetName, bool invite)
+        bool onRequest(VPServices app, Avatar<Vector3> source, string targetName, bool invite)
         {
             // Ignore if self
             if ( source.Name.IEquals(targetName) )
@@ -113,7 +113,7 @@ namespace VPServices.Services
             return true;
         }
 
-        bool onResponse(VPServices app, Avatar targetAv, bool yes)
+        bool onResponse(VPServices app, Avatar<Vector3> targetAv, bool yes)
         {
             var sourceReq = isRequested(targetAv.Name);
 
@@ -150,7 +150,7 @@ namespace VPServices.Services
             var targetSession = sourceReq.Invite ? target.Session : source.Session;
             var targetMsg     = sourceReq.Invite ? msgInvited : msgJoined;
             app.Notify(target.Session, targetMsg, source.Name);
-            app.Bot.Avatars.Teleport(targetSession, "", new Vector3(targetPos.X, targetPos.Y, targetPos.Z), 0, 0);
+            app.Bot.TeleportAvatar(targetSession, "", new Vector3(targetPos.X, targetPos.Y, targetPos.Z), 0, 0);
             return true;
         } 
         #endregion

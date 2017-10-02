@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using VP;
+using VpNet;
 using Nini.Config;
 
 namespace VPServices.Services
@@ -35,9 +35,9 @@ namespace VPServices.Services
 
         IConfig config;
 
-        bool cmdRKill(VPServices app, Avatar who, string data)
+        bool cmdRKill(VPServices app, Avatar<Vector3> who, string data)
         {
-            if (data != app.Bot.Name)
+            if (data != app.Bot.Configuration.BotName)
                 return true;
 
             if ( !config.GetBoolean("Enabled", false) )

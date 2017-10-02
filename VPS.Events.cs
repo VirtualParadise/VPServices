@@ -1,81 +1,73 @@
 ﻿using System;
-using VP;
-using AvatarArgs = VP.InstanceAvatars.AvatarArgs;
+using VpNet;
 
 namespace VPServices
 {
     public partial class VPServices : IDisposable
     {
-        public delegate void ChatArgs(Instance bot, Avatar user, string message);
+        public delegate void AvatarArgs(Instance bot, Avatar<Vector3> user);
 
         public event AvatarArgs AvatarEnter;
         public event AvatarArgs AvatarLeave;
         public event AvatarArgs AvatarChange;
-        public event ChatArgs   Chat;
 
         public void SetupEvents()
         {
-            Bot.Avatars.Enter  += onAvatarAdd;
-            Bot.Avatars.Leave  += onAvatarLeave;
-            Bot.Avatars.Change += onAvatarsChange;
-            Bot.Chat           += onChat;
+            Bot.OnAvatarEnter += onAvatarAdd;
+            Bot.OnAvatarLeave += onAvatarLeave;
+            Bot.OnAvatarChange += onAvatarsChange;
         }
 
         public void ClearEvents()
         {
-            Bot.Avatars.Enter  -= onAvatarAdd;
-            Bot.Avatars.Leave  -= onAvatarLeave;
-            Bot.Avatars.Change -= onAvatarsChange;
-            Bot.Chat           -= onChat;
+            Bot.OnAvatarEnter -= onAvatarAdd;
+            Bot.OnAvatarLeave -= onAvatarLeave;
+            Bot.OnAvatarChange -= onAvatarsChange;
 
-            AvatarEnter  = null;
-            AvatarLeave  = null;
+            AvatarEnter = null;
+            AvatarLeave = null;
             AvatarChange = null;
-            Chat         = null;
         }
 
         #region Event handlers
-        void onAvatarAdd(Instance sender, Avatar avatar)
+        void onAvatarAdd(Instance sender, AvatarEnterEventArgsT<Avatar<Vector3>, Vector3> args)
         {
-            TConsole.WriteLineColored(ConsoleColor.Cyan, "*** {0} [SID#{1}] enters", avatar.Name, avatar.Session);
-            
-            lock (SyncMutex)
-                Users.Add(avatar);
+            sender.ConsoleMessage("", $"*** {args.Avatar.Name} [SID#{args.Avatar.Session}] enters", new Color(0, 0, 128));
 
-            if ( AvatarEnter != null )
-                AvatarEnter(sender, avatar);
+            lock (SyncMutex)
+                Users.Add(args.Avatar);
+
+            if (AvatarEnter != null)
+            {
+                AvatarEnter(sender, args.Avatar);
+            }
         }
 
-        void onAvatarLeave(Instance sender, Avatar avatar)
+        void onAvatarLeave(Instance sender, AvatarLeaveEventArgsT<Avatar<Vector3>, Vector3> args)
         {
-            TConsole.WriteLineColored(ConsoleColor.Cyan, "*** {0} [SID#{1}] leaves", avatar.Name, avatar.Session);
+            sender.ConsoleMessage(string.Format("*** {0} [SID#{1}] leaves", args.Avatar.Name, args.Avatar.Session), new Color(0, 0, 128));
 
-            var user = GetUser(avatar.Session);
-            if ( AvatarLeave != null )
-                AvatarLeave(sender, avatar);
+            var user = GetUser(args.Avatar.Session);
+
+            if (AvatarLeave != null)
+            {
+                AvatarLeave(sender, args.Avatar);
+            }
 
             lock (SyncMutex)
                 Users.Remove(user);
         }
 
-        void onAvatarsChange(Instance sender, Avatar avatar)
+        void onAvatarsChange(Instance sender, AvatarChangeEventArgsT<Avatar<Vector3>, Vector3> args)
         {
-            var user = GetUser(avatar.Session);
-            user.Position = avatar.Position;
+            var user = GetUser(args.Avatar.Session);
+            user.Position = args.Avatar.Position;
 
-            if ( AvatarChange != null )
-                AvatarChange(sender, avatar);
+            if (AvatarChange != null)
+            {
+                AvatarChange(sender, args.Avatar);
+            }
         } 
-
-        void onChat(Instance sender, ChatMessage chat)
-        {
-            var user = GetUser(chat.Session);
-            if ( user == null )
-                return;
-
-            if (Chat != null)
-                Chat(sender, user, chat.Message);
-        }
         #endregion
     }
 }

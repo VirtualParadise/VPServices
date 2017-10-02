@@ -2,7 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using VP;
+using VpNet;
+using VPServices.Extensions;
 
 namespace VPServices.Services
 {
@@ -68,7 +69,7 @@ namespace VPServices.Services
         #endregion
 
         #region Command handlers
-        bool cmdAddJump(VPServices app, Avatar who, string data)
+        bool cmdAddJump(VPServices app, Avatar<Vector3> who, string data)
         {
             var name = data.ToLower();
 
@@ -88,23 +89,27 @@ namespace VPServices.Services
             }
 
             lock (app.DataMutex)
+                // Note: Jump DB and VP SDK define yaw and pitch on different axes -- to maintain backwards compatibility with old jumps,
+                // continue switching Yaw/Pitch axes to jump DB and just switch them back in code. Will look into fixing DB later.
                 connection.Insert( new sqlJump
                 {
                     Name    = name,
                     Creator = who.Name,
                     When    = DateTime.Now,
-                    X       = who.X,
-                    Y       = who.Y,
-                    Z       = who.Z,
-                    Pitch   = who.Pitch,
-                    Yaw     = who.Yaw
+                    X       = (float)who.Position.X,
+                    Y       = (float)who.Position.Y,
+                    Z       = (float)who.Position.Z,
+                    Pitch   = (float)who.Rotation.X,
+                    Yaw     = (float)who.Rotation.Y
                 });
 
-            app.NotifyAll(msgAdded, name, who.X, who.Y, who.Z, who.Yaw, who.Pitch);
-            return Log.Info(Name, "Saved a jump for {0} at {1}, {2}, {3} for {4}", who.Name, who.X, who.Y, who.Z, name);
+            var compass = CompassExtensions.ToCompassTuple(who);
+
+            app.NotifyAll(msgAdded, name, who.Position.X, who.Position.Y, who.Position.Z, compass.Angle, who.Rotation.X);
+            return Log.Info(Name, "Saved a jump for {0} at {1}, {2}, {3} for {4}", who.Name, who.Position.X, who.Position.Y, who.Position.Z, name);
         }
 
-        bool cmdDelJump(VPServices app, Avatar who, string data)
+        bool cmdDelJump(VPServices app, Avatar<Vector3> who, string data)
         {
             var jumpsUrl = app.PublicUrl + webJumps;
             var name     = data.ToLower();
@@ -132,7 +137,7 @@ namespace VPServices.Services
             return Log.Info(Name, "Deleted {0} jump for {1}", name, who.Name);
         }
 
-        bool cmdJumpList(VPServices app, Avatar who, string data)
+        bool cmdJumpList(VPServices app, Avatar<Vector3> who, string data)
         {
             var jumpsUrl = app.PublicUrl + webJumps;
 
@@ -157,15 +162,15 @@ namespace VPServices.Services
                 }
 
                 // Iterate results
-                app.Bot.ConsoleMessage(who.Session, ChatEffect.BoldItalic, VPServices.ColorInfo, "", msgResults, data);
+                app.Bot.ConsoleMessage(who.Session, "", string.Format(msgResults, data), VPServices.ColorInfo, TextEffectTypes.BoldItalic);
                 foreach ( var q in query )
-                    app.Bot.ConsoleMessage(who.Session, ChatEffect.Italic, VPServices.ColorInfo, "", msgResult, q.Name, q.Creator, q.When);
+                    app.Bot.ConsoleMessage(who.Session, "", string.Format( msgResult, q.Name, q.Creator, q.When), VPServices.ColorInfo, TextEffectTypes.Italic);
             }
 
             return true;
         }
 
-        bool cmdJump(VPServices app, Avatar who, string data)
+        bool cmdJump(VPServices app, Avatar<Vector3> who, string data)
         {
             var jumpsUrl = app.PublicUrl + webJumps;
             var name     = data.ToLower();
@@ -181,7 +186,9 @@ namespace VPServices.Services
                         : getJump(name);
 
                 if ( jump != null )
-                    app.Bot.Avatars.Teleport(who.Session, "", new Vector3(jump.X, jump.Y, jump.Z), jump.Yaw, jump.Pitch);
+                    // Note: Jump DB and VP SDK define yaw and pitch on different axes -- to maintain backwards compatibility with old jumps,
+                    // continue switching Yaw/Pitch axes to jump DB and just switch them back in code. Will look into fixing DB later.
+                    app.Bot.TeleportAvatar(who, "", new Vector3(jump.X, jump.Y, jump.Z), new Vector3(jump.Pitch, jump.Yaw, 0));
                 else
                     app.Warn(who.Session, msgNonExistant, jumpsUrl); 
             }

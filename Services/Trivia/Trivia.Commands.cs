@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using VP;
+using VpNet;
 
 namespace VPServices.Services
 {
@@ -11,7 +11,7 @@ namespace VPServices.Services
         const string msgNoResults = "I was unable to fetch a trivia entry; perhaps try a different category?";
         const string msgReloaded  = "The trivia database has been reloaded, with {0} entries";
 
-        void addCommands()
+        void addCommands(Instance bot)
         {
             app.Commands.AddRange(new[] {
                 new Command
@@ -37,7 +37,7 @@ namespace VPServices.Services
             });
         }
 
-        bool cmdBeginTrivia(VPServices app, Avatar who, string data)
+        bool cmdBeginTrivia(VPServices app, Avatar<Vector3> who, string data)
         {
             if ( entries == null )
             {
@@ -69,7 +69,7 @@ namespace VPServices.Services
             return true;
         }
 
-        bool cmdReloadTrivia(VPServices app, Avatar who, string data)
+        bool cmdReloadTrivia(VPServices app, Avatar<Vector3> who, string data)
         {
             entries = null;
             if ( !loadTrivia() )
@@ -80,7 +80,7 @@ namespace VPServices.Services
             return true;
         }
 
-        bool cmdShowUrl(VPServices app, Avatar who, string data)
+        bool cmdShowUrl(VPServices app, Avatar<Vector3> who, string data)
         {
             app.Notify(who.Session, app.PublicUrl + "scores");
 

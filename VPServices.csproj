@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>VPServices</RootNamespace>
     <AssemblyName>VPServices</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -21,6 +21,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>Build\</OutputPath>
@@ -30,6 +31,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CsvHelper">
@@ -51,17 +53,19 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Xml" />
     <Reference Include="Toolbox.Extensions">
       <HintPath>Libraries\Toolbox.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="Toolbox.Logger">
       <HintPath>Libraries\Toolbox.Logger.dll</HintPath>
     </Reference>
-    <Reference Include="VP.NET">
-      <HintPath>Libraries\VP.NET.dll</HintPath>
+    <Reference Include="VpNet, Version=1.0.9.2432, Culture=neutral, PublicKeyToken=59c6dba8997fd469, processorArchitecture=MSIL">
+      <HintPath>packages\VpNet.1.0.9.2432-alpha6\lib\netstandard2.0\VpNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\CompassExtensions.cs" />
     <Compile Include="Services\Rkill.cs" />
     <Compile Include="Services\Facts\Facts.cs" />
     <Compile Include="Services\Facts\Facts.Migrations.cs" />
@@ -92,6 +96,8 @@
     <Compile Include="Services\IService.cs" />
     <Compile Include="Services\Logging\Logging.cs" />
     <Compile Include="Services\IRC\IRC.Core.cs" />
+    <None Include="app.config" />
+    <None Include="packages.config" />
     <None Include="Services\SwordFight\SwordFight.cs" />
     <Compile Include="Services\JoinsInvites.cs" />
     <Compile Include="Services\Jumps\Jumps.cs" />
@@ -105,8 +111,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Docs\Todo.txt" />
+    <Content Include="Libraries\VPSDK.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /y /d  "$(ProjectDir)Libraries\VPSDK.dll" "$(ProjectDir)$(OutDir)"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

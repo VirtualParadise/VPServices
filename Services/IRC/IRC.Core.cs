@@ -3,7 +3,7 @@ using Nini.Config;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using VP;
+using VpNet;
 
 namespace VPServices.Services
 {
@@ -44,7 +44,7 @@ namespace VPServices.Services
                 ),
             });
             
-            setupEvents(app);
+            setupEvents(app, bot);
             loadSettings(app);
             this.app = app;
 

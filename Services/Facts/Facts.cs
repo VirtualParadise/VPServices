@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using VP;
+using VpNet;
 
 namespace VPServices.Services
 {
@@ -60,7 +60,7 @@ namespace VPServices.Services
         #endregion
 
         #region Command handlers
-        bool cmdAddFact(VPServices app, Avatar who, string data)
+        bool cmdAddFact(VPServices app, Avatar<Vector3> who, string data)
         {
             var matches = Regex.Match(data, "^(-+lock )?(.+?): (.+)$");
             if ( !matches.Success )
@@ -75,7 +75,7 @@ namespace VPServices.Services
 
             // Only allow overwrite of locked previous factoid if owner or bot owner
             if ( old != null && old.Locked && !who.Name.IEquals(app.Owner) )
-            if (old.WhoID != who.Id)
+            if (old.WhoID != who.UserId)
             {
                 app.Warn(who.Session, msgLocked, old.WhoID);
                 return true;
@@ -89,7 +89,7 @@ namespace VPServices.Services
                     Topic       = topic,
                     Description = what,
                     When        = DateTime.Now,
-                    WhoID       = who.Id,
+                    WhoID       = who.UserId,
                     Locked      = locked
                 });
             }
@@ -98,7 +98,7 @@ namespace VPServices.Services
             return Log.Info(Name, "Saved a fact from {0} for topic {1} (locked: {2})", who.Name, topic, locked);
         }
 
-        bool cmdDeleteFact(VPServices app, Avatar who, string data)
+        bool cmdDeleteFact(VPServices app, Avatar<Vector3> who, string data)
         {
             var fact = getFact(data);
 
@@ -110,7 +110,7 @@ namespace VPServices.Services
 
             // Only allow deletion of locked factoid if owner or bot owner
             if ( fact.Locked && !who.Name.IEquals(app.Owner) )
-            if (fact.WhoID != who.Id)
+            if (fact.WhoID != who.UserId)
             {
                 app.Warn(who.Session, msgLocked, fact.WhoID);
                 return true;
@@ -123,7 +123,7 @@ namespace VPServices.Services
             return Log.Info(Name, "{0} deleted factoid for topic {1}", who.Name, data);
         }
 
-        bool cmdGetFact(VPServices app, Avatar who, string data)
+        bool cmdGetFact(VPServices app, Avatar<Vector3> who, string data)
         {
             var fact = getFact(data);
 

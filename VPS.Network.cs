@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading;
-using VP;
+using VpNet;
 
 namespace VPServices
 {
@@ -9,6 +9,7 @@ namespace VPServices
         public DateTime LastConnect;
         public string   World;
 
+        string botName;
         string userName;
         string password;
 
@@ -21,12 +22,18 @@ namespace VPServices
             {
                 try
                 {
-                    Bot.Login(userName, password);
+                    // TODO: Async. Example:
+                    // vp.ConnectAsync();
+                    // vp.LoginAsync(user, password, botname);
+                    // vp.EnterAsync(world);
+
+                    var connect = Bot.ConnectAsync().Result;
+                    var login = Bot.LoginAsync(userName, password, botName).Result;
                     LastConnect = DateTime.Now;
                     
                     // Disconnect events
-                    Bot.WorldDisconnect    += onWorldDisconnect;
-                    Bot.UniverseDisconnect += onUniverseDisconnect;
+                    Bot.OnWorldDisconnect    += onWorldDisconnect;
+                    Bot.OnUniverseDisconnect += onUniverseDisconnect;
                     return;
                 }
                 catch (Exception e)
@@ -48,8 +55,8 @@ namespace VPServices
             {
                 try
                 {
-                    Bot.Enter(World);
-                    Bot.GoTo(0, 10, 0);
+                    var enter = Bot.EnterAsync(World).Result;
+                    Bot.UpdateAvatar(new Vector3(0, 0, 0));
                     LastConnect = DateTime.Now;
                     return;
                 }
@@ -63,7 +70,7 @@ namespace VPServices
             throw new Exception("Could not connect to worldserver after ten attempts.");
         }
 
-        void onUniverseDisconnect(Instance sender)
+        void onUniverseDisconnect(Instance sender, UniverseDisconnectEventArgs args)
         {
             Log.Warn("Network", "Disconnected from universe! Reconnecting...");
 
@@ -73,7 +80,7 @@ namespace VPServices
             ConnectToUniverse();
         }
 
-        void onWorldDisconnect(Instance sender)
+        void onWorldDisconnect(Instance sender, WorldDisconnectEventArgs args)
         {
             Log.Warn("Network", "Disconnected from world! Reconnecting...");
 

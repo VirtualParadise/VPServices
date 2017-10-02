@@ -1,7 +1,7 @@
 ﻿using Nini.Config;
 using System;
 using System.Collections.Generic;
-using VP;
+using VpNet;
 using SQLite;
 
 namespace VPServices.Services
@@ -63,11 +63,10 @@ namespace VPServices.Services
         const string settingHome     = "Home";
 
         #region Command handlers
-        void cmdGoHome(VPServices app, Avatar who, bool entering)
+        void cmdGoHome(VPServices app, Avatar<Vector3> who, bool entering)
         {
-            AvatarPosition target;
             var query  = from   h in connection.Table<sqlHome>()
-                         where  h.UserID == who.Id
+                         where  h.UserID == who.UserId
                          select h;
             var home   = query.FirstOrDefault();
 
@@ -75,51 +74,58 @@ namespace VPServices.Services
                 return;
 
             if (home != null)
-                target = new AvatarPosition(home.X, home.Y, home.Z, home.Pitch, home.Yaw);
+            {
+                // Note: Home DB and VP SDK define yaw and pitch on different axes -- to maintain backwards compatibility with old home,
+                // continue switching Yaw/Pitch axes to home DB and just switch them back in code. Will look into fixing DB later.
+                app.Bot.TeleportAvatar(who, "", new Vector3(home.X, home.Y, home.Z), new Vector3(home.Pitch, home.Yaw, 0));
+                Log.Debug(Name, "Teleported {0} home at {1:f3}, {2:f3}, {3:f3}", who.Name, home.X, home.Y, home.Z);
+            }
             else
-                target = AvatarPosition.GroundZero;
-
-            app.Bot.Avatars.Teleport(who.Session, "", target);
-            Log.Debug(Name, "Teleported {0} home at {1:f3}, {2:f3}, {3:f3}", who.Name, target.X, target.Y, target.Z);
+            {
+                app.Bot.TeleportAvatar(who.Session, "", new Vector3(), 0, 0);
+                Log.Debug(Name, "Teleported {0} home (to ground zero) at {1:f3}, {2:f3}, {3:f3}", who.Name, 0, 0, 0);
+            }
         }
 
-        bool cmdSetHome(VPServices app, Avatar who, string data)
+        bool cmdSetHome(VPServices app, Avatar<Vector3> who, string data)
         {
             lock (app.DataMutex)
+                // Note: Home DB and VP SDK define yaw and pitch on different axes -- to maintain backwards compatibility with old home,
+                // continue switching Yaw/Pitch axes to home DB and just switch them back in code. Will look into fixing DB later.
                 connection.InsertOrReplace( new sqlHome
                 {
-                    UserID = who.Id,
-                    X      = who.X,
-                    Y      = who.Y,
-                    Z      = who.Z,
-                    Pitch  = who.Pitch,
-                    Yaw    = who.Yaw
+                    UserID = who.UserId,
+                    X      = (float)who.Position.X,
+                    Y      = (float)who.Position.Y,
+                    Z      = (float)who.Position.Z,
+                    Pitch  = (float)who.Rotation.X,
+                    Yaw    = (float)who.Rotation.Y,
                 });
 
-            app.Notify(who.Session, "Set your home to {0:f3}, {1:f3}, {2:f3}" , who.X, who.Y, who.Z);
-            return Log.Info(Name, "Set home for {0} at {1:f3}, {2:f3}, {3:f3}", who.Name, who.X, who.Y, who.Z);
+            app.Notify(who.Session, "Set your home to {0:f3}, {1:f3}, {2:f3}" , who.Position.X, who.Position.Y, who.Position.Z);
+            return Log.Info(Name, "Set home for {0} at {1:f3}, {2:f3}, {3:f3}", who.Name, who.Position.X, who.Position.Y, who.Position.Z);
         }
 
-        bool cmdClearHome(VPServices app, Avatar who, string data)
+        bool cmdClearHome(VPServices app, Avatar<Vector3> who, string data)
         {
             lock (app.DataMutex)
-                connection.Execute("DELETE FROM Home WHERE UserID = ?", who.Id);
+                connection.Execute("DELETE FROM Home WHERE UserID = ?", who.UserId);
 
             app.Notify(who.Session, "Your home has been cleared to ground zero");
             return Log.Info(Name, "Cleared home for {0}", who.Name);
         }
 
-        bool cmdBounce(VPServices app, Avatar who, string data)
+        bool cmdBounce(VPServices app, Avatar<Vector3> who, string data)
         {
             who.SetSetting(settingBounce, true);
-            app.Bot.Avatars.Teleport(who.Session, app.World, who.Position);
+            app.Bot.TeleportAvatar(who, app.World, who.Position, who.Rotation);
 
             return Log.Info(Name, "Bounced user {0}", who.Name);
         } 
         #endregion
 
         #region Event handlers
-        void onEnter(Instance sender, Avatar who)
+        void onEnter(Instance sender, Avatar<Vector3> who)
         {
             // Do not teleport users home within 10 seconds of bot's startup
             if ( VPServices.App.LastConnect.SecondsToNow() < 10 )
@@ -138,7 +144,7 @@ namespace VPServices.Services
                 cmdGoHome(VPServices.App, who, true);
         }
 
-        void onLeave(Instance sender, Avatar who)
+        void onLeave(Instance sender, Avatar<Vector3> who)
         {
             // Keep track of LastExit to prevent annoying users
             who.SetSetting(settingLastExit, DateTime.Now);

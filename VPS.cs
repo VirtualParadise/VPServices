@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using System.Threading;
-using VP;
+using VpNet;
 
 namespace VPServices
 {
@@ -61,11 +61,18 @@ namespace VPServices
             Log.Level = logLevel;
 
             // Load instance
-            Bot      = new Instance( CoreSettings.Get("Name", defaultName) );
+            //Bot = new Instance(new InstanceConfiguration<World>()
+            //{
+            //    BotName =
+            //}); CoreSettings.Get("Name", defaultName) );
+
+            botName = CoreSettings.Get("Name", defaultName);
             userName = NetworkSettings.Get("Username");
             password = NetworkSettings.Get("Password");
-            World    = NetworkSettings.Get("World");
-            Owner    = userName;
+            World = NetworkSettings.Get("World");
+            Owner = userName;
+
+            Bot = new Instance();
 
             // Connect to network
             ConnectToUniverse();
@@ -85,7 +92,7 @@ namespace VPServices
             Log.Info("Network", "Connected to {0}", World);
 
             CoreSettings.Set("Version", MigrationVersion);
-            Bot.ConsoleBroadcast(ChatEffect.None, ColorInfo,"", "Services is now online; say !help for information");
+            var result = Bot.ConsoleMessage("", "Services is now online; say !help for information", ColorInfo);
         }
 
         /// <summary>
@@ -93,8 +100,6 @@ namespace VPServices
         /// </summary>
         public void UpdateLoop()
         {
-            Bot.Wait(0);
-
             if (Crash)
             {
                 Crash = false;
@@ -140,7 +145,7 @@ namespace VPServices
 
         public void Notify(int session, string msg, params object[] parts)
         {
-            Bot.ConsoleMessage(session, ChatEffect.Italic, ColorInfo, Bot.Name, msg, parts);
+            Bot.ConsoleMessage(session, Bot.Configuration.BotName, string.Format(msg, parts), ColorInfo, TextEffectTypes.Italic);
         }
 
         public void NotifyAll(string msg, params object[] parts)
@@ -150,7 +155,7 @@ namespace VPServices
 
         public void Alert(int session, string msg, params object[] parts)
         {
-            Bot.ConsoleMessage(session, ChatEffect.Bold, ColorAlert, Bot.Name, msg, parts);
+            Bot.ConsoleMessage(session, Bot.Configuration.BotName, string.Format(msg, parts), ColorAlert, TextEffectTypes.Bold);
         }
 
         public void AlertAll(string msg, params object[] parts)
@@ -160,7 +165,7 @@ namespace VPServices
 
         public void Warn(int session, string msg, params object[] parts)
         {
-            Bot.ConsoleMessage(session, ChatEffect.Italic, ColorWarn, Bot.Name, msg, parts);
+            Bot.ConsoleMessage(session, Bot.Configuration.BotName, string.Format(msg, parts), ColorWarn, TextEffectTypes.Italic);
         }
 
         public void WarnAll(string msg, params object[] parts)
