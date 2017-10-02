@@ -75,7 +75,9 @@ namespace VPServices.Services
 
             if (home != null)
             {
-                app.Bot.TeleportAvatar(who.Session, "", new Vector3(home.X, home.Y, home.Z), home.Yaw, home.Pitch);
+                // Note: Home DB and VP SDK define yaw and pitch on different axes -- to maintain backwards compatibility with old home,
+                // continue switching Yaw/Pitch axes to home DB and just switch them back in code. Will look into fixing DB later.
+                app.Bot.TeleportAvatar(who, "", new Vector3(home.X, home.Y, home.Z), new Vector3(home.Pitch, home.Yaw, 0));
                 Log.Debug(Name, "Teleported {0} home at {1:f3}, {2:f3}, {3:f3}", who.Name, home.X, home.Y, home.Z);
             }
             else
@@ -88,14 +90,16 @@ namespace VPServices.Services
         bool cmdSetHome(VPServices app, Avatar<Vector3> who, string data)
         {
             lock (app.DataMutex)
+                // Note: Home DB and VP SDK define yaw and pitch on different axes -- to maintain backwards compatibility with old home,
+                // continue switching Yaw/Pitch axes to home DB and just switch them back in code. Will look into fixing DB later.
                 connection.InsertOrReplace( new sqlHome
                 {
                     UserID = who.UserId,
                     X      = (float)who.Position.X,
                     Y      = (float)who.Position.Y,
                     Z      = (float)who.Position.Z,
-                    Pitch  = (float)who.Rotation.Y,
-                    Yaw    = (float)who.Rotation.X,
+                    Pitch  = (float)who.Rotation.X,
+                    Yaw    = (float)who.Rotation.Y,
                 });
 
             app.Notify(who.Session, "Set your home to {0:f3}, {1:f3}, {2:f3}" , who.Position.X, who.Position.Y, who.Position.Z);
