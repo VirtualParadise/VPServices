@@ -95,7 +95,7 @@ namespace VPServices.Services
                     Y      = (float)who.Position.Y,
                     Z      = (float)who.Position.Z,
                     Pitch  = (float)who.Rotation.Y,
-                    Yaw    = (float)who.Rotation.Z,
+                    Yaw    = (float)who.Rotation.X,
                 });
 
             app.Notify(who.Session, "Set your home to {0:f3}, {1:f3}, {2:f3}" , who.Position.X, who.Position.Y, who.Position.Z);

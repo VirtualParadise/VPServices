@@ -97,10 +97,10 @@ namespace VPServices.Services
                     Y       = (float)who.Position.Y,
                     Z       = (float)who.Position.Z,
                     Pitch   = (float)who.Rotation.Y,
-                    Yaw     = (float)who.Rotation.Z
+                    Yaw     = (float)who.Rotation.X
                 });
 
-            app.NotifyAll(msgAdded, name, who.Position.X, who.Position.Y, who.Position.Z, who.Rotation.Z, who.Rotation.Y);
+            app.NotifyAll(msgAdded, name, who.Position.X, who.Position.Y, who.Position.Z, who.Rotation.X, who.Rotation.Y);
             return Log.Info(Name, "Saved a jump for {0} at {1}, {2}, {3} for {4}", who.Name, who.Position.X, who.Position.Y, who.Position.Z, name);
         }
 
