@@ -106,7 +106,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CsvHelper">
-      <Version>1.17.0</Version>
+      <Version>12.1.1</Version>
     </PackageReference>
     <PackageReference Include="MarkdownSharp">
       <Version>2.0.5</Version>

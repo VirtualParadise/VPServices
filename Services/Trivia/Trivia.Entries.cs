@@ -1,7 +1,9 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
+using CsvHelper.Configuration.Attributes;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -27,25 +29,25 @@ namespace VPServices.Services
                 return false;
             }
 
-            var file        = new StreamReader(fileName);
-            var reader      = new CsvReader(file);
-            var fileEntries = reader.GetRecords<TriviaEntry>();
-            var list        = new List<TriviaEntry>();
-
-            foreach ( var entry in fileEntries )
+            using (var file = new StreamReader(fileName))
+            using (var reader = new CsvReader(file, new Configuration { Delimiter = ",", CultureInfo = CultureInfo.InvariantCulture }))
             {
-                if ( entry.Question.Trim() == "" || entry.Answer.Trim() == "" )
-                    continue;
+                var fileEntries = reader.GetRecords<TriviaEntry>();
+                var list = new List<TriviaEntry>();
 
-                if ( entry.Wrong.Trim() == "" )
-                    entry.Wrong = null;
+                foreach (var entry in fileEntries)
+                {
+                    if (entry.Question.Trim() == "" || entry.Answer.Trim() == "")
+                        continue;
 
-                list.Add(entry);
+                    if (entry.Wrong.Trim() == "")
+                        entry.Wrong = null;
+
+                    list.Add(entry);
+                }
+
+                entries = shuffleEntries(list);
             }
-
-            entries = shuffleEntries(list);
-            reader.Dispose();
-            file  .Dispose();
             Log.Debug(tag, "Loaded trivia database '{0}', {1} entries", fileName, entries.Length);
             return true;
         }
@@ -122,21 +124,14 @@ namespace VPServices.Services
     class TriviaEntry
     {
         public bool   Used;
-
-        [CsvField(Name = "Category")]
+        
         public string Category { get; set; }
-        
-        [CsvField(Name = "Question")]
         public string Question { get; set; }
-        
-        [CsvField(Name = "Answer")]
         public string Answer   { get; set; }
-
-        [CsvField(Name = "Wrong")]
         public string Wrong    { get; set; }
 
         string canonical;
-        [CsvField(Name = "Canonical answer")]
+        [Name("Canonical answer")]
         public string CanonicalAnswer
         {
             get { return canonical ?? Answer; }
