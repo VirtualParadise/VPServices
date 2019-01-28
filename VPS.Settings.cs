@@ -1,6 +1,6 @@
-﻿using Nini.Config;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.CommandLine;
 using System;
-using System.IO;
 
 namespace VPServices
 {
@@ -12,32 +12,30 @@ namespace VPServices
         /// <summary>
         /// Bot settings INI
         /// </summary>
-        public IniConfigSource Settings = new IniConfigSource { AutoSave = true };
+        public IConfigurationRoot Settings;
 
-        public IConfig CoreSettings;
-        public IConfig NetworkSettings;
-        public IConfig WebSettings;
+        public IConfigurationSection CoreSettings;
+        public IConfigurationSection NetworkSettings;
+        public IConfigurationSection WebSettings;
 
         public void SetupSettings(string[] args)
         {
-            var argConfig = new ArgvConfigSource(args);
-            argConfig.AddSwitch("Args", "ini", "i");
+            var argConfig = new CommandLineConfigurationProvider(args);
+            argConfig.Load();
 
-            var file = argConfig.Configs["Args"].Get("ini", defaultFileSettings);
+            string file;
+            if (!argConfig.TryGet("ini", out file))
+            {
+                file = defaultFileSettings;
+            }
 
-            if ( File.Exists(file) )
-            {
-                Settings.Load(file);
-                CoreSettings    = Settings.Configs["Core"];
-                NetworkSettings = Settings.Configs["Network"];
-                WebSettings     = Settings.Configs["Web"];
-            }
-            else
-            {
-                CoreSettings    = Settings.Configs.Add("Core");
-                NetworkSettings = Settings.Configs.Add("Network");
-                WebSettings     = Settings.Configs.Add("Web");
-            }
+            Settings = new ConfigurationBuilder()
+                .AddIniFile(file)
+                .Build();
+
+            CoreSettings = Settings.GetSection("Core");
+            NetworkSettings = Settings.GetSection("Network");
+            WebSettings = Settings.GetSection("Web");
         }
     }
 }

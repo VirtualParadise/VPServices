@@ -1,4 +1,5 @@
 ﻿using MarkdownSharp;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -47,8 +48,8 @@ namespace VPServices
 
         public void SetupWeb()
         {
-            PublicUrl = WebSettings.Get("PublicUrl");
-            Server.Prefixes.Add(WebSettings.Get("Prefix"));
+            PublicUrl = WebSettings.GetValue("PublicUrl", "");
+            Server.Prefixes.Add(WebSettings.GetValue("Prefix", ""));
             Server.Start();
 
             ServerTask = Task.Factory.StartNew(() =>
@@ -67,7 +68,7 @@ namespace VPServices
                 }
             });
 
-            Log.Info("Web server", "Listening on {0}", WebSettings.Get("Prefix"));
+            Log.Info("Web server", "Listening on {0}", WebSettings.GetValue("Prefix", ""));
         }
 
         public void ClearWeb()

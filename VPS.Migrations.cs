@@ -1,4 +1,4 @@
-﻿using Nini.Config;
+﻿using Microsoft.Extensions.Configuration;
 using System;
 using System.IO;
 
@@ -31,7 +31,7 @@ namespace VPServices
         /// </summary>
         void migrateServices()
         {
-            var migration = CoreSettings.GetInt("Version", 0);
+            var migration = CoreSettings.GetValue("Version", 0);
 
             if ( migration >= MigrationVersion )
                 return;
@@ -53,13 +53,12 @@ namespace VPServices
         /// </summary>
         void migrateUsers()
         {
-            var target = CoreSettings.GetInt("Version", 0) + 1;
+            var target = CoreSettings.GetValue("Version", 0) + 1;
 
             switch ( target )
             {
                 case 1:
                     migSetupUserSQLite();
-                    migUserIniToSQLite();
                     break;
             }
         }
@@ -77,58 +76,6 @@ namespace VPServices
 
             Log.Debug("Users", "Created SQLite tables for user settings");
         }
-
-        void migUserIniToSQLite()
-        {
-            var userIni = "UserSettings.ini";
-
-            if ( !File.Exists(userIni) )
-                return;
-
-            var configSource = new IniConfigSource(userIni);
-            foreach ( IConfig config in configSource.Configs )
-            {
-                // Discard bot settings
-                if ( config.Name.StartsWith("__") )
-                {
-                    Log.Fine("Migration", "Found config for bot '{0}'; discarding", config.Name);
-                    continue;
-                }
-
-                var keys = config.GetKeys();
-                if ( keys.Length <= 0 )
-                {
-                    Log.Fine("Migration", "Found empty config for '{0}'; discarding", config.Name);
-                    continue;
-                }
-
-            promptUserID:
-                Console.WriteLine("\n[Migrations] What Virtual Paradise account number is user '{0}'?", config.Name);
-                Console.Write("> ");
-                var givenId = Console.ReadLine();
-                int id;
-
-                if ( !int.TryParse(givenId, out id) )
-                    goto promptUserID;
-
-                Connection.BeginTransaction();
-                foreach ( var key in keys )
-                {
-                    Log.Fine("Users", "Migrating config key '{0}' for user '{1}'", key, id);
-                    Connection.Insert(new sqlUserSettings
-                    {
-                        UserID = id,
-                        Name = key,
-                        Value = config.Get(key)
-                    });
-                }
-                Connection.Commit();
-            }
-
-            var backup = userIni + ".bak";
-            File.Move(userIni, backup);
-            Log.Debug("Users", "Migrated INI user settings to SQLite; backed up to '{0}'", backup);
-        }  
         #endregion
     }
 }

@@ -1,5 +1,4 @@
-﻿using Nini.Config;
-using System;
+﻿using System;
 using System.Linq;
 
 namespace VPServices.Services

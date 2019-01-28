@@ -1,8 +1,7 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using VpNet;
-using Nini.Config;
 
 namespace VPServices.Services
 {
@@ -23,7 +22,7 @@ namespace VPServices.Services
                 ),
             });
 
-            config = app.Settings.Configs["RKill"] ?? app.Settings.AddConfig("RKill");
+            config = app.Settings.GetSection("RKill");
         }
 
         public void Migrate(VPServices app, int target) {  }
@@ -33,21 +32,21 @@ namespace VPServices.Services
         const string msgDisabled = "RKill is not enabled on this bot";
         const string msgUnauth   = "You are not authorized to remote kill this bot";
 
-        IConfig config;
+        IConfigurationSection config;
 
         bool cmdRKill(VPServices app, Avatar<Vector3> who, string data)
         {
             if (data != app.Bot.Configuration.BotName)
                 return true;
 
-            if ( !config.GetBoolean("Enabled", false) )
+            if (!config.GetValue<bool>("Enabled"))
             {
                 app.Warn(who.Session, msgDisabled);
                 return true;
             }
 
-            var permitted = config.Get("Users", "");
-            if ( !TRegex.IsMatch(who.Name, permitted) )
+            var permitted = config["Users"] ?? "";
+            if (!TRegex.IsMatch(who.Name, permitted))
             {
                 app.Warn(who.Session, msgUnauth);
                 return true;

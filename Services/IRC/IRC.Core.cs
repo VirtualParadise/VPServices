@@ -1,5 +1,5 @@
 ﻿using Meebey.SmartIrc4net;
-using Nini.Config;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -7,7 +7,7 @@ using VpNet;
 
 namespace VPServices.Services
 {
-	partial class IRC : IService
+    partial class IRC : IService
     {
 		public string Name
         { 
@@ -61,7 +61,7 @@ namespace VPServices.Services
         VPServices app;
         IrcClient  irc   = new IrcClient();
         object     mutex = new object();
-        IConfig    iniConfig;
+        IConfiguration iniConfig;
 
         IrcConfig _config;
         /// <summary>
@@ -79,17 +79,17 @@ namespace VPServices.Services
         {
             lock (mutex)
             {
-                iniConfig = app.Settings.Configs["IRC"] ?? app.Settings.Configs.Add("IRC");
+                iniConfig = app.Settings.GetSection("IRC");
 
                 config = new IrcConfig
                 {
-                    Host    = iniConfig.Get("Server", "localhost"),
-                    Port    = iniConfig.GetInt("Port", 6667),
-                    Channel = iniConfig.Get("Channel", "#vp"),
+                    Host    = iniConfig.GetValue("Server", "localhost"),
+                    Port    = iniConfig.GetValue("Port", 6667),
+                    Channel = iniConfig.GetValue("Channel", "#vp"),
 
-                    AutoConnect = iniConfig.GetBoolean("Autoconnect", false),
-                    NickName    = iniConfig.Get("Nickname", "VPBridgeBot"),
-                    RealName    = iniConfig.Get("Realname", "VPBridgeAdmin"),
+                    AutoConnect = iniConfig.GetValue("Autoconnect", false),
+                    NickName    = iniConfig.GetValue("Nickname", "VPBridgeBot"),
+                    RealName    = iniConfig.GetValue("Realname", "VPBridgeAdmin"),
                 };
 
                 Log.Debug(Name, "Loaded IRC connection settings");

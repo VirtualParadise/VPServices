@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.Text.RegularExpressions;
 using System.Threading;
 using VpNet;
@@ -57,7 +58,7 @@ namespace VPServices
         {
             // Set logging level
             LogLevels logLevel;
-            Enum.TryParse<LogLevels>( CoreSettings.Get("LogLevel", "Production"), out logLevel );
+            Enum.TryParse<LogLevels>( CoreSettings.GetValue("LogLevel", "Production"), out logLevel );
             Log.Level = logLevel;
 
             // Load instance
@@ -66,10 +67,10 @@ namespace VPServices
             //    BotName =
             //}); CoreSettings.Get("Name", defaultName) );
 
-            botName = CoreSettings.Get("Name", defaultName);
-            userName = NetworkSettings.Get("Username");
-            password = NetworkSettings.Get("Password");
-            World = NetworkSettings.Get("World");
+            botName = CoreSettings.GetValue("Name", defaultName);
+            userName = NetworkSettings.GetValue("Username", "");
+            password = NetworkSettings.GetValue("Password", "");
+            World = NetworkSettings.GetValue("World", "");
             Owner = userName;
 
             Bot = new Instance();
@@ -91,7 +92,8 @@ namespace VPServices
             InitServices();
             Log.Info("Network", "Connected to {0}", World);
 
-            CoreSettings.Set("Version", MigrationVersion);
+            //TODO: Save this somewhere else?
+            //CoreSettings.Set("Version", MigrationVersion);
             var result = Bot.ConsoleMessage("", "Services is now online; say !help for information", ColorInfo);
         }
 

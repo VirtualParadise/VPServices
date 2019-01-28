@@ -1,5 +1,4 @@
-﻿using Nini.Config;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using VpNet;
 using SQLite;

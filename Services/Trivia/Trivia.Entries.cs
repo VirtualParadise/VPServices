@@ -20,8 +20,8 @@ namespace VPServices.Services
 
         bool loadTrivia()
         {
-            var config   = app.Settings.Configs[configTrivia];
-            var fileName = config.Get(keyDatabase, fileDatabase);
+            var config = app.Settings.GetSection(configTrivia);
+            var fileName = config[keyDatabase] ?? fileDatabase;
 
             if ( !File.Exists(fileName) )
             {

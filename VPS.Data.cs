@@ -1,4 +1,5 @@
-﻿using SQLite;
+﻿using Microsoft.Extensions.Configuration;
+using SQLite;
 using System;
 
 namespace VPServices
@@ -19,7 +20,7 @@ namespace VPServices
 
         public void SetupDatabase()
         {
-            var database = CoreSettings.Get("Database", "VPServices.db");
+            var database = CoreSettings.GetValue("Database", "VPServices.db");
             Connection   = new SQLiteConnection(database, true);
             Connection.BusyTimeout = TimeSpan.MaxValue;
 

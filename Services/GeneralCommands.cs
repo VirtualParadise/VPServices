@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -198,7 +199,7 @@ namespace VPServices.Services
         #region Debug commands
         bool cmdCrash(VPServices app, Avatar<Vector3> who, string data)
         {
-            var owner = app.NetworkSettings.Get("Username");
+            var owner = app.NetworkSettings.GetValue("Username", "");
 
             if ( !who.Name.IEquals(owner) )
                 return false;
@@ -209,7 +210,7 @@ namespace VPServices.Services
 
         bool cmdHang(VPServices app, Avatar<Vector3> who, string data)
         {
-            var owner = app.NetworkSettings.Get("Username");
+            var owner = app.NetworkSettings.GetValue("Username", "");
 
             if ( !who.Name.IEquals(owner) )
                 return false;
