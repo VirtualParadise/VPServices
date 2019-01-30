@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -14,6 +15,8 @@ namespace VPServices.Services
         const  string   msgAcceptedFrom = "Ding! The answer was {0} (accepted from {1}), {2} {3}";
         const  string   keyTriviaPoints = "TriviaPoints";
         const  string   tag             = "Trivia";
+        readonly ILogger logger = Log.ForContext("Tag", tag);
+
         static string[] welldones       = new[]
         {
             "well done", "good show", "GG", "nice one", "not bad,", "jolly good", "keep going",
@@ -54,7 +57,10 @@ namespace VPServices.Services
             entryInPlay       = entry;
             entryInPlay.Used  = true;
 
-            Log.Debug(tag, "Beginning game with question:\n\t[{0}] {1}\n\tAnswer: {2}",
+            logger.Debug(
+                "Beginning game with question:\n" +
+                "\t[{Category}] {Question}\n" +
+                "\tAnswer: {Answer}",
                 entryInPlay.Category, entryInPlay.Question, entryInPlay.Answer);
 
             task = new Task(gameTimeout);
@@ -70,7 +76,7 @@ namespace VPServices.Services
                     {
                         gameEnd();
                         app.NotifyAll("Timeout! The answer was {0}.", entryInPlay.CanonicalAnswer);
-                        Log.Debug(tag, "Question timed out");
+                        logger.Debug("Question timed out");
                     }
 
                 Thread.Sleep(500);
@@ -83,7 +89,7 @@ namespace VPServices.Services
 
             inProgress = false;
             bot.OnChatMessage -= onChat;
-            Log.Fine(tag, "Game has ended");
+            logger.Information("Game has ended");
         } 
         #endregion
 
@@ -102,7 +108,7 @@ namespace VPServices.Services
 
                 if ( entryInPlay.Wrong != null && TRegex.TryMatch(message, entryInPlay.Wrong, out wrongMatch) )
                 {
-                    Log.Debug(tag, "Given answer '{0}' by {1} matched, but turned out to be wrong; rejecting", wrongMatch[0], args.Avatar.Name);
+                    logger.Debug("Given answer '{Answer}' by {User} matched, but turned out to be wrong; rejecting", wrongMatch[0], args.Avatar.Name);
                     return;
                 }
 
@@ -115,7 +121,7 @@ namespace VPServices.Services
                 else
                     app.Bot.ConsoleMessage("Triviamaster", string.Format(msgAcceptedFrom, entryInPlay.CanonicalAnswer, match[0], welldone, args.Avatar.Name), VPServices.ColorInfo, TextEffectTypes.Bold);
 
-                Log.Debug(tag, "Correct answer '{0}' by {1}", match[0], args.Avatar.Name);
+                logger.Debug("Correct answer '{Answer}' by {UserName}", match[0], args.Avatar.Name);
                 awardPoint(args.Avatar.Name);
             }
         } 
@@ -129,13 +135,13 @@ namespace VPServices.Services
 
             if (user.IsBot)
             {
-                Log.Fine(tag, "Not awarding point to {0} as they are a bot", who);
+                logger.Information("Not awarding point to {User} as they are a bot", who);
                 return;
             }
 
             points++;
             user.SetSetting(keyTriviaPoints, points);
-            Log.Fine(tag, "{0} is now up to {1} points", who, points);
+            logger.Information("{User} is now up to {Points} points", who, points);
 
             if ( points % 10 == 0 )
                 app.NotifyAll("{0} is climbing the scoreboard with {1} points!", who, points);
@@ -146,7 +152,7 @@ namespace VPServices.Services
             if (task == null)
                 return;
 
-            Log.Debug(tag, "Skipping question...");
+            logger.Debug("Skipping question...");
             gameEnd();
             task.Wait();
         } 

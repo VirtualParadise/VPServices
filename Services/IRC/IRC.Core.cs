@@ -1,5 +1,6 @@
 ﻿using Meebey.SmartIrc4net;
 using Microsoft.Extensions.Configuration;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ namespace VPServices.Services
 {
     partial class IRC : IService
     {
+        readonly ILogger logger = Log.ForContext("Tag", "IRC");
 		public string Name
         { 
             get { return "IRC"; }
@@ -92,7 +94,7 @@ namespace VPServices.Services
                     RealName    = iniConfig.GetValue("Realname", "VPBridgeAdmin"),
                 };
 
-                Log.Debug(Name, "Loaded IRC connection settings");
+                logger.Debug("Loaded IRC connection settings");
             }
         } 
         #endregion
@@ -103,14 +105,14 @@ namespace VPServices.Services
             lock (mutex)
             {
                 app.NotifyAll(msgConnecting, app.World, config.Channel, config.Host);
-                Log.Info(Name, "Creating and establishing IRC bridge...");
+                logger.Information("Creating and establishing IRC bridge...");
 
                 try
                 {
                     irc.Connect(config.Host, config.Port);
                     irc.Login(config.NickName, config.RealName);
 
-                    Log.Debug(Name, "Connected and logged into {0}", config.Host);
+                    logger.Debug("Connected and logged into {Host}", config.Host);
                 }
                 catch (Exception e)
                 {
@@ -119,7 +121,7 @@ namespace VPServices.Services
                         irc.Disconnect();
 
                     app.WarnAll(msgConnectError, e.Message);
-                    Log.Warn(Name, "Could not login to IRC: {0}", e.Message);
+                    logger.Warning(e, "Could not login to IRC: {Error}", e.Message);
                     return;
                 }
                 
@@ -127,7 +129,7 @@ namespace VPServices.Services
                 {
                     irc.RfcJoin(config.Channel);
 
-                    Log.Debug(Name, "Joined channel {0}", config.Channel);
+                    logger.Debug("Joined channel {Channel}", config.Channel);
                 }
                 catch (Exception e)
                 {
@@ -136,7 +138,7 @@ namespace VPServices.Services
                         irc.Disconnect();
 
                     app.WarnAll(msgConnectError, e.Message);
-                    Log.Warn(Name, "Could not join channel: {0}", e.Message);
+                    logger.Warning(e, "Could not join channel: {Error}", e.Message);
                     return;
                 }
 
@@ -154,7 +156,7 @@ namespace VPServices.Services
                 }
                 catch (Exception e)
                 {
-                    Log.Warn(Name, "Exception in IRC listen loop: {0}", e.Message);
+                    logger.Warning(e, "Exception in IRC listen loop: {Error}", e.Message);
                     return;
                 }
         }
@@ -167,11 +169,11 @@ namespace VPServices.Services
                     return;
 
                 app.NotifyAll(msgDisconnected, app.World, config.Channel, config.Host);
-                Log.Info(Name, "Disconnecting IRC bridge...");
+                logger.Information("Disconnecting IRC bridge...");
 
                 irc.RfcQuit("Goodbye");
                 irc.Disconnect();
-                Log.Debug(Name, "Disconnected IRC bridge");
+                logger.Debug("Disconnected IRC bridge");
             }
         } 
         #endregion

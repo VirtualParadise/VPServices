@@ -1,5 +1,5 @@
 ﻿using System;
-using System.IO;
+using Serilog;
 using SQLite;
 using VpNet;
 
@@ -14,6 +14,7 @@ namespace VPServices.Services
     /// </remarks>
     partial class Logging : IService
     {
+        readonly ILogger logger = Log.ForContext("Tag", "Logging");
         public string Name
         { 
             get { return "Logging"; }

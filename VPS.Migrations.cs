@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
-using System.IO;
 
 namespace VPServices
 {
@@ -40,10 +39,10 @@ namespace VPServices
                 for ( var i = migration; i < MigrationVersion; i++ )
                 {
                     service.Migrate(this, i + 1);
-                    Log.Fine("Services", "Migrated '{0}' to version {1}", service.Name, i + 1);
+                    servicesLogger.Information("Migrated '{Service}' to version {Version}", service.Name, i + 1);
                 }
 
-            Log.Debug("Services", "All services migrated to version {0}", MigrationVersion);
+            servicesLogger.Debug("All services migrated to version {Version}", MigrationVersion);
         } 
         #endregion
 
@@ -74,7 +73,7 @@ namespace VPServices
                 DELETE FROM UserSettings WHERE UserID = new.UserID AND Name = new.Name;
                 END");
 
-            Log.Debug("Users", "Created SQLite tables for user settings");
+            servicesLogger.Debug("Created SQLite tables for user settings");
         }
         #endregion
     }

@@ -1,4 +1,5 @@
-﻿using SQLite;
+﻿using Serilog;
+using SQLite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,7 @@ namespace VPServices.Services
 {
     partial class Telegrams : IService
     {
+        readonly ILogger logger = Log.ForContext("Tag", "Telegrams");
         public string Name
         {
             get { return "Telegrams"; }
@@ -74,7 +76,8 @@ namespace VPServices.Services
 
             told[target.ToLower()] = false;
             app.Notify(who.Session, msgTelegramSent, target);
-            return Log.Info(Name, "Recorded from {0} for {1}", who.Name, target);
+            logger.Information("Recorded from {Name} for {Target}", who.Name, target);
+            return true;
         }
 
         bool cmdReadTelegrams(VPServices app, Avatar<Vector3> who, string data)

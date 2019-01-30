@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using VpNet;
 
@@ -21,6 +22,7 @@ namespace VPServices.Services
         const string msgPendingRequestee = "That user already has a pending request";
 
         List<JoinInvite> requests = new List<JoinInvite>();
+        readonly ILogger logger = Log.ForContext("Tag", "JoinInvites");
 
         public string Name { get { return "Joins & invites"; } }
         public void Init(VPServices app, Instance bot)
@@ -78,14 +80,16 @@ namespace VPServices.Services
             if ( !isRequestee(source.Session).Equals(JoinInvite.Nobody) )
             {
                 app.Warn(source.Session, msgPendingRequester);
-                return Log.Info(Name, "Rejecting request by {0} as they already have one pending", source);
+                logger.Information("Rejecting request by {Source} as they already have one pending", source);
+                return true;
             }
 
             // Reject if target has request
             if ( !isRequested(targetName).Equals(JoinInvite.Nobody) )
             {
                 app.Warn(source.Session, msgPendingRequestee);
-                return Log.Info(Name, "Rejecting request by {0} as they already have one pending", source);
+                logger.Information("Rejecting request by {0} as they already have one pending", source);
+                return true;
             }
 
             // Ignore if no such users found
@@ -143,7 +147,8 @@ namespace VPServices.Services
             if ( source == null )
             {
                 app.Warn(targetAv.Session, msgNotPresent);
-                return Log.Info(Name, "Rejecting response by {0} as they have left", source.Name);
+                logger.Information("Rejecting response by {Source} as they have left", source.Name);
+                return true;
             }
 
             var targetPos     = sourceReq.Invite ? source.Position : target.Position;

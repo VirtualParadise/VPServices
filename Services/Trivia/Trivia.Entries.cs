@@ -25,7 +25,7 @@ namespace VPServices.Services
 
             if ( !File.Exists(fileName) )
             {
-                Log.Warn(tag, "Could not load database; '{0}' is missing", fileName);
+                logger.Warning("Could not load database; '{FileName}' is missing", fileName);
                 return false;
             }
 
@@ -48,7 +48,7 @@ namespace VPServices.Services
 
                 entries = shuffleEntries(list);
             }
-            Log.Debug(tag, "Loaded trivia database '{0}', {1} entries", fileName, entries.Length);
+            logger.Debug("Loaded trivia database '{DbFile}', {EntryCount} entries", fileName, entries.Length);
             return true;
         }
 
@@ -70,7 +70,7 @@ namespace VPServices.Services
                 idx++;
             }
 
-            Log.Debug(tag, "Shuffled {0} entries into random order", arr.Length);
+            logger.Debug("Shuffled {EntryCount} entries into random order", arr.Length);
             return arr;
         }
 
@@ -112,7 +112,7 @@ namespace VPServices.Services
                 // No more unused entries in specified category; mark all as unused and
                 // repeat search
                 markEntriesUnused(category);
-                Log.Debug(tag, "No more unused trivia entries for category '{0}'; marking all as unused", category);
+                logger.Debug("No more unused trivia entries for category '{Category}'; marking all as unused", category);
                 app.WarnAll("Out of entries for that query; marking all entries as unused and starting over");
                 goto pickEntry;
             }

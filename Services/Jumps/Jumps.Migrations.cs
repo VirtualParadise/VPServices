@@ -22,7 +22,7 @@ namespace VPServices.Services
         void migSetupSQLite(VPServices app)
         {
             connection.CreateTable<sqlJump>();
-            Log.Debug(Name, "Created SQLite table for jump points");
+            logger.Debug("Created SQLite table for jump points");
         }
 
         void migDatToSQLite(VPServices app)
@@ -57,7 +57,7 @@ namespace VPServices.Services
             
             backup = fileJumps + ".bak";
             File.Move(fileJumps, backup);
-            Log.Debug(Name, "Migrated .dat jump list to SQLite; backed up to '{0}'", backup);
+            logger.Debug("Migrated .dat jump list to SQLite; backed up to '{BackupFile}'", backup);
         }
     }
 }

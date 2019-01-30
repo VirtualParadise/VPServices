@@ -1,4 +1,5 @@
-﻿using SQLite;
+﻿using Serilog;
+using SQLite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,7 @@ namespace VPServices.Services
 {
     public partial class Facts : IService
     {
+        readonly ILogger logger = Log.ForContext("Tag", "Facts");
         public string Name
         { 
             get { return "Facts"; }
@@ -95,7 +97,8 @@ namespace VPServices.Services
             }
 
             app.Notify(who.Session, msg, topic, locked ? "locked " : "");
-            return Log.Info(Name, "Saved a fact from {0} for topic {1} (locked: {2})", who.Name, topic, locked);
+            logger.Information("Saved a fact from {User} for topic {Topic} (locked: {Locked})", who.Name, topic, locked);
+            return true;
         }
 
         bool cmdDeleteFact(VPServices app, Avatar<Vector3> who, string data)
@@ -120,7 +123,8 @@ namespace VPServices.Services
                 connection.Execute("DELETE FROM Facts WHERE Topic = ? COLLATE NOCASE", data);
 
             app.Notify(who.Session, msgDeleted);
-            return Log.Info(Name, "{0} deleted factoid for topic {1}", who.Name, data);
+            logger.Information("{User} deleted factoid for topic {Topic}", who.Name, data);
+            return true;
         }
 
         bool cmdGetFact(VPServices app, Avatar<Vector3> who, string data)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -60,7 +61,7 @@ namespace VPServices
             foreach (var service in Services)
             {
                 service.Init(this, Bot);
-                Log.Fine("Services", "Loaded service '{0}'", service.Name);
+                servicesLogger.Information("Loaded service '{Name}'", service.Name);
             }
         }
     }

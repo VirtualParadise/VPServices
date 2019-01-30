@@ -1,4 +1,5 @@
-﻿using SQLite;
+﻿using Serilog;
+using SQLite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace VPServices.Services
         { 
             get { return "Jumps"; }
         }
+        readonly ILogger logger = Log.ForContext("Tag", "Jumps");
 
         public void Init (VPServices app, Instance bot)
         {
@@ -85,7 +87,8 @@ namespace VPServices.Services
             if ( getJump(name) != null )
             {
                 app.Warn(who.Session, msgExists);
-                return Log.Debug(Name, "{0} tried to overwrite jump {1}", who.Name, getJump(name).Name);
+                logger.Debug("{User} tried to overwrite jump {Jump}", who.Name, getJump(name).Name);
+                return true;
             }
 
             lock (app.DataMutex)
@@ -106,7 +109,8 @@ namespace VPServices.Services
             var compass = CompassExtensions.ToCompassTuple(who);
 
             app.NotifyAll(msgAdded, name, who.Position.X, who.Position.Y, who.Position.Z, compass.Angle, who.Rotation.X);
-            return Log.Info(Name, "Saved a jump for {0} at {1}, {2}, {3} for {4}", who.Name, who.Position.X, who.Position.Y, who.Position.Z, name);
+            logger.Information("Saved a jump for {User} at {Position} for {Jump}", who.Name, who.Position, name);
+            return true;
         }
 
         bool cmdDelJump(VPServices app, Avatar<Vector3> who, string data)
@@ -127,14 +131,16 @@ namespace VPServices.Services
             if ( jump == null )
             {
                 app.Warn(who.Session, msgNonExistant, jumpsUrl);
-                return Log.Debug(Name, "{1} tried to delete non-existant jump {0}", name, who.Name);
+                logger.Debug("{User} tried to delete non-existant jump {Jump}", name, who.Name);
+                return true;
             }
             else
                 lock (app.DataMutex)
                     connection.Delete(jump);
 
             app.NotifyAll(msgDeleted, name);
-            return Log.Info(Name, "Deleted {0} jump for {1}", name, who.Name);
+            logger.Information("deleted {Jump} jump for {User}", name, who.Name);
+            return true;
         }
 
         bool cmdJumpList(VPServices app, Avatar<Vector3> who, string data)

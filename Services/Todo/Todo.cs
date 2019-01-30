@@ -1,4 +1,5 @@
-﻿using SQLite;
+﻿using Serilog;
+using SQLite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,7 @@ namespace VPServices.Services
 {
     public partial class Todo : IService
     {
+        readonly ILogger logger = Log.ForContext("Tag", "Todo");
         public string Name
         { 
             get { return "Todo"; }
@@ -94,7 +96,8 @@ namespace VPServices.Services
                 });
 
             app.Notify(who.Session, msgAdded);
-            return Log.Info(Name, "Saved a todo for {0}: {1}", who.Name, data);
+            logger.Information("Saved a todo for {User}: {What}", who.Name, data);
+            return true;
         }
 
         bool cmdFinishTodo(VPServices app, Avatar<Vector3> who, string data)
@@ -119,7 +122,7 @@ namespace VPServices.Services
                     if ( affected <= 0 )
                         app.Warn(who.Session, msgNonExistant, id);
                     else
-                        Log.Info(Name, "Marked todo #{0} as done for {1}", id, who.Name); 
+                        logger.Information("Marked todo #{Id} as done for {User}", id, who.Name); 
                 }
             }
             
@@ -149,7 +152,7 @@ namespace VPServices.Services
                     if ( affected <= 0 )
                         app.Warn(who.Session, msgNonExistant, id);
                     else
-                        Log.Info(Name, "Deleted todo #{0} for {1}", id, who.Name); 
+                        logger.Information("Deleted todo #{Id} for {User}", id, who.Name);
                 }
             }
             

@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Serilog;
+using Serilog.Events;
 using System;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -19,13 +21,12 @@ namespace VPServices
         public Instance Bot;
         public string   Owner;
         public bool     Crash;
+        readonly ILogger servicesLogger = Log.ForContext("Tag", "Services");
 
         public static int Main(string[] args)
         {
             int exit = 0;
-
-            // Set up logger
-            new ConsoleLogger();
+            
             Console.WriteLine("### [{0}] Services is starting...", DateTime.Now);
 
             try
@@ -39,7 +40,7 @@ namespace VPServices
             }
             catch (Exception e)
             {
-                e.LogFullStackTrace();
+                Log.ForContext("Tag", "Services").Fatal(e, "Unhandled error");
                 exit = 1;
             }
             finally
@@ -56,16 +57,12 @@ namespace VPServices
         /// </summary>
         public void Setup()
         {
-            // Set logging level
-            LogLevels logLevel;
-            Enum.TryParse<LogLevels>( CoreSettings.GetValue("LogLevel", "Production"), out logLevel );
-            Log.Level = logLevel;
+            var logLevel = CoreSettings.GetValue<LogEventLevel>("LogLevel", LogEventLevel.Information);
+            var loggerConfig = new LoggerConfiguration()
+                .MinimumLevel.Is(logLevel)
+                .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Tag}] {Message}{NewLine}{Exception}");
 
-            // Load instance
-            //Bot = new Instance(new InstanceConfiguration<World>()
-            //{
-            //    BotName =
-            //}); CoreSettings.Get("Name", defaultName) );
+            Log.Logger = loggerConfig.CreateLogger();
 
             botName = CoreSettings.GetValue("Name", defaultName);
             userName = NetworkSettings.GetValue("Username", "");
@@ -77,7 +74,7 @@ namespace VPServices
 
             // Connect to network
             ConnectToUniverse();
-            Log.Info("Network", "Connected to universe");
+            Log.ForContext("Tag", "Network").Information("Connected to universe");
 
             // Set up subsystems
             SetupDatabase();
@@ -90,7 +87,7 @@ namespace VPServices
             ConnectToWorld();
             PerformMigrations();
             InitServices();
-            Log.Info("Network", "Connected to {0}", World);
+            Log.ForContext("Tag", "Network").Information("Connected to {World}", World);
 
             //TODO: Save this somewhere else?
             //CoreSettings.Set("Version", MigrationVersion);

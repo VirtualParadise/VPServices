@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using VpNet;
 using VPServices;
@@ -10,6 +11,7 @@ namespace VPServices.Services
     /// </summary>
     public class Greetings : IService
     {
+        readonly ILogger logger = Log.ForContext("Tag", "Greetings");
         public string Name
         {
             get { return "Greetings"; }
@@ -85,7 +87,8 @@ namespace VPServices.Services
             }
 
             app.Notify(who.Session, msg);
-            return Log.Debug(Name, "Toggled greet-me for {0} to {1}", who.Name, toggle);
+            logger.Debug("Toggled greet-me for {User} to {GreetMe}", who.Name, toggle);
+            return true;
         }
         #endregion
 

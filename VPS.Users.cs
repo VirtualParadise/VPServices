@@ -1,4 +1,5 @@
-﻿using SQLite;
+﻿using Serilog;
+using SQLite;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -93,9 +94,7 @@ namespace VPServices
             }
             catch (Exception e)
             {
-                Log.Severe("Users", "Could not get setting '{0}' for ID {1}", key, user.UserId);
-                e.LogFullStackTrace();
-
+                Log.ForContext("Tag", "Users").Error(e, "Could not get setting '{Setting}' for ID {UserId}", key, user.UserId);
                 return null;
             }
         }

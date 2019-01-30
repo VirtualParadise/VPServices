@@ -21,7 +21,7 @@ namespace VPServices.Services
         void migSetupSQLite(VPServices app)
         {
             connection.CreateTable<sqlTelegram>();
-            Log.Debug(Name, "Created SQLite tables for user telegrams");
+            logger.Debug("Created SQLite tables for user telegrams");
         }
 
         void migDatToSQLite(VPServices app)
@@ -55,7 +55,7 @@ namespace VPServices.Services
 
             var backup = fileTelegrams + ".bak";
             File.Move(fileTelegrams, backup);
-            Log.Debug(Name, "Migrated .dat telegrams to SQLite; backed up to '{0}'", backup);
+            logger.Debug("Migrated .dat telegrams to SQLite; backed up to '{BackupFile}'", backup);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Serilog;
 using SQLite;
 using System;
 
@@ -24,7 +25,7 @@ namespace VPServices
             Connection   = new SQLiteConnection(database, true);
             Connection.BusyTimeout = TimeSpan.MaxValue;
 
-            Log.Info("Database", "Set up {0} as database", database);
+            Log.ForContext("Tag", "Database").Information("Set up {Database} as database", database);
         }
 
         public void CloseDatabase()

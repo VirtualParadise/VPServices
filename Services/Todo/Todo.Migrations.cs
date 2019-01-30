@@ -21,7 +21,7 @@ namespace VPServices.Services
         void migSetupSQLite(VPServices app)
         {
             connection.CreateTable<sqlTodo>();
-            Log.Debug(Name, "Created SQLite table for todo list");
+            logger.Debug("Created SQLite table for todo list");
         }
 
         void migDatToSQLite(VPServices app)
@@ -53,7 +53,7 @@ namespace VPServices.Services
             
             backup = fileIdeas + ".bak";
             File.Move(fileIdeas, backup);
-            Log.Debug(Name, "Migrated .dat ideas list to SQLite; backed up to '{0}'", backup);
+            logger.Debug("Migrated .dat ideas list to SQLite; backed up to '{BackupFile}'", backup);
         }
     }
 }

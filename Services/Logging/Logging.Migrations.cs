@@ -1,7 +1,5 @@
 ﻿using System;
 using System.IO;
-using SQLite;
-using VpNet;
 
 namespace VPServices.Services
 {
@@ -24,7 +22,7 @@ namespace VPServices.Services
         {
             connection.CreateTable<sqlBuildHistory>();
             connection.CreateTable<sqlUserHistory>();
-            Log.Debug(Name, "Created SQLite tables for build and user history");
+            logger.Debug("Created SQLite tables for build and user history");
         }
 
         void migDatToSQLite(VPServices app)
@@ -60,7 +58,7 @@ namespace VPServices.Services
 
             backup = fileBuildHistory + ".bak";
             File.Move(fileBuildHistory, backup);
-            Log.Debug(Name, "Migrated .dat build history log to SQLite; backed up to '{0}'", backup);
+            logger.Debug("Migrated .dat build history log to SQLite; backed up to '{BackupFile}'", backup);
 
         userHistory:
             if ( !File.Exists(fileUserHistory) )
@@ -90,7 +88,7 @@ namespace VPServices.Services
 
             backup = fileUserHistory + ".bak";
             File.Move(fileUserHistory, backup);
-            Log.Debug(Name, "Migrated .dat user history log to SQLite; backed up to '{0}'", backup);
+            logger.Debug("Migrated .dat user history log to SQLite; backed up to '{BackupFile}'", backup);
             
         }
     }

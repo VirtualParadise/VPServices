@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Threading;
 using VpNet;
 
@@ -12,6 +13,7 @@ namespace VPServices
         string botName;
         string userName;
         string password;
+        readonly ILogger networkLogger = Log.ForContext("Tag", "Network");
 
         /// <summary>
         /// Makes up to 10 connection attempts to the universe
@@ -38,7 +40,7 @@ namespace VPServices
                 }
                 catch (Exception e)
                 {
-                    Log.Warn("Network", "Failed to connect to universe: {0}", e.Message);
+                    networkLogger.Warning(e, "Failed to connect to universe: {Error}", e.Message);
                     Thread.Sleep(30000);
                 }
             }
@@ -62,7 +64,7 @@ namespace VPServices
                 }
                 catch (Exception e)
                 {
-                    Log.Warn("Network", "Failed to connect to world: {0}", e.Message);
+                    networkLogger.Warning(e, "Failed to connect to world: {Error}", e.Message);
                     Thread.Sleep(30000);
                 }
             }
@@ -72,7 +74,7 @@ namespace VPServices
 
         void onUniverseDisconnect(Instance sender, UniverseDisconnectEventArgs args)
         {
-            Log.Warn("Network", "Disconnected from universe! Reconnecting...");
+            networkLogger.Warning("Disconnected from universe! Reconnecting...");
 
             lock (SyncMutex)
                 Users.Clear();
@@ -82,7 +84,7 @@ namespace VPServices
 
         void onWorldDisconnect(Instance sender, WorldDisconnectEventArgs args)
         {
-            Log.Warn("Network", "Disconnected from world! Reconnecting...");
+            networkLogger.Warning("Disconnected from world! Reconnecting...");
 
             lock (SyncMutex)
                 Users.Clear();

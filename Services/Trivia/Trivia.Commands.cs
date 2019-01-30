@@ -42,7 +42,7 @@ namespace VPServices.Services
             if ( entries == null )
             {
                 app.Notify(who.Session, msgFirstLoad);
-                Log.Debug(tag, msgFirstLoad);
+                logger.Debug(msgFirstLoad);
 
                 if ( !loadTrivia() )
                 {
@@ -55,7 +55,7 @@ namespace VPServices.Services
             if ( inProgress )
             {
                 app.Notify(who.Session, msgSkipping);
-                Log.Debug(tag, msgSkipping);
+                logger.Debug(msgSkipping);
                 skipQuestion();
             }
 

@@ -19,7 +19,7 @@ namespace VPServices.Services
         void migSetupSQLite(VPServices app)
         {
             connection.CreateTable<sqlHome>();
-            Log.Debug(Name, "Created SQLite table for home locations");
+            logger.Debug("Created SQLite table for home locations");
         }
     }
 }

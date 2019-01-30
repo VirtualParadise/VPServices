@@ -1,5 +1,6 @@
 ﻿using MarkdownSharp;
 using Microsoft.Extensions.Configuration;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,6 +12,7 @@ namespace VPServices
 {
     public partial class VPServices : IDisposable
     {
+        readonly ILogger webServerLogger = Log.ForContext("Tag", "Web server");
         public HttpListener Server         = new HttpListener();
         public Markdown     MarkdownParser = new Markdown();
 
@@ -63,12 +65,12 @@ namespace VPServices
                     }
                     catch (Exception e)
                     {
-                        Log.Severe("Web server", "General error: {0}", e.Message);
+                        webServerLogger.Error(e, "General error: {Error}", e.Message);
                     }
                 }
             });
 
-            Log.Info("Web server", "Listening on {0}", WebSettings.GetValue("Prefix", ""));
+            webServerLogger.Information("Listening on {Prefix}", WebSettings.GetValue("Prefix", ""));
         }
 
         public void ClearWeb()
@@ -94,7 +96,7 @@ namespace VPServices
                 return;
             }
 
-            Log.Fine("Web server", "Request for {0} by {1}", ctx.Request.RawUrl, ctx.Request.RemoteEndPoint);
+            webServerLogger.Information("Request for {Url} by {RemoteEndPoint}", ctx.Request.RawUrl, ctx.Request.RemoteEndPoint);
             string response = null;
             var intercept = ctx.Request.RawUrl.Split(new[] { '/' }, 2, StringSplitOptions.RemoveEmptyEntries);
             var targetRoute = intercept.Length >= 1 ? intercept[0] : null;
@@ -111,7 +113,7 @@ namespace VPServices
                 foreach (var rt in Routes)
                     if (TRegex.IsMatch(targetRoute, rt.Regex) || rt.Name.Equals(targetRoute, StringComparison.CurrentCultureIgnoreCase))
                     {
-                        Log.Debug("Web server", "Routing to {0}", rt.Name);
+                        webServerLogger.Debug("Routing to {0}", rt.Name);
                         response = string.Format(HTML_WHOLE,
                             string.Format(HTML_HEAD, "VPServices: " + rt.Name),
                             string.Format(HTML_BODY, rt.Handler(this, data), World, DateTime.Now));
@@ -142,7 +144,7 @@ namespace VPServices
                     ctx.Response.AddHeader("Content-Type", "Content-Type:text/html; charset=utf-8");
                     ctx.Response.Close();
                 }
-                catch { Log.Info("Web server", "Discarding response for closed connection {0}", ctx.Request.RemoteEndPoint); }
+                catch { webServerLogger.Information("Discarding response for closed connection {RemoteEndPoint}", ctx.Request.RemoteEndPoint); }
             }
         }
 
