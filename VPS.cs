@@ -4,6 +4,7 @@ using Serilog.Events;
 using System;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using VpNet;
 
 namespace VPServices
@@ -55,7 +56,7 @@ namespace VPServices
         /// <summary>
         /// Sets up bot instance
         /// </summary>
-        public void Setup()
+        public async Task Setup()
         {
             var logLevel = CoreSettings.GetValue<LogEventLevel>("LogLevel", LogEventLevel.Information);
             var loggerConfig = new LoggerConfiguration()
@@ -73,7 +74,7 @@ namespace VPServices
             Bot = new Instance();
 
             // Connect to network
-            ConnectToUniverse();
+            await ConnectToUniverse();
             Log.ForContext("Tag", "Network").Information("Connected to universe");
 
             // Set up subsystems
@@ -84,7 +85,7 @@ namespace VPServices
             LoadServices();
 
             // Set up services
-            ConnectToWorld();
+            await ConnectToWorld();
             PerformMigrations();
             InitServices();
             Log.ForContext("Tag", "Network").Information("Connected to {World}", World);

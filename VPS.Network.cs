@@ -1,6 +1,7 @@
 ﻿using Serilog;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using VpNet;
 
 namespace VPServices
@@ -18,19 +19,14 @@ namespace VPServices
         /// <summary>
         /// Makes up to 10 connection attempts to the universe
         /// </summary>
-        void ConnectToUniverse()
+        async Task ConnectToUniverse()
         {
             while (true)
             {
                 try
                 {
-                    // TODO: Async. Example:
-                    // vp.ConnectAsync();
-                    // vp.LoginAsync(user, password, botname);
-                    // vp.EnterAsync(world);
-
-                    var connect = Bot.ConnectAsync().Result;
-                    var login = Bot.LoginAsync(userName, password, botName).Result;
+                    await Bot.ConnectAsync();
+                    await Bot.LoginAsync(userName, password, botName);
                     LastConnect = DateTime.Now;
                     
                     // Disconnect events
@@ -51,13 +47,13 @@ namespace VPServices
         /// <summary>
         /// Makes up to 10 connection attempts to the world
         /// </summary>
-        void ConnectToWorld()
+        async Task ConnectToWorld()
         {
             while (true)
             {
                 try
                 {
-                    var enter = Bot.EnterAsync(World).Result;
+                    await Bot.EnterAsync(World);
                     Bot.UpdateAvatar(new Vector3(0, 0, 0));
                     LastConnect = DateTime.Now;
                     return;
@@ -72,24 +68,24 @@ namespace VPServices
             throw new Exception("Could not connect to worldserver after ten attempts.");
         }
 
-        void onUniverseDisconnect(Instance sender, UniverseDisconnectEventArgs args)
+        async void onUniverseDisconnect(Instance sender, UniverseDisconnectEventArgs args)
         {
             networkLogger.Warning("Disconnected from universe! Reconnecting...");
 
             lock (SyncMutex)
                 Users.Clear();
 
-            ConnectToUniverse();
+            await ConnectToUniverse();
         }
 
-        void onWorldDisconnect(Instance sender, WorldDisconnectEventArgs args)
+        async void onWorldDisconnect(Instance sender, WorldDisconnectEventArgs args)
         {
             networkLogger.Warning("Disconnected from world! Reconnecting...");
 
             lock (SyncMutex)
                 Users.Clear();
 
-            ConnectToWorld();
+            await ConnectToWorld();
         }
     }
 }
