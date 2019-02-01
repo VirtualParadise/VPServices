@@ -1,102 +1,24 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{185C1F00-9F11-4986-A49C-0CB97E0BDE37}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <TargetFramework>net461</TargetFramework>
     <RootNamespace>VPServices</RootNamespace>
     <AssemblyName>VPServices</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <StartupObject>VPServices.VPServices</StartupObject>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>Build\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>Build\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
+  
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Xml" />
+    <Compile Remove="Services\KickBans.cs" />
+    <Compile Remove="Services\SwordFight\SwordFight.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Extensions\CompassExtensions.cs" />
-    <Compile Include="Extensions\DateTimeExtensions.cs" />
-    <Compile Include="Extensions\RexegExtensions.cs" />
-    <Compile Include="Extensions\StringExtensions.cs" />
-    <Compile Include="Services\Rkill.cs" />
-    <Compile Include="Services\Facts\Facts.cs" />
-    <Compile Include="Services\Facts\Facts.Migrations.cs" />
-    <Compile Include="Services\Home\Home.Migrations.cs" />
-    <Compile Include="Services\IRC\IRC.Events.cs" />
-    <Compile Include="Services\IRC\IRC.Constants.cs" />
-    <Compile Include="Services\IRC\IRC.Outgoing.cs" />
-    <Compile Include="Services\IRC\IRC.Incoming.cs" />
-    <Compile Include="Services\Todo\Todo.Migrations.cs" />
-    <Compile Include="VPS.Migrations.cs" />
-    <Compile Include="Services\Jumps\Jumps.Migrations.cs" />
-    <Compile Include="Services\Telegrams\Telegrams.Migrations.cs" />
-    <Compile Include="VPS.Events.cs" />
-    <Compile Include="Services\Logging\Logging.Migrations.cs" />
-    <Compile Include="VPS.Data.cs" />
-    <Compile Include="Services\Greetings.cs" />
-    <Compile Include="Services\Trivia\Trivia.Commands.cs" />
-    <Compile Include="Services\Trivia\Trivia.Web.cs" />
-    <Compile Include="Services\IRC\IRC.Commands.cs" />
-    <Compile Include="Services\Todo\Todo.cs" />
-    <Compile Include="Services\Trivia\Trivia.Core.cs" />
-    <Compile Include="Services\Trivia\Trivia.Entries.cs" />
-    <Compile Include="VPS.Settings.cs" />
-    <Compile Include="Services\Home\Home.cs" />
-    <Compile Include="Services\GeneralCommands.cs" />
-    <Compile Include="VPS.Users.cs" />
-    <Compile Include="VPS.Commands.cs" />
-    <Compile Include="Services\IService.cs" />
-    <Compile Include="Services\Logging\Logging.cs" />
-    <Compile Include="Services\IRC\IRC.Core.cs" />
-    <None Include="app.config">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Services\SwordFight\SwordFight.cs" />
-    <Compile Include="Services\JoinsInvites.cs" />
-    <Compile Include="Services\Jumps\Jumps.cs" />
-    <Compile Include="Services\Telegrams\Telegrams.cs" />
-    <Compile Include="Services\WorldSettings.cs" />
-    <Compile Include="VPS.Services.cs" />
-    <Compile Include="VPS.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="VPS.Network.cs" />
-    <Compile Include="VPS.WebServer.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Docs\Todo.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Libraries\" />
-  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="CsvHelper">
       <Version>12.1.1</Version>
@@ -129,24 +51,13 @@
       <Version>1.0.9.2960-alpha</Version>
     </PackageReference>
   </ItemGroup>
+
   <ItemGroup>
-    <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">
-      <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4.6.1 %28x86 and x64%29</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
+    <None Update="Settings.ini">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Start Services.bat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>
