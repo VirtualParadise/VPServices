@@ -125,12 +125,12 @@ namespace VPServices
         #region Helper functions
         public static bool TryParseBool(string msg, out bool value)
         {
-            if ( TRegex.IsMatch(msg, "^(true|1|yes|on)$") )
+            if ( Regex.IsMatch(msg, "^(true|1|yes|on)$", RegexOptions.IgnoreCase) )
             {
                 value = true;
                 return true;
             }
-            else if ( TRegex.IsMatch(msg, "^(false|0|no|off)$") )
+            else if ( Regex.IsMatch(msg, "^(false|0|no|off)$", RegexOptions.IgnoreCase) )
             {
                 value = false;
                 return true;

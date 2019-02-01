@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using VpNet;
 using SQLite;
 using Serilog;
+using VPServices.Extensions;
 
 namespace VPServices.Services
 {
@@ -19,36 +20,30 @@ namespace VPServices.Services
 
         public void Init(VPServices app, Instance bot)
         {
-            app.Commands.AddRange(new[] {
-                new Command
-                (
-                    "Home: Set", "^sethome$", cmdSetHome,
-                    @"Sets user's home position, where they will be teleported to every time they enter the world",
-                    @"!sethome"
-                ),
+            app.Commands.Add(new Command(
+                "Home: Set", "^sethome$", cmdSetHome,
+                @"Sets user's home position, where they will be teleported to every time they enter the world",
+                @"!sethome"
+            ));
 
-                new Command
-                (
-                    "Home: Teleport", "^home$",
-                    (s,a,d) => { cmdGoHome(s, a, false); return true; },
-                    @"Teleports user to their home position, or ground zero if unset",
-                    @"!home"
-                ),
+            app.Commands.Add(new Command(
+                "Home: Teleport", "^home$",
+                (s,a,d) => { cmdGoHome(s, a, false); return true; },
+                @"Teleports user to their home position, or ground zero if unset",
+                @"!home"
+            ));
 
-                new Command
-                (
-                    "Home: Clear", "^clearhome$", cmdClearHome,
-                    @"Clears user's home position",
-                    @"!clearhome"
-                ),
+            app.Commands.Add(new Command(
+                "Home: Clear", "^clearhome$", cmdClearHome,
+                @"Clears user's home position",
+                @"!clearhome"
+            ));
 
-                new Command
-                (
-                    "Teleport: Bounce", "^bounce$", cmdBounce,
-                    @"Disconnects and reconnects user to the world; useful for clearing the download queue and fixing some issues",
-                    @"!bounce"
-                ),
-            });
+            app.Commands.Add(new Command(
+                "Teleport: Bounce", "^bounce$", cmdBounce,
+                @"Disconnects and reconnects user to the world; useful for clearing the download queue and fixing some issues",
+                @"!bounce"
+            ));
 
             app.AvatarEnter += onEnter;
             app.AvatarLeave += onLeave;

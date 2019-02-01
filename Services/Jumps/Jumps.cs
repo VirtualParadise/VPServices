@@ -18,35 +18,29 @@ namespace VPServices.Services
 
         public void Init (VPServices app, Instance bot)
         {
-            app.Commands.AddRange(new[] {
-                new Command
-                (
-                    "Jumps: Add", "^(addjump|aj)$", cmdAddJump,
-                    @"Adds a jump of the specified name at your position",
-                    @"!aj `name`"
-                ),
+            app.Commands.Add(new Command(
+                "Jumps: Add", "^(addjump|aj)$", cmdAddJump,
+                @"Adds a jump of the specified name at your position",
+                @"!aj `name`"
+            ));
 
-                new Command
-                (
-                    "Jumps: Delete", "^(deljump|dj)$", cmdDelJump,
-                    @"Deletes a jump of the specified name",
-                    @"!dj `name`"
-                ),
+            app.Commands.Add(new Command(
+                "Jumps: Delete", "^(deljump|dj)$", cmdDelJump,
+                @"Deletes a jump of the specified name",
+                @"!dj `name`"
+            ));
 
-                new Command
-                (
-                    "Jumps: List", "^(listjumps?|lj|jumps?list)$", cmdJumpList,
-                    @"Prints the URL to a listing of jumps to chat or lists those matching a search term to you",
-                    @"!lj `[search]`"
-                ),
+            app.Commands.Add(new Command(
+                "Jumps: List", "^(listjumps?|lj|jumps?list)$", cmdJumpList,
+                @"Prints the URL to a listing of jumps to chat or lists those matching a search term to you",
+                @"!lj `[search]`"
+            ));
 
-                new Command
-                (
-                    "Jumps: Jump", "^j(ump)?$", cmdJump,
-                    @"Teleports you to the specified or a random jump",
-                    @"!j `name|random`"
-                ),
-            });
+            app.Commands.Add(new Command(
+                "Jumps: Jump", "^j(ump)?$", cmdJump,
+                @"Teleports you to the specified or a random jump",
+                @"!j `name|random`"
+            ));
 
             app.Routes.Add(new WebRoute("Jumps", "^(list)?jumps?$", webListJumps,
                 @"Provides a list of jump points registered in the system"));
@@ -212,14 +206,14 @@ namespace VPServices.Services
             foreach ( var jump in list )
             {
                 listing +=
-@"## !jump {0}
+$@"## !jump {jump.Name}
 
-* **Coordinates:** {1:f3}, {2:f3}, {3:f3}
-* **Pitch / yaw:** {4:f0} / {5:f0}
-* **Creator:** {6}
-* **Created:** {7}
+* **Coordinates:** {jump.X:f3}, {jump.Y:f3}, {jump.Z:f3}
+* **Pitch / yaw:** {jump.Pitch:f0} / {jump.Yaw:f0}
+* **Creator:** {jump.Creator}
+* **Created:** {jump.When}
 
-".LFormat(jump.Name, jump.X, jump.Y, jump.Z, jump.Pitch, jump.Yaw, jump.Creator, jump.When);
+";
             }
 
             return serv.MarkdownParser.Transform(listing);

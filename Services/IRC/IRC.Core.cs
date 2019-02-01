@@ -18,33 +18,27 @@ namespace VPServices.Services
 
         public void Init (VPServices app, Instance bot)
         {
-            app.Commands.AddRange(new[] {
-                new Command
-                (
-                    "IRC: Connect", "^irc(start|connect)$", cmdIRCConnect,
-                    @"Starts the IRC-VP bridge", "!ircstart"
-                ),
+            app.Commands.Add(new Command(
+                "IRC: Connect", "^irc(start|connect)$", cmdIRCConnect,
+                @"Starts the IRC-VP bridge", "!ircstart"
+            ));
                 
-                new Command
-                (
-                    "IRC: Disconnect", "^irc(end|disconnect)$", cmdIRCDisconnect,
-                    @"Stops the IRC-VP bridge", "!ircend"
-                ),
+            app.Commands.Add(new Command(
+                "IRC: Disconnect", "^irc(end|disconnect)$", cmdIRCDisconnect,
+                @"Stops the IRC-VP bridge", "!ircend"
+            ));
 
-                new Command
-                (
-                    "IRC: Mute", "^ircmute$",
-                    (s, w, d) => { return cmdMute(s, w, d, true); },
-                    @"Mutes specific user or all of IRC for you", "!ircmute `[target]`"
-                ),
+            app.Commands.Add(new Command(
+                "IRC: Mute", "^ircmute$",
+                (s, w, d) => { return cmdMute(s, w, d, true); },
+                @"Mutes specific user or all of IRC for you", "!ircmute `[target]`"
+            ));
 
-                new Command
-                (
-                    "IRC: Unmute", "^ircunmute$",
-                    (s, w, d) => { return cmdMute(s, w, d, false); },
-                    @"Unmutes specific user or all of IRC for you", "!ircunmute `[target]`"
-                ),
-            });
+            app.Commands.Add(new Command(
+                "IRC: Unmute", "^ircunmute$",
+                (s, w, d) => { return cmdMute(s, w, d, false); },
+                @"Unmutes specific user or all of IRC for you", "!ircunmute `[target]`"
+            ));
             
             setupEvents(app, bot);
             loadSettings(app);

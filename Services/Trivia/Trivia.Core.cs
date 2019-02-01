@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using VpNet;
+using VPServices.Extensions;
 
 namespace VPServices.Services
 {
@@ -99,14 +100,13 @@ namespace VPServices.Services
             lock ( mutex )
             {
                 string message = args.ChatMessage.Message;
-
-                string[] match;
-                string[] wrongMatch;
-
-                if ( !TRegex.TryMatch(message, entryInPlay.Answer, out match) )
+                
+                var correctRegex = new Regex(entryInPlay.Answer ?? "", RegexOptions.IgnoreCase);
+                if ( !correctRegex.TryMatch(message, out var match) )
                     return;
 
-                if ( entryInPlay.Wrong != null && TRegex.TryMatch(message, entryInPlay.Wrong, out wrongMatch) )
+                var wrongRegex = new Regex(entryInPlay.Wrong ?? "", RegexOptions.IgnoreCase);
+                if ( entryInPlay.Wrong != null && wrongRegex.TryMatch(message, out var wrongMatch) )
                 {
                     logger.Debug("Given answer '{Answer}' by {User} matched, but turned out to be wrong; rejecting", wrongMatch[0], args.Avatar.Name);
                     return;
@@ -116,7 +116,7 @@ namespace VPServices.Services
 
                 var welldone = welldones.Skip(VPServices.Rand.Next(welldones.Length)).Take(1).Single();
 
-                if (match[0].IEquals(entryInPlay.CanonicalAnswer))
+                if (match[0].Equals(entryInPlay.CanonicalAnswer, StringComparison.OrdinalIgnoreCase))
                     app.Bot.ConsoleMessage("Triviamaster", string.Format(msgAccepted, entryInPlay.CanonicalAnswer, welldone, args.Avatar.Name), VPServices.ColorInfo, TextEffectTypes.Bold);
                 else
                     app.Bot.ConsoleMessage("Triviamaster", string.Format(msgAcceptedFrom, entryInPlay.CanonicalAnswer, match[0], welldone, args.Avatar.Name), VPServices.ColorInfo, TextEffectTypes.Bold);

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using VpNet;
+using VPServices.Extensions;
 
 namespace VPServices.Services
 {
@@ -17,42 +18,35 @@ namespace VPServices.Services
 
         public void Init(VPServices app, Instance bot)
         {
-            app.Commands.AddRange(new[] {
-                new Command
-                (
-                    "Todo: Add", "^(addtodo|atd|todoadd)$", cmdAddTodo,
-                    @"Adds an attributed and timestamped todo entry",
-                    @"!todoadd `entry`"
-                ),
+            app.Commands.Add(new Command(
+                "Todo: Add", "^(addtodo|atd|todoadd)$", cmdAddTodo,
+                @"Adds an attributed and timestamped todo entry",
+                @"!todoadd `entry`"
+            ));
 
-                new Command
-                (
-                    "Todo: Finish", "^(tododone|finishtodo)$", cmdFinishTodo,
-                    @"Marks a single or multiple todo entries as finished",
-                    @"!tododone `id[, id, [...]]`"
-                ),
+            app.Commands.Add(new Command(
+                "Todo: Finish", "^(tododone|finishtodo)$", cmdFinishTodo,
+                @"Marks a single or multiple todo entries as finished",
+                @"!tododone `id[, id, [...]]`"
+            ));
 
-                new Command
-                (
-                    "Todo: Delete", "^(tododel(ete)?|deltodo|dtd)$", cmdDeleteTodo,
-                    @"Deletes a single or multiple todo entries",
-                    @"!tododel `id[, id, [...]]`"
-                ),
+            app.Commands.Add(new Command(
+                "Todo: Delete", "^(tododel(ete)?|deltodo|dtd)$", cmdDeleteTodo,
+                @"Deletes a single or multiple todo entries",
+                @"!tododel `id[, id, [...]]`"
+            ));
 
-                new Command
-                (
-                    "Todo: List", "^(listtodos?|ltd|todolist)$", cmdListTodo,
-                    @"Prints the URL to the todo list to chat or lists those matching a search term to you",
-                    @"!todolist `[search]`"
-                ),
+            app.Commands.Add(new Command(
+                "Todo: List", "^(listtodos?|ltd|todolist)$", cmdListTodo,
+                @"Prints the URL to the todo list to chat or lists those matching a search term to you",
+                @"!todolist `[search]`"
+            ));
 
-                new Command
-                (
-                    "Todo: Get random", "^todo$", cmdGetTodo,
-                    @"Spins the todo wheel and gives you a random unfinished todo",
-                    "!todo"
-                ),
-            });
+            app.Commands.Add(new Command(
+                "Todo: Get random", "^todo$", cmdGetTodo,
+                @"Spins the todo wheel and gives you a random unfinished todo",
+                "!todo"
+            ));
 
             app.Routes.Add(new WebRoute("Todo", "^(list)?todos?$", webListTodos,
                 @"Provides a list of todo entries"));
@@ -233,12 +227,12 @@ namespace VPServices.Services
                     var done = todo.Done ? "&#10003;" : "&#10007;";
 
                     listing +=
-    @"## [{0}] #{1} - {2}
+$@"## [{done}] #{todo.ID} - {todo.What}
 
-* **By:** {3} (#{4})
-* **When:** {5}
+* **By:** {todo.Who} (#{todo.WhoID})
+* **When:** {todo.When}
 
-".LFormat(done, todo.ID, todo.What, todo.Who, todo.WhoID, todo.When);
+";
                 }
 
                 return app.MarkdownParser.Transform(listing); 

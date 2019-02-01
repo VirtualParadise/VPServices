@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using VPServices.Extensions;
 
 namespace VPServices.Services
 {

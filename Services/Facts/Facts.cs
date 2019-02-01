@@ -18,28 +18,20 @@ namespace VPServices.Services
 
         public void Init(VPServices app, Instance bot)
         {
-            app.Commands.AddRange(new[] {
-                new Command
-                (
-                    "Facts: Add", "^(addfact|af|define)$", cmdAddFact,
-                    @"Adds or overwrites a factoid for a topic, allowing it to be locked or alias another topic",
-                    @"!addfact [--lock] `topic: [what|@alias]`"
-                ),
-
-                new Command
-                (
-                    "Facts: Delete", "^(del(ete)?fact|df)$", cmdDeleteFact,
-                    @"Clears a factoid for a topic",
-                    @"!delfact `topic`"
-                ),
-
-                new Command
-                (
-                    "Facts: Get", "^(what(is)?|explain|fact)$", cmdGetFact,
-                    @"Explains a given topic",
-                    "!what `topic`"
-                ),
-            });
+            app.Commands.Add(new Command(
+                "Facts: Add", "^(addfact|af|define)$", cmdAddFact,
+                @"Adds or overwrites a factoid for a topic, allowing it to be locked or alias another topic",
+                @"!addfact [--lock] `topic: [what|@alias]`"));
+            app.Commands.Add(new Command(
+                "Facts: Delete", "^(del(ete)?fact|df)$", cmdDeleteFact,
+                @"Clears a factoid for a topic",
+                @"!delfact `topic`"
+            ));
+            app.Commands.Add(new Command(
+                "Facts: Get", "^(what(is)?|explain|fact)$", cmdGetFact,
+                @"Explains a given topic",
+                "!what `topic`"
+            ));
 
             app.Routes.Add(new WebRoute("Facts", "^(list)?facts?$", webListFacts,
                 @"Provides a list of defined facts"));
@@ -68,7 +60,8 @@ namespace VPServices.Services
             if ( !matches.Success )
                 return false;
 
-            var parts  = matches.ToArray();
+            var parts = (from Group grp in matches.Groups
+                         select grp.Value).ToArray();
             var locked = parts[1] != "";
             var topic  = parts[2].Trim();
             var what   = parts[3].Trim();
@@ -76,7 +69,7 @@ namespace VPServices.Services
             var msg    = old == null ? msgAdded : msgOverwritten;
 
             // Only allow overwrite of locked previous factoid if owner or bot owner
-            if ( old != null && old.Locked && !who.Name.IEquals(app.Owner) )
+            if ( old != null && old.Locked && !who.Name.Equals(app.Owner, StringComparison.OrdinalIgnoreCase) )
             if (old.WhoID != who.UserId)
             {
                 app.Warn(who.Session, msgLocked, old.WhoID);
@@ -112,7 +105,7 @@ namespace VPServices.Services
             }
 
             // Only allow deletion of locked factoid if owner or bot owner
-            if ( fact.Locked && !who.Name.IEquals(app.Owner) )
+            if ( fact.Locked && !who.Name.Equals(app.Owner, StringComparison.OrdinalIgnoreCase) )
             if (fact.WhoID != who.UserId)
             {
                 app.Warn(who.Session, msgLocked, fact.WhoID);
@@ -169,13 +162,13 @@ namespace VPServices.Services
 
                 foreach ( var fact in list )
                     listing +=
-    @"## {0} is {1}
+    $@"## {fact.Topic} is {fact.Description}
 
-    * **By:** #{2}
-    * **When:** {3}
-    * **Locked:** {4}
+    * **By:** #{fact.WhoID}
+    * **When:** {fact.When}
+    * **Locked:** {fact.Locked}
 
-    ".LFormat(fact.Topic, fact.Description, fact.WhoID, fact.When, fact.Locked);
+    ";
 
                 return app.MarkdownParser.Transform(listing);
             }

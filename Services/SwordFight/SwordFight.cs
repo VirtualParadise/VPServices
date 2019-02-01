@@ -27,28 +27,23 @@ namespace VPServices.Services
         {
             this.app = app;
 
-            app.Commands.AddRange( new[] {
-                new Command
-                (
-                    "Swordfight: Toggle", "^swordfight", cmdTogglePVP,
-                    @"Toggles or sets swordfighting (PVP) mode for you",
-                    @"!swordfight `[true|false]`"
-                ),
+            app.Commands.Add(new Command(
+                "Swordfight: Toggle", "^swordfight", cmdTogglePVP,
+                @"Toggles or sets swordfighting (PVP) mode for you",
+                @"!swordfight `[true|false]`"
+            ));
 
-                new Command
-                (
-                    "Swordfight: Punchbag", "^punchbag", cmdPunchbag,
-                    @"Brings me to user's location to practise swordfighting",
-                    @"!punchbag", 5
-                ),
+            app.Commands.Add(new Command(
+                "Swordfight: Punchbag", "^punchbag", cmdPunchbag,
+                @"Brings me to user's location to practise swordfighting",
+                @"!punchbag", 5
+            ));
 
-                new Command
-                (
-                    "Swordfight: Health", "^health", cmdHealth,
-                    @"Notifys the user of their health",
-                    @"!health"
-                )
-            });
+            app.Commands.Add(new Command(
+                "Swordfight: Health", "^health", cmdHealth,
+                @"Notifys the user of their health",
+                @"!health"
+            ));
 
             app.Bot.Property.CallbackObjectCreate += onCreate;
             app.Bot.Avatars.Clicked               += onClick;

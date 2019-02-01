@@ -41,12 +41,12 @@
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xml" />
-    <Reference Include="Toolbox.Extensions">
-      <HintPath>Libraries\Toolbox.Extensions.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions\CompassExtensions.cs" />
+    <Compile Include="Extensions\DateTimeExtensions.cs" />
+    <Compile Include="Extensions\RexegExtensions.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Services\Rkill.cs" />
     <Compile Include="Services\Facts\Facts.cs" />
     <Compile Include="Services\Facts\Facts.Migrations.cs" />

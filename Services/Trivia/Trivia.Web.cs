@@ -23,7 +23,7 @@ namespace VPServices.Services
 
             // XXX: ID only; investigate getting names
             foreach (var score in query)
-                listing += "* **{0}** : {1} point(s)\n\n".LFormat(score.UserID, score.Value);
+                listing += $"* **{score.UserID}** : {score.Value} point(s)\n\n";
 
             return app.MarkdownParser.Transform(listing);
         }

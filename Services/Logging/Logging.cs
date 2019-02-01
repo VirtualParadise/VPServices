@@ -2,6 +2,7 @@
 using Serilog;
 using SQLite;
 using VpNet;
+using VPServices.Extensions;
 
 namespace VPServices.Services
 {
@@ -45,7 +46,7 @@ namespace VPServices.Services
                     Y    = (float)o.Position.Y,
                     Z    = (float)o.Position.Z,
                     Type = type,
-                    When = TDateTime.UnixTimestamp
+                    When = DateTime.UtcNow.ToUnixTimestamp()
                 });
         }
 
@@ -59,7 +60,7 @@ namespace VPServices.Services
                     Y    = 0,
                     Z    = 0,
                     Type = sqlBuildType.Delete,
-                    When = TDateTime.UnixTimestamp
+                    When = DateTime.UtcNow.ToUnixTimestamp()
                 });
         }
 
@@ -74,7 +75,7 @@ namespace VPServices.Services
                     ID   = avatar.UserId,
                     Name = avatar.Name,
                     Type = type,
-                    When = TDateTime.UnixTimestamp
+                    When = DateTime.UtcNow.ToUnixTimestamp()
                 });
         }        
     }

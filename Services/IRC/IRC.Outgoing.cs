@@ -2,6 +2,7 @@
 using System;
 using VpNet;
 using VpNet.Interfaces;
+using VPServices.Extensions;
 
 namespace VPServices.Services
 {
@@ -57,7 +58,7 @@ namespace VPServices.Services
             if ( greets != null && !greets.CanGreet(avatar) )
                 return;
 
-            var msg = msgEntry.LFormat(avatar.Name, VPServices.App.World);
+            var msg = string.Format(msgEntry, avatar.Name, VPServices.App.World);
             irc.SendMessage(SendType.Action, config.Channel, msg);
         }
 
@@ -76,7 +77,7 @@ namespace VPServices.Services
             if ( greets != null && !greets.CanGreet(avatar) )
                 return;
 
-            var msg = msgPart.LFormat(avatar.Name, VPServices.App.World);
+            var msg = string.Format(msgPart, avatar.Name, VPServices.App.World);
             irc.SendMessage(SendType.Action, config.Channel, msg);
         }
     }

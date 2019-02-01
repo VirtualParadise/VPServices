@@ -18,21 +18,17 @@ namespace VPServices.Services
 
         public void Init(VPServices app, Instance bot)
         {
-            VPServices.App.Commands.AddRange(new[] {
-                new Command
-                (
-                    "Telegrams: Compose", "^(telegram|tg(ram)?|compose)", cmdSendTelegram,
-                    @"Composes a telegram to a user",
-                    @"!tg `user: message`"
-                ),
+            app.Commands.Add(new Command(
+                "Telegrams: Compose", "^(telegram|tg(ram)?|compose)", cmdSendTelegram,
+                @"Composes a telegram to a user",
+                @"!tg `user: message`"
+            ));
 
-                new Command
-                (
-                    "Telegrams: Check", "^(telegrams|read)", cmdReadTelegrams,
-                    @"Gets all pending telegrams",
-                    @"!read"
-                ),
-            });
+            app.Commands.Add(new Command(
+                "Telegrams: Check", "^(telegrams|read)", cmdReadTelegrams,
+                @"Gets all pending telegrams",
+                @"!read"
+            ));
 
             bot.OnChatMessage += (b, a) => { checkTelegrams(b, a.Avatar.Session, a.Avatar.Name); };
 

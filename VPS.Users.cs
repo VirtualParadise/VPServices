@@ -24,7 +24,7 @@ namespace VPServices
             lock (SyncMutex)
             {
                 var query = from   u in Users
-                            where  u.Name.IEquals(name)
+                            where  u.Name.Equals(name, StringComparison.OrdinalIgnoreCase)
                             select u;
 
                 return query.ToArray();
@@ -127,7 +127,7 @@ namespace VPServices
             DateTime value;
 
             if ( setting == null || !DateTime.TryParse(setting, out value) )
-                return TDateTime.UnixEpoch;
+                return new DateTime(1970, 1, 1, 0, 0, 0, 0);
             else
                 return value;
         }

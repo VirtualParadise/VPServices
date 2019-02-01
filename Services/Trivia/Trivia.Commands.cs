@@ -13,28 +13,23 @@ namespace VPServices.Services
 
         void addCommands(Instance bot)
         {
-            app.Commands.AddRange(new[] {
-                new Command
-                (
-                    "Trivia: Start", "^trivia$", cmdBeginTrivia,
-                    @"Outputs a trivia question with optional category filter",
-                    @"!trivia `[category]`", 3
-                ),
+            app.Commands.Add(new Command(
+                "Trivia: Start", "^trivia$", cmdBeginTrivia,
+                @"Outputs a trivia question with optional category filter",
+                @"!trivia `[category]`", 3
+            ));
 
-                new Command
-                (
-                    "Trivia: Load", "^(re)?loadtrivia$", cmdReloadTrivia,
-                    @"Loads or reloads the trivia database",
-                    @"!loadtrivia", 10
-                ),
+            app.Commands.Add(new Command(
+                "Trivia: Load", "^(re)?loadtrivia$", cmdReloadTrivia,
+                @"Loads or reloads the trivia database",
+                @"!loadtrivia", 10
+            ));
 
-                new Command
-                (
-                    "Trivia: Scores", "^(trivia)?scores$", cmdShowUrl,
-                    @"Shows you the URL to a listing of trivia scores",
-                    @"!scores"
-                )
-            });
+            app.Commands.Add(new Command(
+                "Trivia: Scores", "^(trivia)?scores$", cmdShowUrl,
+                @"Shows you the URL to a listing of trivia scores",
+                @"!scores"
+            ));
         }
 
         bool cmdBeginTrivia(VPServices app, Avatar<Vector3> who, string data)

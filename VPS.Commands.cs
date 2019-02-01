@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using VpNet;
+using VPServices.Extensions;
 
 namespace VPServices
 {
@@ -27,15 +28,17 @@ namespace VPServices
 
             Bot.OnChatMessage += (s, c) =>
             {
+                Console.ForegroundColor = ConsoleColor.White;
                 if (string.IsNullOrWhiteSpace(c.ChatMessage.Name))
                 {
-                    TConsole.WriteLineColored(ConsoleColor.White, "Console: {0}", c.ChatMessage.Message);
+                    Console.WriteLine("Console: {0}", c.ChatMessage.Message);
                 }
                 else
                 {
                     parseCommand(s, c.Avatar, c.ChatMessage.Message);
-                    TConsole.WriteLineColored(ConsoleColor.White, " {0} | {1}", c.ChatMessage.Name.PadRight(16), c.ChatMessage.Message);
+                    Console.WriteLine(" {0} | {1}", c.ChatMessage.Name.PadRight(16), c.ChatMessage.Message);
                 }
+                Console.ResetColor();
             };
 
             //Bot. += (s, c) =>
@@ -66,7 +69,7 @@ namespace VPServices
 
             // Iterate through commands, rejecting invokes if time limited
             foreach (var cmd in Commands)
-                if ( TRegex.IsMatch(targetCommand, cmd.Regex) )
+                if ( Regex.IsMatch(targetCommand, cmd.Regex, RegexOptions.IgnoreCase) )
                 {
                     var timeSpan = cmd.LastInvoked.SecondsToNow();
                     if (timeSpan < cmd.TimeLimit)

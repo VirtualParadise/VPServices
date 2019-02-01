@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using VpNet;
 using VPServices;
+using VPServices.Extensions;
 
 namespace VPServices.Services
 {
@@ -19,21 +20,17 @@ namespace VPServices.Services
 
         public void Init(VPServices app, Instance bot)
         {
-            app.Commands.AddRange(new[] {
-                new Command
-                (
-                    "Greetings: Show/hide", "^greet(ing)?s?$", (o,e,a) => { return cmdToggle(o,e,a, SettingShowGreets); },
-                    @"Toggles or sets whether or not the bot sends you user entry/exit messages",
-                    @"!greets `[true|false]`"
-                ),
+            app.Commands.Add(new Command(
+                "Greetings: Show/hide", "^greet(ing)?s?$", (o, e, a) => { return cmdToggle(o, e, a, SettingShowGreets); },
+                @"Toggles or sets whether or not the bot sends you user entry/exit messages",
+                @"!greets `[true|false]`"
+            ));
 
-                new Command
-                (
-                    "Greetings: Greet me", "^greetme$", (o,e,a) => { return cmdToggle(o,e,a, SettingGreetMe); },
-                    @"Toggles or sets whether or not the bot should announce your entry and exit to other users",
-                    @"!greetme `[true|false]`"
-                ),
-            });
+            app.Commands.Add(new Command(
+                "Greetings: Greet me", "^greetme$", (o, e, a) => { return cmdToggle(o, e, a, SettingGreetMe); },
+                @"Toggles or sets whether or not the bot should announce your entry and exit to other users",
+                @"!greetme `[true|false]`"
+            ));
 
             app.AvatarEnter += (b,a) => { doGreet(b, a, true);  };
             app.AvatarLeave += (b,a) => { doGreet(b, a, false); };

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
+using VPServices.Extensions;
 
 namespace VPServices.Services
 {
@@ -48,7 +49,7 @@ namespace VPServices.Services
 			        Z       = float.Parse(parts[3], CultureInfo.InvariantCulture),
 			        Yaw     = float.Parse(parts[4], CultureInfo.InvariantCulture),
 			        Pitch   = float.Parse(parts[5], CultureInfo.InvariantCulture),
-                    When    = TDateTime.UnixEpoch,
+                    When    = new DateTime(1970, 1, 1, 0, 0, 0, 0),
                     Creator = "Unknown"
                 });
             }

@@ -27,39 +27,33 @@ namespace VPServices.Services
         public string Name { get { return "Joins & invites"; } }
         public void Init(VPServices app, Instance bot)
         {
-            app.Commands.AddRange(new[] {
-                new Command
-                (
-                    "Request: Join", "^jo(in)?$",
-                    (s, w, d) => { return onRequest(s, w, d, false); },
-                    @"Sends a join request to target user",
-                    @"!join `target`"
-                ),
+            app.Commands.Add(new Command(
+                "Request: Join", "^jo(in)?$",
+                (s, w, d) => { return onRequest(s, w, d, false); },
+                @"Sends a join request to target user",
+                @"!join `target`"
+            ));
 
-                new Command
-                (
-                    "Request: Invite", "^inv(ite)?$",
-                    (s, w, d) => { return onRequest(s, w, d, true); },
-                    @"Sends an invite request to the target user",
-                    @"!invite `target`"
-                ),
+            app.Commands.Add(new Command(
+                "Request: Invite", "^inv(ite)?$",
+                (s, w, d) => { return onRequest(s, w, d, true); },
+                @"Sends an invite request to the target user",
+                @"!invite `target`"
+            ));
 
-                new Command
-                (
-                    "Request: Accept", "^(yes|accept)$",
-                    (s, w, d) => { return onResponse(s, w, true); },
-                    @"Accepts a pending join or invite request",
-                    @"!yes"
-                ),
+            app.Commands.Add(new Command(
+                "Request: Accept", "^(yes|accept)$",
+                (s, w, d) => { return onResponse(s, w, true); },
+                @"Accepts a pending join or invite request",
+                @"!yes"
+            ));
 
-                new Command
-                (
-                    "Request: Reject", "^(no|reject|deny)$",
-                    (s, w, d) => { return onResponse(s, w, false); },
-                    @"Rejects a pending join or invite request",
-                    @"!no"
-                ),
-            });
+            app.Commands.Add(new Command(
+                "Request: Reject", "^(no|reject|deny)$",
+                (s, w, d) => { return onResponse(s, w, false); },
+                @"Rejects a pending join or invite request",
+                @"!no"
+            ));
         }
 
         public void Migrate(VPServices app, int target) {  }
@@ -70,7 +64,7 @@ namespace VPServices.Services
         bool onRequest(VPServices app, Avatar<Vector3> source, string targetName, bool invite)
         {
             // Ignore if self
-            if ( source.Name.IEquals(targetName) )
+            if ( source.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase) )
             {
                 app.Warn(source.Session, msgSelf);
                 return true;

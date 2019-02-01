@@ -21,101 +21,86 @@ namespace VPServices.Services
 
         public void Init(VPServices app, Instance bot)
         {
-            app.Commands.AddRange(new[] {
-                new Command
-                (
-                    "Services: Help", @"^(help|commands|\?)$", cmdHelp,
-                    @"Prints the URL to this documentation to all users or explains a specific command to you",
-                    @"!help `[command]`"
-                ),
+            app.Commands.Add(new Command(
+                "Services: Help", @"^(help|commands|\?)$", cmdHelp,
+                @"Prints the URL to this documentation to all users or explains a specific command to you",
+                @"!help `[command]`"
+            ));
 
-                new Command
-                (
-                    "Services: Version", @"^version$", cmdVersion,
-                    @"Sends all users the version of this bot",
-                    @"!version", 120
-                ),
+            app.Commands.Add(new Command(
+                "Services: Version", @"^version$", cmdVersion,
+                @"Sends all users the version of this bot",
+                @"!version", 120
+            ));
 
-                new Command
-                (
-                    "Info: Position", "^(my)?(coord(s|inates)?|pos(ition)?|compass)$", cmdCoords,
-                    @"Prints user's position to chat, including coordinates, pitch, yaw and compass",
-                    @"!pos"
-                ),
+            app.Commands.Add(new Command(
+                "Info: Position", "^(my)?(coord(s|inates)?|pos(ition)?|compass)$", cmdCoords,
+                @"Prints user's position to chat, including coordinates, pitch, yaw and compass",
+                @"!pos"
+            ));
 
-                new Command
-                (
-                    "Info: Data", "^(my)?(data|settings)$", cmdData,
-                    @"Prints a listing of user's settings saved by the bot",
-                    @"!mydata"
-                ),
+            app.Commands.Add(new Command(
+                "Info: Data", "^(my)?(data|settings)$", cmdData,
+                @"Prints a listing of user's settings saved by the bot",
+                @"!mydata"
+            ));
 
-                new Command
-                (
-                    "Teleport: Offset X", "^x$",
-                    (s,a,d) => { return cmdOffset(a, d, offsetBy.X); },
-                    @"Offsets user's X coordinate by *x* number of meters",
-                    @"!x `x`"
-                ),
+            app.Commands.Add(new Command(
+                "Teleport: Offset X", "^x$",
+                (s,a,d) => { return cmdOffset(a, d, offsetBy.X); },
+                @"Offsets user's X coordinate by *x* number of meters",
+                @"!x `x`"
+            ));
 
-                new Command
-                (
-                    "Teleport: Offset altitude", "^(alt|y)$",
-                    (s,a,d) => { return cmdOffset(a, d, offsetBy.Y); },
-                    @"Offsets user's altitude by *x* number of meters",
-                    @"!alt `x`"
-                ),
+            app.Commands.Add(new Command(
+                "Teleport: Offset altitude", "^(alt|y)$",
+                (s,a,d) => { return cmdOffset(a, d, offsetBy.Y); },
+                @"Offsets user's altitude by *x* number of meters",
+                @"!alt `x`"
+            ));
 
-                new Command
-                (
-                    "Teleport: Offset Z", "^z$",
-                    (s,a,d) => { return cmdOffset(a, d, offsetBy.Z); },
-                    @"Offsets user's Z coordinate by *x* number of meters",
-                    @"!z `z`"
-                ),
+            app.Commands.Add(new Command(
+                "Teleport: Offset Z", "^z$",
+                (s,a,d) => { return cmdOffset(a, d, offsetBy.Z); },
+                @"Offsets user's Z coordinate by *x* number of meters",
+                @"!z `z`"
+            ));
 
-                new Command
-                (
-                    "Teleport: Random", "^rand(om)?$", cmdRandomPos,
-                    @"Teleports user to a random X,Z coordinate within the 65535 / -65535 range at ground level",
-                    @"!rand"
-                ),
+            app.Commands.Add(new Command(
+                "Teleport: Random", "^rand(om)?$", cmdRandomPos,
+                @"Teleports user to a random X,Z coordinate within the 65535 / -65535 range at ground level",
+                @"!rand"
+            ));
 
-                new Command
-                (
-                    "Teleport: Ground zero", "^g(round)?z(ero)?$", cmdGroundZero,
-                    @"Teleports user to ground zero (0,0,0)",
-                    @"!gz"
-                ),
+            app.Commands.Add(new Command(
+                "Teleport: Ground zero", "^g(round)?z(ero)?$", cmdGroundZero,
+                @"Teleports user to ground zero (0,0,0)",
+                @"!gz"
+            ));
 
-                new Command
-                (
-                    "Teleport: Ground", "^g(round)?$", cmdGround,
-                    @"Snaps the user to ground",
-                    @"!g"
-                ),
+            app.Commands.Add(new Command(
+                "Teleport: Ground", "^g(round)?$", cmdGround,
+                @"Snaps the user to ground",
+                @"!g"
+            ));
 
-                new Command
-                (
-                    "Debug: Say", "^say$", cmdSay,
-                    @"Makes the bot say a chat message as somebody else",
-                    @"!say `who: message`"
-                ),
+            app.Commands.Add(new Command(
+                "Debug: Say", "^say$", cmdSay,
+                @"Makes the bot say a chat message as somebody else",
+                @"!say `who: message`"
+            ));
 
-                new Command
-                (
-                    "Debug: Crash", "^(crash|exception)$", cmdCrash,
-                    @"Crashes the bot for debugging purposes; owner only",
-                    @"!crash"
-                ),
+            app.Commands.Add(new Command(
+                "Debug: Crash", "^(crash|exception)$", cmdCrash,
+                @"Crashes the bot for debugging purposes; owner only",
+                @"!crash"
+            ));
 
-                new Command
-                (
-                    "Debug: Hang", "^hang$", cmdHang,
-                    @"Hangs the bot for debugging purposes; owner only",
-                    @"!hang"
-                ),
-            });
+            app.Commands.Add(new Command(
+                "Debug: Hang", "^hang$", cmdHang,
+                @"Hangs the bot for debugging purposes; owner only",
+                @"!hang"
+            ));
 
             app.Routes.Add(new WebRoute("Help", "^(help|commands)$", webHelp,
                 @"Provides documentation on using the bot in-world via chat"));
@@ -144,7 +129,7 @@ namespace VPServices.Services
                 // If given data, try to find specific command and print help in console for
                 // that user
                 foreach ( var cmd in app.Commands )
-                    if ( TRegex.IsMatch(data, cmd.Regex) )
+                    if ( Regex.IsMatch(data, cmd.Regex, RegexOptions.IgnoreCase) )
                     {
                         app.Bot.ConsoleMessage(who.Session, "", string.Format(msgCommandTitle, cmd.Name), VPServices.ColorInfo, TextEffectTypes.BoldItalic);
                         app.Bot.ConsoleMessage(who.Session, "", string.Format(msgCommandRgx, cmd.Regex), VPServices.ColorInfo, TextEffectTypes.Italic);
@@ -201,7 +186,7 @@ namespace VPServices.Services
         {
             var owner = app.NetworkSettings.GetValue("Username", "");
 
-            if ( !who.Name.IEquals(owner) )
+            if ( !who.Name.Equals(owner, StringComparison.OrdinalIgnoreCase) )
                 return false;
 
             app.Crash = true;
@@ -212,7 +197,7 @@ namespace VPServices.Services
         {
             var owner = app.NetworkSettings.GetValue("Username", "");
 
-            if ( !who.Name.IEquals(owner) )
+            if ( !who.Name.Equals(owner, StringComparison.OrdinalIgnoreCase) )
                 return false;
             else
             {
@@ -298,14 +283,14 @@ namespace VPServices.Services
             foreach (var command in app.Commands)
             {
                 listing +=
-@"## {0}
+$@"## {command.Name}
 
-* **Regex:** {1}
-* **Example:** {2}
-* **Time limit:** {3}
-* *{4}*
+* **Regex:** {command.Regex}
+* **Example:** {command.Example}
+* **Time limit:** {command.TimeLimit}
+* *{command.Help}*
 
-".LFormat(command.Name, command.Regex, command.Example, command.TimeLimit, command.Help);
+";
             }
 
             return app.MarkdownParser.Transform(listing);

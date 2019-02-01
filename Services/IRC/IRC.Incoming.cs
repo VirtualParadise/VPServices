@@ -1,7 +1,9 @@
 ﻿using Meebey.SmartIrc4net;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using VpNet;
+using VPServices.Extensions;
 
 namespace VPServices.Services
 {
@@ -54,7 +56,7 @@ namespace VPServices.Services
         {
             var fx    = announce ? TextEffectTypes.Italic : (TextEffectTypes)0;
             var color = announce ? VPServices.ColorInfo : colorChat;
-            message   = message.LFormat(parts);
+            message   = string.Format(message, parts);
 
             lock (VPServices.App.SyncMutex)
             {
@@ -68,7 +70,7 @@ namespace VPServices.Services
                     var muted    = ( muteList ?? "" ).TerseSplit(',');
 
                     // No broadcasting to those muting target user
-                    if ( muted.IContains(name) )
+                    if (muted.Any(otherName => string.Equals(name, otherName, StringComparison.OrdinalIgnoreCase)))
                         continue;
 
                     // Keep within VP message limit

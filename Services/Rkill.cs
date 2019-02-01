@@ -13,14 +13,11 @@ namespace VPServices.Services
         public string Name { get { return "RKill"; } }
         public void Init(VPServices app, Instance bot)
         {
-            app.Commands.AddRange(new[] {
-                new Command
-                (
-                    "Services: RKill", "^rkill$", cmdRKill,
-                    @"Kills a Services bot by name; restricted to set users",
-                    @"!rkill `name`"
-                ),
-            });
+            app.Commands.Add(new Command(
+                "Services: RKill", "^rkill$", cmdRKill,
+                @"Kills a Services bot by name; restricted to set users",
+                @"!rkill `name`"
+            ));
 
             config = app.Settings.GetSection("RKill");
         }
@@ -46,7 +43,7 @@ namespace VPServices.Services
             }
 
             var permitted = config["Users"] ?? "";
-            if (!TRegex.IsMatch(who.Name, permitted))
+            if (!Regex.IsMatch(who.Name, permitted, RegexOptions.IgnoreCase))
             {
                 app.Warn(who.Session, msgUnauth);
                 return true;
