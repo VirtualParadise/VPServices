@@ -36,7 +36,7 @@ namespace VPServices
                 await App.Setup();
 
                 while (true)
-                    App.UpdateLoop();
+                    await App.UpdateLoop();
             }
             catch (Exception e)
             {
@@ -101,7 +101,7 @@ namespace VPServices
             PerformMigrations();
             InitServices();
             Log.ForContext("Tag", "Network").Information("Connected to {World}", World);
-
+            
             //TODO: Save this somewhere else?
             //CoreSettings.Set("Version", MigrationVersion);
             var result = Bot.ConsoleMessage("", "Services is now online; say !help for information", ColorInfo);
@@ -110,15 +110,15 @@ namespace VPServices
         /// <summary>
         /// Pumps bot events
         /// </summary>
-        public void UpdateLoop()
+        public async Task UpdateLoop()
         {
             if (Crash)
             {
                 Crash = false;
                 throw new Exception("Forced crash in update loop");
             }
-
-            Thread.Sleep(100);
+            
+            await Task.Delay(100);
         }
 
         /// <summary>
