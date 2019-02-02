@@ -102,8 +102,7 @@ namespace VPServices
             InitServices();
             Log.ForContext("Tag", "Network").Information("Connected to {World}", World);
             
-            //TODO: Save this somewhere else?
-            //CoreSettings.Set("Version", MigrationVersion);
+            SaveMigrationVersion(MigrationVersion);
             var result = Bot.ConsoleMessage("", "Services is now online; say !help for information", ColorInfo);
         }
 

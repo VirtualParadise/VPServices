@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
+using SQLite;
 using System;
+using System.Linq;
 
 namespace VPServices
 {
@@ -30,20 +32,20 @@ namespace VPServices
         /// </summary>
         void migrateServices()
         {
-            var migration = CoreSettings.GetValue("Version", 0);
+            var migration = GetMigrationVersion();
 
-            if ( migration >= MigrationVersion )
+            if (migration >= MigrationVersion)
                 return;
 
-            foreach ( var service in Services )
-                for ( var i = migration; i < MigrationVersion; i++ )
+            foreach (var service in Services)
+                for (var i = migration; i < MigrationVersion; i++)
                 {
                     service.Migrate(this, i + 1);
                     servicesLogger.Information("Migrated '{Service}' to version {Version}", service.Name, i + 1);
                 }
 
             servicesLogger.Debug("All services migrated to version {Version}", MigrationVersion);
-        } 
+        }
         #endregion
 
         #region User settings migrations
@@ -52,9 +54,9 @@ namespace VPServices
         /// </summary>
         void migrateUsers()
         {
-            var target = CoreSettings.GetValue("Version", 0) + 1;
+            var target = GetMigrationVersion() + 1;
 
-            switch ( target )
+            switch (target)
             {
                 case 1:
                     migSetupUserSQLite();
@@ -76,5 +78,36 @@ namespace VPServices
             servicesLogger.Debug("Created SQLite tables for user settings");
         }
         #endregion
+
+        private const string VersionTableName = "Version";
+        private bool MigrationVersionTableExists => 
+            Connection.ExecuteScalar<string>("SELECT name FROM sqlite_master WHERE type='table' AND name=?;", VersionTableName) == VersionTableName;
+
+        private int GetMigrationVersion()
+        {
+            int version;
+            if (MigrationVersionTableExists)
+            {
+                version = Connection.ExecuteScalar<int>("SELECT VersionNumber from Version");
+            }
+            else
+            {
+                version = CoreSettings.GetValue("Version", 0);
+            }
+            return version;
+        }
+
+        private void SaveMigrationVersion(int version)
+        {
+            if (MigrationVersionTableExists)
+            {
+                Connection.Execute("UPDATE Version SET VersionNumber = ?", version);
+            }
+            else
+            {
+                Connection.Execute("CREATE TABLE Version (VersionNumber INTEGER)");
+                Connection.Execute("INSERT INTO Version VALUES(?)", version);
+            }
+        }
     }
 }
