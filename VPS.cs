@@ -22,7 +22,7 @@ namespace VPServices
         public Instance Bot;
         public string   Owner;
         public bool     Crash;
-        readonly ILogger servicesLogger = Log.ForContext("Tag", "Services");
+        readonly ILogger servicesLogger;
 
         public static async Task<int> Main(string[] args)
         {
@@ -32,8 +32,7 @@ namespace VPServices
 
             try
             {
-                App = new VPServices();
-                App.SetupSettings(args);
+                App = new VPServices(args);
                 await App.Setup();
 
                 while (true)
@@ -53,10 +52,17 @@ namespace VPServices
             return exit;
         }
 
-        /// <summary>
-        /// Sets up bot instance
-        /// </summary>
-        public async Task Setup()
+        public VPServices(string[] args)
+        {
+            SetupSettings(args);
+            SetupLogging();
+            servicesLogger = Log.ForContext("Tag", "Services");
+            commandsLogger = Log.ForContext("Tag", "Commands");
+            webServerLogger = Log.ForContext("Tag", "Web server");
+            networkLogger = Log.ForContext("Tag", "Network");
+        }
+
+        private void SetupLogging()
         {
             var logLevel = CoreSettings.GetValue<LogEventLevel>("LogLevel", LogEventLevel.Information);
             var loggerConfig = new LoggerConfiguration()
@@ -64,7 +70,13 @@ namespace VPServices
                 .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Tag}] {Message}{NewLine}{Exception}");
 
             Log.Logger = loggerConfig.CreateLogger();
+        }
 
+        /// <summary>
+        /// Sets up bot instance
+        /// </summary>
+        public async Task Setup()
+        {
             botName = CoreSettings.GetValue("Name", defaultName);
             userName = NetworkSettings.GetValue("Username", "");
             password = NetworkSettings.GetValue("Password", "");

@@ -9,7 +9,7 @@ namespace VPServices
 {
     public partial class VPServices : IDisposable
     {
-        readonly ILogger commandsLogger = Log.ForContext("Tag", "Commands");
+        readonly ILogger commandsLogger;
         /// <summary>
         /// Global list of all commands registered
         /// </summary>

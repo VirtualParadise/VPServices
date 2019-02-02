@@ -14,7 +14,7 @@ namespace VPServices
         string botName;
         string userName;
         string password;
-        readonly ILogger networkLogger = Log.ForContext("Tag", "Network");
+        readonly ILogger networkLogger;
 
         /// <summary>
         /// Makes up to 10 connection attempts to the universe

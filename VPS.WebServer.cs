@@ -12,7 +12,7 @@ namespace VPServices
 {
     public partial class VPServices : IDisposable
     {
-        readonly ILogger webServerLogger = Log.ForContext("Tag", "Web server");
+        readonly ILogger webServerLogger;
         public HttpListener Server         = new HttpListener();
         public Markdown     MarkdownParser = new Markdown();
 
