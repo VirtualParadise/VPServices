@@ -12,6 +12,7 @@
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <StartupObject>VPServices.VPServices</StartupObject>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   
   <ItemGroup>

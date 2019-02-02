@@ -24,7 +24,7 @@ namespace VPServices
         public bool     Crash;
         readonly ILogger servicesLogger = Log.ForContext("Tag", "Services");
 
-        public static int Main(string[] args)
+        public static async Task<int> Main(string[] args)
         {
             int exit = 0;
             
@@ -34,7 +34,7 @@ namespace VPServices
             {
                 App = new VPServices();
                 App.SetupSettings(args);
-                App.Setup();
+                await App.Setup();
 
                 while (true)
                     App.UpdateLoop();
