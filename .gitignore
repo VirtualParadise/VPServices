@@ -4,26 +4,5 @@ obj/
 *.pdb
 *vshost*
 *.suo
-VPServices.csproj.user
-Build/VPServices Failsafe.bat
-Build/VPServices.exe
-Build/VPServices.exe.config
-Build/Test/
-Build/Backups/
-Build/UserSettings.ini
-Build/Void/
-Build/Settings - Test.ini
-Build/TriviaQuickfire.csv
-Build/VPServices.lnk
-Ideas.txt
-Build/*.bak
-Build/*.dat
-Build/*.dll
-Build/*.xml
-Build/*.db
-Build/*.db-shm
-Build/*.db-wal
-Build/x86
-Build/x64
-packages/
-.vs/
+*.csproj.user
+.vs
