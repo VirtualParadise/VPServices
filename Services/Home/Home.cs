@@ -98,7 +98,7 @@ namespace VPServices.Services
                     Yaw    = (float)who.Rotation.Y,
                 });
 
-            app.Notify(who.Session, "Set your home to {X:f3}, {Y:f3}, {Z:f3}" , who.Position.X, who.Position.Y, who.Position.Z);
+            app.Notify(who.Session, "Set your home to {0:f3}, {1:f3}, {2:f3}" , who.Position.X, who.Position.Y, who.Position.Z);
             logger.Information("Set home for {User} at {X:f3}, {Y:f3}, {Z:f3}", who.Name, who.Position.X, who.Position.Y, who.Position.Z);
             return true;
         }
