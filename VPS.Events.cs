@@ -32,8 +32,6 @@ namespace VPServices
         #region Event handlers
         void onAvatarAdd(Instance sender, AvatarEnterEventArgsT<Avatar<Vector3>, Vector3> args)
         {
-            sender.ConsoleMessage("", $"*** {args.Avatar.Name} [SID#{args.Avatar.Session}] enters", new Color(0, 0, 128));
-
             lock (SyncMutex)
                 Users.Add(args.Avatar);
 
@@ -45,8 +43,6 @@ namespace VPServices
 
         void onAvatarLeave(Instance sender, AvatarLeaveEventArgsT<Avatar<Vector3>, Vector3> args)
         {
-            sender.ConsoleMessage(string.Format("*** {0} [SID#{1}] leaves", args.Avatar.Name, args.Avatar.Session), new Color(0, 0, 128));
-
             var user = GetUser(args.Avatar.Session);
 
             if (AvatarLeave != null)
