@@ -30,7 +30,9 @@ namespace VPServices
             }
 
             Settings = new ConfigurationBuilder()
-                .AddIniFile(file)
+                .AddIniFile(file, true)
+                .AddEnvironmentVariables("VPServices:")
+                .AddCommandLine(args)
                 .Build();
 
             CoreSettings = Settings.GetSection("Core");
