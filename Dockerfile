@@ -1,13 +1,12 @@
-FROM microsoft/dotnet:2.1-sdk as builder
+FROM microsoft/dotnet:2.2-sdk as builder
 
 WORKDIR /vpservices
 COPY . .
-RUN dotnet publish -c Release -r linux-x64 -f netcoreapp2.1 -o output
+RUN dotnet publish -c Release -r linux-x64 -f netcoreapp2.2 -o output
 
 
 
-FROM microsoft/dotnet:2.1-runtime-deps
-#FROM debian:stretch-slim
+FROM microsoft/dotnet:2.2-runtime-deps
 
 WORKDIR /vpsdk
 ADD http://dev.virtualparadise.org/downloads/vpsdk_20190123_1ece91e_linux_debian-stretch_x86_64.tar.gz ./vpsdk.tar.gz
