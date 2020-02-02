@@ -2,7 +2,7 @@ FROM microsoft/dotnet:2.2-sdk as builder
 
 WORKDIR /vpservices
 COPY . .
-RUN dotnet publish -c Release -r linux-x64 -f netcoreapp2.2 -o output
+RUN dotnet publish -c Release -r linux-x64 -o output
 
 
 
