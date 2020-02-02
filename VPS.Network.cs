@@ -1,6 +1,5 @@
 ﻿using Serilog;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using VpNet;
 
@@ -37,7 +36,7 @@ namespace VPServices
                 catch (Exception e)
                 {
                     networkLogger.Warning(e, "Failed to connect to universe: {Error}", e.Message);
-                    Thread.Sleep(30000);
+                    await Task.Delay(30000);
                 }
             }
 
@@ -61,7 +60,7 @@ namespace VPServices
                 catch (Exception e)
                 {
                     networkLogger.Warning(e, "Failed to connect to world: {Error}", e.Message);
-                    Thread.Sleep(30000);
+                    await Task.Delay(30000);
                 }
             }
 
@@ -71,21 +70,30 @@ namespace VPServices
         async void onUniverseDisconnect(Instance sender, UniverseDisconnectEventArgs args)
         {
             networkLogger.Warning("Disconnected from universe! Reconnecting...");
-
-            lock (SyncMutex)
-                Users.Clear();
-
-            await ConnectToUniverse();
+            await Reconnect();
         }
 
         async void onWorldDisconnect(Instance sender, WorldDisconnectEventArgs args)
         {
             networkLogger.Warning("Disconnected from world! Reconnecting...");
+            await Reconnect();
+        }
 
+        private async Task Reconnect()
+        {
             lock (SyncMutex)
                 Users.Clear();
 
-            await ConnectToWorld();
+            try
+            {
+                await ConnectToUniverse();
+                await ConnectToWorld();
+            }
+            catch (Exception e)
+            {
+                networkLogger.Fatal(e, "Failed to reconnect");
+                Environment.Exit(1);
+            }
         }
     }
 }
