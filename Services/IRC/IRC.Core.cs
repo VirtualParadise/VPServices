@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using VpNet;
 
@@ -166,7 +165,19 @@ namespace VPServices.Services
                 logger.Information("Disconnecting IRC bridge...");
 
                 irc.RfcQuit("Goodbye");
-                irc.Disconnect();
+                try
+                {
+                    irc.Disconnect();
+                }
+                catch (PlatformNotSupportedException e)
+                {
+                    // Work around "Thread abort is not supported on this platform." exception. 
+                    // Unfortunately, the threads will be leaked.
+                    
+                    logger.Error(e, "Failed to disconnect cleanly");
+                    irc = new IrcClient();
+                    setupIrcEvents();
+                }
                 logger.Debug("Disconnected IRC bridge");
             }
         } 
