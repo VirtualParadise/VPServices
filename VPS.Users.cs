@@ -13,13 +13,13 @@ namespace VPServices
         /// <summary>
         /// Global list of currently present users
         /// </summary>
-        public List<Avatar<Vector3>> Users = new List<Avatar<Vector3>>();
+        public List<Avatar> Users = new List<Avatar>();
 
         #region User getters
         /// <summary>
         /// Gets all known sessions of a given case-insensitive user name
         /// </summary>
-        public Avatar<Vector3>[] GetUsers(string name)
+        public Avatar[] GetUsers(string name)
         {
             lock (SyncMutex)
             {
@@ -34,7 +34,7 @@ namespace VPServices
         /// <summary>
         /// Gets case-insensitive user by name or returns null
         /// </summary>
-        public Avatar<Vector3> GetUser(string name)
+        public Avatar GetUser(string name)
         {
             return GetUsers(name).FirstOrDefault();
         }
@@ -42,7 +42,7 @@ namespace VPServices
         /// <summary>
         /// Gets user by session number or returns null
         /// </summary>
-        public Avatar<Vector3> GetUser(int session)
+        public Avatar GetUser(int session)
         {
             lock (SyncMutex)
             {
@@ -58,13 +58,13 @@ namespace VPServices
 
     static class AvatarExtensions
     {
-        public static VpNet.Dictionary<string, string> GetSettings(this Avatar<Vector3> user)
+        public static Dictionary<string, string> GetSettings(this Avatar user)
         {
             lock (VPServices.App.DataMutex)
             {
                 var conn  = VPServices.App.Connection;
-                var query = conn.Query<sqlUserSettings>("SELECT * FROM UserSettings WHERE UserID = ? ORDER BY Name ASC", user.UserId);
-                var dict  = new VpNet.Dictionary<string, string>();
+                var query = conn.Query<sqlUserSettings>("SELECT * FROM UserSettings WHERE UserID = ? ORDER BY Name ASC", user.User.Id);
+                var dict  = new Dictionary<string, string>();
 
                 foreach (var entry in query)
                     dict.Add(entry.Name, entry.Value);
@@ -77,14 +77,14 @@ namespace VPServices
         /// Gets a user setting of the specified key as a string, or returns null if
         /// not set
         /// </summary>
-        public static string GetSetting(this Avatar<Vector3> user, string key)
+        public static string GetSetting(this Avatar user, string key)
         {
             try
             {
                 lock (VPServices.App.DataMutex)
                 {
                     var conn  = VPServices.App.Connection;
-                    var query = conn.Query<sqlUserSettings>("SELECT * FROM UserSettings WHERE UserID = ? AND Name = ? COLLATE NOCASE", user.UserId, key);
+                    var query = conn.Query<sqlUserSettings>("SELECT * FROM UserSettings WHERE UserID = ? AND Name = ? COLLATE NOCASE", user.User.Id, key);
 
                     if (query.Count() <= 0)
                         return null;
@@ -94,12 +94,12 @@ namespace VPServices
             }
             catch (Exception e)
             {
-                Log.ForContext("Tag", "Users").Error(e, "Could not get setting '{Setting}' for ID {UserId}", key, user.UserId);
+                Log.ForContext("Tag", "Users").Error(e, "Could not get setting '{Setting}' for ID {UserId}", key, user.User.Id);
                 return null;
             }
         }
 
-        public static int GetSettingInt(this Avatar<Vector3> user, string key, int defValue = 0)
+        public static int GetSettingInt(this Avatar user, string key, int defValue = 0)
         {
             var setting = GetSetting(user, key);
             int value;
@@ -110,7 +110,7 @@ namespace VPServices
                 return value;
         }
 
-        public static bool GetSettingBool(this Avatar<Vector3> user, string key, bool defValue = false)
+        public static bool GetSettingBool(this Avatar user, string key, bool defValue = false)
         {
             var  setting = GetSetting(user, key);
             bool value;
@@ -121,7 +121,7 @@ namespace VPServices
                 return value;
         }
 
-        public static DateTime GetSettingDateTime(this Avatar<Vector3> user, string key)
+        public static DateTime GetSettingDateTime(this Avatar user, string key)
         {
             var      setting = GetSetting(user, key);
             DateTime value;
@@ -132,23 +132,23 @@ namespace VPServices
                 return value;
         }
 
-        public static void SetSetting(this Avatar<Vector3> user, string key, object value)
+        public static void SetSetting(this Avatar user, string key, object value)
         {
             lock (VPServices.App.DataMutex)
             {
                 VPServices.App.Connection.InsertOrReplace(new sqlUserSettings
                 {
-                    UserID = user.UserId,
+                    UserID = user.User.Id,
                     Name   = key,
                     Value  = value.ToString()
                 });
             }
         }
 
-        public static void DeleteSetting(this Avatar<Vector3> user, string key)
+        public static void DeleteSetting(this Avatar user, string key)
         {
             lock (VPServices.App.DataMutex)
-                VPServices.App.Connection.Execute("DELETE FROM UserSettings WHERE UserID = ? AND Name = ?", user.UserId, key);
+                VPServices.App.Connection.Execute("DELETE FROM UserSettings WHERE UserID = ? AND Name = ?", user.User.Id, key);
         }
     }
 

@@ -25,7 +25,7 @@ namespace VPServices.Services
         readonly ILogger logger = Log.ForContext("Tag", "JoinInvites");
 
         public string Name { get { return "Joins & invites"; } }
-        public void Init(VPServices app, Instance bot)
+        public void Init(VPServices app, VirtualParadiseClient bot)
         {
             app.Commands.Add(new Command(
                 "Request: Join", "^jo(in)?$",
@@ -61,7 +61,7 @@ namespace VPServices.Services
         public void Dispose() { }
 
         #region Command handlers
-        bool onRequest(VPServices app, Avatar<Vector3> source, string targetName, bool invite)
+        bool onRequest(VPServices app, Avatar source, string targetName, bool invite)
         {
             // Ignore if self
             if ( source.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase) )
@@ -111,7 +111,7 @@ namespace VPServices.Services
             return true;
         }
 
-        bool onResponse(VPServices app, Avatar<Vector3> targetAv, bool yes)
+        bool onResponse(VPServices app, Avatar targetAv, bool yes)
         {
             var sourceReq = isRequested(targetAv.Name);
 
@@ -145,11 +145,11 @@ namespace VPServices.Services
                 return true;
             }
 
-            var targetPos     = sourceReq.Invite ? source.Position : target.Position;
-            var targetSession = sourceReq.Invite ? target.Session : source.Session;
+            var targetPos     = sourceReq.Invite ? source.Location.Position : target.Location.Position;
+            var targetSession = sourceReq.Invite ? target : source;
             var targetMsg     = sourceReq.Invite ? msgInvited : msgJoined;
             app.Notify(target.Session, targetMsg, source.Name);
-            app.Bot.TeleportAvatar(targetSession, "", new Vector3(targetPos.X, targetPos.Y, targetPos.Z), 0, 0);
+            app.Bot.Teleport(targetSession, new Location("", new Vector3(targetPos.X, targetPos.Y, targetPos.Z), new Vector3()));
             return true;
         } 
         #endregion

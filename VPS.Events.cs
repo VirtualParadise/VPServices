@@ -5,7 +5,7 @@ namespace VPServices
 {
     public partial class VPServices : IDisposable
     {
-        public delegate void AvatarArgs(Instance bot, Avatar<Vector3> user);
+        public delegate void AvatarArgs(VirtualParadiseClient bot, Avatar user);
 
         public event AvatarArgs AvatarEnter;
         public event AvatarArgs AvatarLeave;
@@ -13,16 +13,16 @@ namespace VPServices
 
         public void SetupEvents()
         {
-            Bot.OnAvatarEnter += onAvatarAdd;
-            Bot.OnAvatarLeave += onAvatarLeave;
-            Bot.OnAvatarChange += onAvatarsChange;
+            Bot.AvatarEntered += onAvatarAdd;
+            Bot.AvatarLeft += onAvatarLeave;
+            Bot.AvatarChanged += onAvatarsChange;
         }
 
         public void ClearEvents()
         {
-            Bot.OnAvatarEnter -= onAvatarAdd;
-            Bot.OnAvatarLeave -= onAvatarLeave;
-            Bot.OnAvatarChange -= onAvatarsChange;
+            Bot.AvatarEntered -= onAvatarAdd;
+            Bot.AvatarLeft -= onAvatarLeave;
+            Bot.AvatarChanged -= onAvatarsChange;
 
             AvatarEnter = null;
             AvatarLeave = null;
@@ -30,7 +30,7 @@ namespace VPServices
         }
 
         #region Event handlers
-        void onAvatarAdd(Instance sender, AvatarEnterEventArgsT<Avatar<Vector3>, Vector3> args)
+        void onAvatarAdd(VirtualParadiseClient sender, AvatarEnterEventArgs args)
         {
             lock (SyncMutex)
                 Users.Add(args.Avatar);
@@ -41,7 +41,7 @@ namespace VPServices
             }
         }
 
-        void onAvatarLeave(Instance sender, AvatarLeaveEventArgsT<Avatar<Vector3>, Vector3> args)
+        void onAvatarLeave(VirtualParadiseClient sender, AvatarLeaveEventArgs args)
         {
             var user = GetUser(args.Avatar.Session);
 
@@ -54,11 +54,8 @@ namespace VPServices
                 Users.Remove(user);
         }
 
-        void onAvatarsChange(Instance sender, AvatarChangeEventArgsT<Avatar<Vector3>, Vector3> args)
+        void onAvatarsChange(VirtualParadiseClient sender, AvatarChangeEventArgs args)
         {
-            var user = GetUser(args.Avatar.Session);
-            user.Position = args.Avatar.Position;
-
             if (AvatarChange != null)
             {
                 AvatarChange(sender, args.Avatar);

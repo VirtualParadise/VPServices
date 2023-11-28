@@ -30,10 +30,10 @@ namespace VPServices.Services
         Task       task;
         DateTime   progressSince;
         VPServices app;
-        Instance bot;
+        VirtualParadiseClient bot;
 
         public string Name { get { return "Trivia"; } }
-        public void Init(VPServices app, Instance bot)
+        public void Init(VPServices app, VirtualParadiseClient bot)
         {
             this.app = app;
             this.bot = bot;
@@ -52,7 +52,7 @@ namespace VPServices.Services
         void gameBegin(TriviaEntry entry)
         {
             app.Bot.ConsoleMessage("", $"{entry.Category}:{entry.Question}", VPServices.ColorInfo, TextEffectTypes.Bold);
-            bot.OnChatMessage += onChat;
+            bot.ChatMessageReceived += onChat;
             inProgress        = true;
             progressSince     = DateTime.Now;
             entryInPlay       = entry;
@@ -89,13 +89,13 @@ namespace VPServices.Services
             if ( !inProgress ) return;
 
             inProgress = false;
-            bot.OnChatMessage -= onChat;
+            bot.ChatMessageReceived -= onChat;
             logger.Information("Game has ended");
         } 
         #endregion
 
         #region Event handlers
-        void onChat(Instance bot, ChatMessageEventArgsT<Avatar<Vector3>, ChatMessage, Vector3, Color> args)
+        void onChat(VirtualParadiseClient bot, ChatMessageEventArgs args)
         {
             lock ( mutex )
             {

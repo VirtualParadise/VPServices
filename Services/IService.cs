@@ -7,7 +7,7 @@ namespace VPServices.Services
     {
         string Name { get; }
 
-        void Init(VPServices app, Instance bot);
+        void Init(VPServices app, VirtualParadiseClient bot);
         void Migrate(VPServices app, int target);
     }
 }

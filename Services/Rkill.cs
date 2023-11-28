@@ -11,7 +11,7 @@ namespace VPServices.Services
     public class RKill : IService
     {
         public string Name { get { return "RKill"; } }
-        public void Init(VPServices app, Instance bot)
+        public void Init(VPServices app, VirtualParadiseClient bot)
         {
             app.Commands.Add(new Command(
                 "Services: RKill", "^rkill$", cmdRKill,
@@ -31,7 +31,7 @@ namespace VPServices.Services
 
         IConfigurationSection config;
 
-        bool cmdRKill(VPServices app, Avatar<Vector3> who, string data)
+        bool cmdRKill(VPServices app, Avatar who, string data)
         {
             if (data != app.Bot.Configuration.BotName)
                 return true;

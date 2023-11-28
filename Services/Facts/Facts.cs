@@ -16,7 +16,7 @@ namespace VPServices.Services
             get { return "Facts"; }
         }
 
-        public void Init(VPServices app, Instance bot)
+        public void Init(VPServices app, VirtualParadiseClient bot)
         {
             app.Commands.Add(new Command(
                 "Facts: Add", "^(addfact|af|define)$", cmdAddFact,
@@ -54,7 +54,7 @@ namespace VPServices.Services
         #endregion
 
         #region Command handlers
-        bool cmdAddFact(VPServices app, Avatar<Vector3> who, string data)
+        bool cmdAddFact(VPServices app, Avatar who, string data)
         {
             var matches = Regex.Match(data, "^(-+lock )?(.+?): (.+)$");
             if ( !matches.Success )
@@ -70,7 +70,7 @@ namespace VPServices.Services
 
             // Only allow overwrite of locked previous factoid if owner or bot owner
             if ( old != null && old.Locked && !who.Name.Equals(app.Owner, StringComparison.OrdinalIgnoreCase) )
-            if (old.WhoID != who.UserId)
+            if (old.WhoID != who.User.Id)
             {
                 app.Warn(who.Session, msgLocked, old.WhoID);
                 return true;
@@ -84,7 +84,7 @@ namespace VPServices.Services
                     Topic       = topic,
                     Description = what,
                     When        = DateTime.Now,
-                    WhoID       = who.UserId,
+                    WhoID       = who.User.Id,
                     Locked      = locked
                 });
             }
@@ -94,7 +94,7 @@ namespace VPServices.Services
             return true;
         }
 
-        bool cmdDeleteFact(VPServices app, Avatar<Vector3> who, string data)
+        bool cmdDeleteFact(VPServices app, Avatar who, string data)
         {
             var fact = getFact(data);
 
@@ -106,7 +106,7 @@ namespace VPServices.Services
 
             // Only allow deletion of locked factoid if owner or bot owner
             if ( fact.Locked && !who.Name.Equals(app.Owner, StringComparison.OrdinalIgnoreCase) )
-            if (fact.WhoID != who.UserId)
+            if (fact.WhoID != who.User.Id)
             {
                 app.Warn(who.Session, msgLocked, fact.WhoID);
                 return true;
@@ -120,7 +120,7 @@ namespace VPServices.Services
             return true;
         }
 
-        bool cmdGetFact(VPServices app, Avatar<Vector3> who, string data)
+        bool cmdGetFact(VPServices app, Avatar who, string data)
         {
             var fact = getFact(data);
 

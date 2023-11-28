@@ -19,7 +19,7 @@ namespace VPServices.Services
             get { return "General commands"; }
         }
 
-        public void Init(VPServices app, Instance bot)
+        public void Init(VPServices app, VirtualParadiseClient bot)
         {
             app.Commands.Add(new Command(
                 "Services: Help", @"^(help|commands|\?)$", cmdHelp,
@@ -120,7 +120,7 @@ namespace VPServices.Services
         const string msgCommandExample = "Example: {0}";
 
         #region Services commands
-        bool cmdHelp(VPServices app, Avatar<Vector3> who, string data)
+        bool cmdHelp(VPServices app, Avatar who, string data)
         {
             var helpUrl = app.PublicUrl + "help";
 
@@ -150,7 +150,7 @@ namespace VPServices.Services
             }
         }
 
-        bool cmdVersion(VPServices app, Avatar<Vector3> who, string data)
+        bool cmdVersion(VPServices app, Avatar who, string data)
         {
             var asm      = Assembly.GetExecutingAssembly().Location;
             var fileDate = File.GetLastWriteTime(asm);
@@ -163,7 +163,7 @@ namespace VPServices.Services
         const string msgDataNoResults = "No user data is stored for you";
         const string msgDataResult    = "{0}: {1}";
 
-        bool cmdData(VPServices app, Avatar<Vector3> who, string data)
+        bool cmdData(VPServices app, Avatar who, string data)
         {
             var settings = who.GetSettings();
 
@@ -182,7 +182,7 @@ namespace VPServices.Services
         #endregion
 
         #region Debug commands
-        bool cmdCrash(VPServices app, Avatar<Vector3> who, string data)
+        bool cmdCrash(VPServices app, Avatar who, string data)
         {
             var owner = app.NetworkSettings.GetValue("Username", "");
 
@@ -193,7 +193,7 @@ namespace VPServices.Services
             return true;
         }
 
-        bool cmdHang(VPServices app, Avatar<Vector3> who, string data)
+        bool cmdHang(VPServices app, Avatar who, string data)
         {
             var owner = app.NetworkSettings.GetValue("Username", "");
 
@@ -206,7 +206,7 @@ namespace VPServices.Services
             }
         }
 
-        bool cmdSay(VPServices app, Avatar<Vector3> who, string data)
+        bool cmdSay(VPServices app, Avatar who, string data)
         {
             var matches = Regex.Match(data, "^(.+?): (.+)$");
             if ( !matches.Success )
@@ -219,15 +219,16 @@ namespace VPServices.Services
         #endregion
 
         #region Teleport commands
-        bool cmdCoords(VPServices app, Avatar<Vector3> who, string data)
+        bool cmdCoords(VPServices app, Avatar who, string data)
         {
             var compass = CompassExtensions.ToCompassTuple(who);
 
-            app.Notify(who.Session, "You are at X: {0:f4} Y: {1:f4}a Z: {2:f4}, facing {3} ({4:f0}), pitch {5:f0}", who.Position.X, who.Position.Y, who.Position.Z, compass.Direction, compass.Angle, who.Rotation.X);
+            app.Notify(who.Session, "You are at X: {0:f4} Y: {1:f4}a Z: {2:f4}, facing {3} ({4:f0}), pitch {5:f0}", 
+                who.Location.Position.X, who.Location.Position.Y, who.Location.Position.Z, compass.Direction, compass.Angle, who.Location.Rotation.X);
             return true;
         }
 
-        bool cmdOffset(Avatar<Vector3> who, string data, offsetBy offsetBy)
+        bool cmdOffset(Avatar who, string data, offsetBy offsetBy)
         {
             float   by;
             Vector3 location;
@@ -238,39 +239,41 @@ namespace VPServices.Services
             {
                 default:
                 case offsetBy.X:
-                    location = new Vector3(who.Position.X + by, who.Position.Y, who.Position.Z);
+                    location = new Vector3(who.Location.Position.X + by, who.Location.Position.Y, who.Location.Position.Z);
                     break;
                 case offsetBy.Y:
-                    location = new Vector3(who.Position.X, who.Position.Y + by, who.Position.Z);
+                    location = new Vector3(who.Location.Position.X, who.Location.Position.Y + by, who.Location.Position.Z);
                     break;
                 case offsetBy.Z:
-                    location = new Vector3(who.Position.X, who.Position.Y, who.Position.Z + by);
+                    location = new Vector3(who.Location.Position.X, who.Location.Position.Y, who.Location.Position.Z + by);
                     break;
             }
 
-            VPServices.App.Bot.TeleportAvatar(who.Session, "", location, who.Rotation.Y, who.Rotation.X);
+            VPServices.App.Bot.Teleport(who, new Location("", location, new Vector3(who.Location.Rotation.X, who.Location.Rotation.Y, 0)));
             return true;
         }
 
-        bool cmdRandomPos(VPServices app, Avatar<Vector3> who, string data)
+        bool cmdRandomPos(VPServices app, Avatar who, string data)
         {
             var randX = VPServices.Rand.Next(-65535, 65535);
             var randZ = VPServices.Rand.Next(-65535, 65535);
 
             app.Notify(who.Session, "Teleporting to {0}, 0, {1}", randX, randZ);
-            app.Bot.TeleportAvatar(who.Session, "", new Vector3(randX, 0, randZ), who.Rotation.Y, who.Rotation.X);
+            app.Bot.Teleport(who, new Location("", new Vector3(randX, 0, randZ), new Vector3(who.Location.Rotation.X, who.Location.Rotation.Y, 0)));
             return true;
         } 
 
-        bool cmdGroundZero(VPServices app, Avatar<Vector3> who, string data)
+        bool cmdGroundZero(VPServices app, Avatar who, string data)
         {
-            app.Bot.TeleportAvatar(who.Session, "", new Vector3(), 0, 0);
+            app.Bot.Teleport(who, new Location("", new Vector3(), new Vector3()));
             return true;
         } 
 
-        bool cmdGround(VPServices app, Avatar<Vector3> who, string data)
+        bool cmdGround(VPServices app, Avatar who, string data)
         {
-            app.Bot.TeleportAvatar(who.Session, "", new Vector3(who.Position.X, 0.1f, who.Position.Z), who.Rotation.Y, who.Rotation.X);
+            app.Bot.Teleport(who, new Location("", 
+                new Vector3(who.Location.Position.X, 0.1f, who.Location.Position.Z),
+				new Vector3(who.Location.Rotation.X, who.Location.Rotation.Y, 0)));
             return true;
         }
         #endregion

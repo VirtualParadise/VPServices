@@ -26,7 +26,7 @@ namespace VPServices
             //    TConsole.WriteLineColored(ConsoleColor.White, " {0} | {1}", a.Name.PadRight(16), m);
             //};
 
-            Bot.OnChatMessage += (s, c) =>
+            Bot.ChatMessageReceived += (s, c) =>
             {
                 Console.ForegroundColor = ConsoleColor.White;
                 if (string.IsNullOrWhiteSpace(c.ChatMessage.Name))
@@ -50,7 +50,7 @@ namespace VPServices
         /// <summary>
         /// Parses incoming chat for a command and runs it
         /// </summary>
-        void parseCommand(Instance sender, Avatar<Vector3> user, string message)
+        void parseCommand(VirtualParadiseClient sender, Avatar user, string message)
         {
             // Accept only commands
             if ( !message.StartsWith("!") )
@@ -110,7 +110,7 @@ namespace VPServices
         }
     }
 
-    public delegate bool CommandHandler(VPServices app, Avatar<Vector3> who, string data);
+    public delegate bool CommandHandler(VPServices app, Avatar who, string data);
 
     /// <summary>
     /// Defines a text command, fired by !(regex)

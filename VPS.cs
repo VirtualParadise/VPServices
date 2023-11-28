@@ -19,7 +19,7 @@ namespace VPServices
         public static Color ColorWarn   = new Color(220,80,20);
         public static Color ColorAlert  = new Color(255,0,0);
 
-        public Instance Bot;
+        public VirtualParadiseClient Bot;
         public string   Owner;
         public bool     Crash;
         readonly ILogger servicesLogger;
@@ -83,7 +83,7 @@ namespace VPServices
             World = NetworkSettings.GetValue("World", "");
             Owner = userName;
 
-            Bot = new Instance();
+            Bot = new VirtualParadiseClient();
 
             // Connect to network
             await ConnectToUniverse();
@@ -103,7 +103,7 @@ namespace VPServices
             Log.ForContext("Tag", "Network").Information("Connected to {World}", World);
             
             SaveMigrationVersion(MigrationVersion);
-            var result = Bot.ConsoleMessage("", "Services is now online; say !help for information", ColorInfo);
+            Bot.ConsoleMessage("", "Services is now online; say !help for information", ColorInfo);
         }
 
         /// <summary>

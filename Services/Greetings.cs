@@ -18,7 +18,7 @@ namespace VPServices.Services
             get { return "Greetings"; }
         }
 
-        public void Init(VPServices app, Instance bot)
+        public void Init(VPServices app, VirtualParadiseClient bot)
         {
             app.Commands.Add(new Command(
                 "Greetings: Show/hide", "^greet(ing)?s?$", (o, e, a) => { return cmdToggle(o, e, a, SettingShowGreets); },
@@ -50,14 +50,14 @@ namespace VPServices.Services
         const string msgGreetMeNot = "You will no longer be announced on entry/exit";
 
         #region Public cross-plugin methods
-        public bool CanGreet(Avatar<Vector3> who)
+        public bool CanGreet(Avatar who)
         {
             return who.GetSettingBool(SettingGreetMe, true);
         }
         #endregion
 
         #region Command handlers
-        bool cmdToggle(VPServices app, Avatar<Vector3> who, string data, string key)
+        bool cmdToggle(VPServices app, Avatar who, string data, string key)
         {
             string msg    = null;
             bool   toggle;
@@ -90,7 +90,7 @@ namespace VPServices.Services
         #endregion
 
         #region Event handlers
-        void doGreet(Instance bot, Avatar<Vector3> who, bool entering)
+        void doGreet(VirtualParadiseClient bot, Avatar who, bool entering)
         {
             // No greetings within 10 seconds of bot load, to prevent flooding of entries
             // on initial user list load

@@ -16,7 +16,7 @@ namespace VPServices.Services
             get { return "Telegrams"; }
         }
 
-        public void Init(VPServices app, Instance bot)
+        public void Init(VPServices app, VirtualParadiseClient bot)
         {
             app.Commands.Add(new Command(
                 "Telegrams: Compose", "^(telegram|tg(ram)?|compose)", cmdSendTelegram,
@@ -30,7 +30,7 @@ namespace VPServices.Services
                 @"!read"
             ));
 
-            bot.OnChatMessage += (b, a) => { checkTelegrams(b, a.Avatar.Session, a.Avatar.Name); };
+            bot.ChatMessageReceived += (b, a) => { checkTelegrams(b, a.Avatar.Session, a.Avatar.Name); };
 
             //app.Chat        += (b,a,c) => { checkTelegrams(b, a.Session, a.Name); };
             app.AvatarEnter += (b,c)   => { checkTelegrams(b, c.Session, c.Name); };
@@ -46,12 +46,12 @@ namespace VPServices.Services
         const string msgNoTelegrams  = "You have no telegrams to read";
         const string msgTelegramSent = "Your telegram to {0} has been sent";
 
-        VpNet.Dictionary<string, bool> told = new VpNet.Dictionary<string, bool>();
+        Dictionary<string, bool> told = new Dictionary<string, bool>();
         SQLiteConnection         connection; 
         #endregion
         
         #region Command handlers
-        bool cmdSendTelegram(VPServices app, Avatar<Vector3> who, string data)
+        bool cmdSendTelegram(VPServices app, Avatar who, string data)
         {
             var matches = Regex.Match(data, "^(.+?): (.+)$");
             if ( !matches.Success )
@@ -76,7 +76,7 @@ namespace VPServices.Services
             return true;
         }
 
-        bool cmdReadTelegrams(VPServices app, Avatar<Vector3> who, string data)
+        bool cmdReadTelegrams(VPServices app, Avatar who, string data)
         {
             var grams = getUnread(who.Name);
 
@@ -110,7 +110,7 @@ namespace VPServices.Services
         /// Marks all telegrams of a leaving avatar as "unaware", so tha they can again
         /// be reminded on re-entry
         /// </summary>
-        void onLeave(Instance sender, Avatar<Vector3> who)
+        void onLeave(VirtualParadiseClient sender, Avatar who)
         {
             var grams = getUnread(who.Name);
 
@@ -126,7 +126,7 @@ namespace VPServices.Services
                 return connection.Query<sqlTelegram>("SELECT * FROM Telegrams WHERE Read = ? AND Target = ? COLLATE NOCASE", false, target);
         }
 
-        void checkTelegrams(Instance bot, int session, string name)
+        void checkTelegrams(VirtualParadiseClient bot, int session, string name)
         {
             var safeName = name.ToLower();
             var grams    = getUnread(name);

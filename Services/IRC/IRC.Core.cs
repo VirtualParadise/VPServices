@@ -15,7 +15,7 @@ namespace VPServices.Services
             get { return "IRC"; }
         }
 
-        public void Init (VPServices app, Instance bot)
+        public void Init (VPServices app, VirtualParadiseClient bot)
         {
             app.Commands.Add(new Command(
                 "IRC: Connect", "^irc(start|connect)$", cmdIRCConnect,

@@ -29,8 +29,8 @@ namespace VPServices
                     LastConnect = DateTime.Now;
                     
                     // Disconnect events
-                    Bot.OnWorldDisconnect    += onWorldDisconnect;
-                    Bot.OnUniverseDisconnect += onUniverseDisconnect;
+                    Bot.WorldDisconnected    += onWorldDisconnect;
+                    Bot.UniverseDisconnected += onUniverseDisconnect;
                     return;
                 }
                 catch (Exception e)
@@ -67,13 +67,13 @@ namespace VPServices
             throw new Exception("Could not connect to worldserver after ten attempts.");
         }
 
-        async void onUniverseDisconnect(Instance sender, UniverseDisconnectEventArgs args)
+        async void onUniverseDisconnect(VirtualParadiseClient sender, UniverseDisconnectEventArgs args)
         {
             networkLogger.Warning("Disconnected from universe! Reconnecting...");
             await Reconnect();
         }
 
-        async void onWorldDisconnect(Instance sender, WorldDisconnectEventArgs args)
+        async void onWorldDisconnect(VirtualParadiseClient sender, WorldDisconnectEventArgs args)
         {
             networkLogger.Warning("Disconnected from world! Reconnecting...");
             await Reconnect();

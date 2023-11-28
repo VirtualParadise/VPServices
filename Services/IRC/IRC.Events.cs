@@ -4,12 +4,12 @@ namespace VPServices.Services
 {
     partial class IRC : IService
     {
-        void setupEvents(VPServices app, Instance bot)
+        void setupEvents(VPServices app, VirtualParadiseClient bot)
         {
             // VP (outgoing) events
             app.AvatarEnter += onWorldEnter;
             app.AvatarLeave += onWorldLeave;
-            bot.OnChatMessage += onWorldChat;
+            bot.ChatMessageReceived += onWorldChat;
             //app.Chat        += onWorldChat;
             
             setupIrcEvents();

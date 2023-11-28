@@ -16,7 +16,7 @@ namespace VPServices.Services
         }
         readonly ILogger logger = Log.ForContext("Tag", "Jumps");
 
-        public void Init (VPServices app, Instance bot)
+        public void Init (VPServices app, VirtualParadiseClient bot)
         {
             app.Commands.Add(new Command(
                 "Jumps: Add", "^(addjump|aj)$", cmdAddJump,
@@ -65,7 +65,7 @@ namespace VPServices.Services
         #endregion
 
         #region Command handlers
-        bool cmdAddJump(VPServices app, Avatar<Vector3> who, string data)
+        bool cmdAddJump(VPServices app, Avatar who, string data)
         {
             var name = data.ToLower();
 
@@ -93,21 +93,21 @@ namespace VPServices.Services
                     Name    = name,
                     Creator = who.Name,
                     When    = DateTime.Now,
-                    X       = (float)who.Position.X,
-                    Y       = (float)who.Position.Y,
-                    Z       = (float)who.Position.Z,
-                    Pitch   = (float)who.Rotation.X,
-                    Yaw     = (float)who.Rotation.Y
+                    X       = (float)who.Location.Position.X,
+                    Y       = (float)who.Location.Position.Y,
+                    Z       = (float)who.Location.Position.Z,
+                    Pitch   = (float)who.Location.Rotation.X,
+                    Yaw     = (float)who.Location.Rotation.Y
                 });
 
             var compass = CompassExtensions.ToCompassTuple(who);
 
-            app.NotifyAll(msgAdded, name, who.Position.X, who.Position.Y, who.Position.Z, compass.Angle, who.Rotation.X);
-            logger.Information("Saved a jump for {User} at {Position} for {Jump}", who.Name, who.Position, name);
+            app.NotifyAll(msgAdded, name, who.Location.Position.X, who.Location.Position.Y, who.Location.Position.Z, compass.Angle, who.Location.Rotation.X);
+            logger.Information("Saved a jump for {User} at {Position} for {Jump}", who.Name, who.Location.Position, name);
             return true;
         }
 
-        bool cmdDelJump(VPServices app, Avatar<Vector3> who, string data)
+        bool cmdDelJump(VPServices app, Avatar who, string data)
         {
             var jumpsUrl = app.PublicUrl + webJumps;
             var name     = data.ToLower();
@@ -137,7 +137,7 @@ namespace VPServices.Services
             return true;
         }
 
-        bool cmdJumpList(VPServices app, Avatar<Vector3> who, string data)
+        bool cmdJumpList(VPServices app, Avatar who, string data)
         {
             var jumpsUrl = app.PublicUrl + webJumps;
 
@@ -170,7 +170,7 @@ namespace VPServices.Services
             return true;
         }
 
-        bool cmdJump(VPServices app, Avatar<Vector3> who, string data)
+        bool cmdJump(VPServices app, Avatar who, string data)
         {
             var jumpsUrl = app.PublicUrl + webJumps;
             var name     = data.ToLower();
@@ -185,10 +185,10 @@ namespace VPServices.Services
                         ? connection.Query<sqlJump>("SELECT * FROM Jumps ORDER BY RANDOM() LIMIT 1;").FirstOrDefault()
                         : getJump(name);
 
-                if ( jump != null )
+                if (jump != null)
                     // Note: Jump DB and VP SDK define yaw and pitch on different axes -- to maintain backwards compatibility with old jumps,
                     // continue switching Yaw/Pitch axes to jump DB and just switch them back in code. Will look into fixing DB later.
-                    app.Bot.TeleportAvatar(who, "", new Vector3(jump.X, jump.Y, jump.Z), new Vector3(jump.Pitch, jump.Yaw, 0));
+                    app.Bot.Teleport(who, new Location("", new Vector3(jump.X, jump.Y, jump.Z), new Vector3(jump.Pitch, jump.Yaw, 0)));
                 else
                     app.Warn(who.Session, msgNonExistant, jumpsUrl); 
             }

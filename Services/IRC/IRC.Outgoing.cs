@@ -8,7 +8,7 @@ namespace VPServices.Services
 {
     partial class IRC : IService
     {
-        void onWorldChat(Instance sender, ChatMessageEventArgsT<Avatar<Vector3>, ChatMessage, Vector3, Color> args) //Avatar<Vector3> user, string message)
+        void onWorldChat(VirtualParadiseClient sender, ChatMessageEventArgs args) //Avatar user, string message)
         {
             // No chat if not connected
             if (!irc.IsConnected)
@@ -23,7 +23,7 @@ namespace VPServices.Services
                     irc.SendMessage(SendType.Message, config.Channel, args.Avatar.Name + ": " +  msg );
         }
 
-        void onWorldConsole(Instance sender, IChatMessage<Color> console)
+        void onWorldConsole(VirtualParadiseClient sender, ChatMessage console)
         {
             // No chat if not connected
             if (!irc.IsConnected)
@@ -43,7 +43,7 @@ namespace VPServices.Services
                 irc.SendMessage(SendType.Message, config.Channel, "C* " + console.Name + " " +  msg );
         }
 
-        void onWorldEnter(Instance sender, Avatar<Vector3> avatar)
+        void onWorldEnter(VirtualParadiseClient sender, Avatar avatar)
         {
             if (!irc.IsConnected)
                 return;
@@ -62,7 +62,7 @@ namespace VPServices.Services
             irc.SendMessage(SendType.Action, config.Channel, msg);
         }
 
-        void onWorldLeave(Instance sender, Avatar<Vector3> avatar)
+        void onWorldLeave(VirtualParadiseClient sender, Avatar avatar)
         {
             if (!irc.IsConnected)
                 return;

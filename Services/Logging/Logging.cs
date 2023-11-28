@@ -21,11 +21,11 @@ namespace VPServices.Services
             get { return "Logging"; }
         }
 
-        public void Init(VPServices app, Instance bot)
+        public void Init(VPServices app, VirtualParadiseClient bot)
         {
-            bot.OnObjectCreate += (sender, args) => { objectEvent(args.VpObject, sqlBuildType.Create); };
-            bot.OnObjectChange += (sender, args) => { objectEvent(args.VpObject, sqlBuildType.Modify); };
-            bot.OnObjectDelete += onObjDelete;
+            bot.ObjectCreated += (sender, args) => { objectEvent(args.Object, sqlBuildType.Create); };
+            bot.ObjectChanged += (sender, args) => { objectEvent(args.Object, sqlBuildType.Modify); };
+            bot.ObjectDeleted += onObjDelete;
             app.AvatarEnter += (s,a) => { userEvent(a, sqlUserType.Enter); };
             app.AvatarLeave += (s,a) => { userEvent(a, sqlUserType.Leave); };
 
@@ -36,7 +36,7 @@ namespace VPServices.Services
 
         SQLiteConnection connection;
 
-        void objectEvent(VpObject<Vector3> o, sqlBuildType type)
+        void objectEvent(VpObject o, sqlBuildType type)
         {
             lock (VPServices.App.DataMutex)
                 connection.Insert( new sqlBuildHistory
@@ -50,12 +50,12 @@ namespace VPServices.Services
                 });
         }
 
-        void onObjDelete(Instance sender, ObjectDeleteArgsT<Avatar<Vector3>, VpObject<Vector3>, Vector3> args)
+        void onObjDelete(VirtualParadiseClient sender, ObjectDeleteArgs args)
         {
             lock (VPServices.App.DataMutex)
                 connection.Insert( new sqlBuildHistory
                 {
-                    ID   = args.VpObject.Id,
+                    ID   = args.Object.Id,
                     X    = 0,
                     Y    = 0,
                     Z    = 0,
@@ -64,7 +64,7 @@ namespace VPServices.Services
                 });
         }
 
-        void userEvent(Avatar<Vector3> avatar, sqlUserType type)
+        void userEvent(Avatar avatar, sqlUserType type)
         {
             if ( VPServices.App.LastConnect.SecondsToNow() < 10 )
                 return;
@@ -72,7 +72,7 @@ namespace VPServices.Services
             lock (VPServices.App.DataMutex)
                 connection.Insert ( new sqlUserHistory
                 {
-                    ID   = avatar.UserId,
+                    ID   = avatar.User.Id,
                     Name = avatar.Name,
                     Type = type,
                     When = DateTime.UtcNow.ToUnixTimestamp()

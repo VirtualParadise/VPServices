@@ -11,7 +11,7 @@ namespace VPServices.Services
         const string msgNoResults = "I was unable to fetch a trivia entry; perhaps try a different category?";
         const string msgReloaded  = "The trivia database has been reloaded, with {0} entries";
 
-        void addCommands(Instance bot)
+        void addCommands(VirtualParadiseClient bot)
         {
             app.Commands.Add(new Command(
                 "Trivia: Start", "^trivia$", cmdBeginTrivia,
@@ -32,7 +32,7 @@ namespace VPServices.Services
             ));
         }
 
-        bool cmdBeginTrivia(VPServices app, Avatar<Vector3> who, string data)
+        bool cmdBeginTrivia(VPServices app, Avatar who, string data)
         {
             if ( entries == null )
             {
@@ -64,7 +64,7 @@ namespace VPServices.Services
             return true;
         }
 
-        bool cmdReloadTrivia(VPServices app, Avatar<Vector3> who, string data)
+        bool cmdReloadTrivia(VPServices app, Avatar who, string data)
         {
             entries = null;
             if ( !loadTrivia() )
@@ -75,7 +75,7 @@ namespace VPServices.Services
             return true;
         }
 
-        bool cmdShowUrl(VPServices app, Avatar<Vector3> who, string data)
+        bool cmdShowUrl(VPServices app, Avatar who, string data)
         {
             app.Notify(who.Session, app.PublicUrl + "scores");
 

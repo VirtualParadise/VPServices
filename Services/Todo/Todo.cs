@@ -16,7 +16,7 @@ namespace VPServices.Services
             get { return "Todo"; }
         }
 
-        public void Init(VPServices app, Instance bot)
+        public void Init(VPServices app, VirtualParadiseClient bot)
         {
             app.Commands.Add(new Command(
                 "Todo: Add", "^(addtodo|atd|todoadd)$", cmdAddTodo,
@@ -74,7 +74,7 @@ namespace VPServices.Services
         #endregion
 
         #region Command handlers
-        bool cmdAddTodo(VPServices app, Avatar<Vector3> who, string data)
+        bool cmdAddTodo(VPServices app, Avatar who, string data)
         {
             if ( string.IsNullOrWhiteSpace(data) )
                 return false;
@@ -85,7 +85,7 @@ namespace VPServices.Services
                     What  = data,
                     When  = DateTime.Now,
                     Who   = who.Name,
-                    WhoID = who.UserId,
+                    WhoID = who.User.Id,
                     Done  = false
                 });
 
@@ -94,7 +94,7 @@ namespace VPServices.Services
             return true;
         }
 
-        bool cmdFinishTodo(VPServices app, Avatar<Vector3> who, string data)
+        bool cmdFinishTodo(VPServices app, Avatar who, string data)
         {
             var ids = data.TerseSplit(",");
 
@@ -124,7 +124,7 @@ namespace VPServices.Services
             return true;
         }
 
-        bool cmdDeleteTodo(VPServices app, Avatar<Vector3> who, string data)
+        bool cmdDeleteTodo(VPServices app, Avatar who, string data)
         {
             var ids = data.TerseSplit(",");
 
@@ -154,7 +154,7 @@ namespace VPServices.Services
             return true;
         }
 
-        bool cmdListTodo(VPServices app, Avatar<Vector3> who, string data)
+        bool cmdListTodo(VPServices app, Avatar who, string data)
         {
             var todoUrl = app.PublicUrl + webTodo;
 
@@ -195,7 +195,7 @@ namespace VPServices.Services
             return true;
         }
 
-        bool cmdGetTodo(VPServices app, Avatar<Vector3> who, string data)
+        bool cmdGetTodo(VPServices app, Avatar who, string data)
         {
             lock ( app.DataMutex )
             {
