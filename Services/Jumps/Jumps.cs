@@ -53,6 +53,7 @@ namespace VPServices.Services
         #region Privates and strings
         const string msgAdded       = "Added jump '{0}' at {1}, {2}, {3} ({4} yaw, {5} pitch)";
         const string msgDeleted     = "Deleted jump '{0}'";
+        const string msgNotAllowed  = "That action is not allowed for this jump";
         const string msgExists      = "That jump already exists";
         const string msgNonExistant = "That jump does not exist; check {0}";
         const string msgReserved    = "That name is reserved";
@@ -127,8 +128,16 @@ namespace VPServices.Services
                 app.Warn(who.Session, msgNonExistant, jumpsUrl);
                 logger.Debug("{User} tried to delete non-existant jump {Jump}", name, who.Name);
                 return true;
-            }
-            else
+			}
+			else if (
+				!who.Name.Equals(jump.Creator, StringComparison.OrdinalIgnoreCase) &&
+				!who.Name.Equals(app.Owner, StringComparison.OrdinalIgnoreCase))
+			{
+				app.Warn(who.Session, msgNotAllowed);
+				logger.Warning("{User} tried to delete jump created by {Creator}", who.Name, jump.Creator);
+                return true;
+			}
+			else
                 lock (app.DataMutex)
                     connection.Delete(jump);
 
