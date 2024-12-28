@@ -69,7 +69,7 @@ namespace VPServices.Services
             var msg    = old == null ? msgAdded : msgOverwritten;
 
             // Only allow overwrite of locked previous factoid if owner or bot owner
-            if ( old != null && old.Locked && !who.Name.Equals(app.Owner, StringComparison.OrdinalIgnoreCase) )
+            if ( old != null && old.Locked && !app.IsOwner(who.Name) )
             if (old.WhoID != who.User.Id)
             {
                 app.Warn(who.Session, msgLocked, old.WhoID);
@@ -105,7 +105,7 @@ namespace VPServices.Services
             }
 
             // Only allow deletion of locked factoid if owner or bot owner
-            if ( fact.Locked && !who.Name.Equals(app.Owner, StringComparison.OrdinalIgnoreCase) )
+            if ( fact.Locked && !app.IsOwner(who.Name))
             if (fact.WhoID != who.User.Id)
             {
                 app.Warn(who.Session, msgLocked, fact.WhoID);

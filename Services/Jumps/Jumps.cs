@@ -131,7 +131,7 @@ namespace VPServices.Services
 			}
 			else if (
 				!who.Name.Equals(jump.Creator, StringComparison.OrdinalIgnoreCase) &&
-				!who.Name.Equals(app.Owner, StringComparison.OrdinalIgnoreCase))
+				!app.IsOwner(who.Name))
 			{
 				app.Warn(who.Session, msgNotAllowed);
 				logger.Warning("{User} tried to delete jump created by {Creator}", who.Name, jump.Creator);

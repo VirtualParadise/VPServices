@@ -2,6 +2,7 @@
 using Serilog;
 using Serilog.Events;
 using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,7 +21,7 @@ namespace VPServices
         public static Color ColorAlert  = new Color(255,0,0);
 
         public VirtualParadiseClient Bot;
-        public string   Owner;
+        public string[]   Owners;
         public bool     Crash;
         readonly ILogger servicesLogger;
 
@@ -81,7 +82,11 @@ namespace VPServices
             userName = NetworkSettings.GetValue("Username", "");
             password = NetworkSettings.GetValue("Password", "");
             World = NetworkSettings.GetValue("World", "");
-            Owner = userName;
+            Owners = NetworkSettings.GetSection("Owners").Get<string[]>();
+            if (Owners == null || Owners.Length == 0)
+            {
+                Owners = new[] { userName };
+            }
 
             Bot = new VirtualParadiseClient();
 
@@ -183,6 +188,8 @@ namespace VPServices
         {
             Warn(0, msg, parts);
         }
-        #endregion
-    }
+
+		public bool IsOwner(string name) => Owners.Any(owner => owner.Equals(name, StringComparison.OrdinalIgnoreCase));
+		#endregion
+	}
 }
