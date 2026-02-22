@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/dotnet/runtime:6.0 AS base
 WORKDIR /vpsdk
-ADD http://static.virtualparadise.org/dev-downloads/vpsdk_20241201_734ca140_linux_debian10_x86_64.tar.gz ./vpsdk.tar.gz
-RUN echo "3033EEFE0B8E6742C690C8AC4A27864401CE5C583EB8AD6C84E1AD44E6C11679 vpsdk.tar.gz" | sha256sum -c -&& \
+ADD http://static.virtualparadise.org/dev-downloads/vpsdk_20260222_e8e15ab5_linux_debian10_x86_64.tar.gz ./vpsdk.tar.gz
+RUN echo "CFD8E0DB2E12750B02CD8A679C56C5F7E358B161AB5F5E68BE4C9062DAD642FD vpsdk.tar.gz" | sha256sum -c -&& \
     tar xfv vpsdk.tar.gz --strip-components=1 && \
     rm -r vpsdk.tar.gz include
 ENV LD_LIBRARY_PATH=/vpsdk/lib
