@@ -30,7 +30,12 @@ namespace VPServices.Services
                 @"!read"
             ));
 
-            bot.ChatMessageReceived += (b, a) => { checkTelegrams(b, a.Avatar.Session, a.Avatar.Name); };
+            bot.ChatMessageReceived += (b, a) => {
+                if (a.Avatar != null)
+                {
+                    checkTelegrams(b, a.Avatar.Session, a.Avatar.Name);
+                }
+            };
 
             //app.Chat        += (b,a,c) => { checkTelegrams(b, a.Session, a.Name); };
             app.AvatarEnter += (b,c)   => { checkTelegrams(b, c.Session, c.Name); };

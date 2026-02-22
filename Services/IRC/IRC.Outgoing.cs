@@ -18,9 +18,9 @@ namespace VPServices.Services
 
             foreach (var msg in msgRoll)
                 if ( msg.StartsWith("/me ") )
-                    irc.SendMessage(SendType.Action, config.Channel, args.Avatar.Name + " " + msg.Substring(4) );
+                    irc.SendMessage(SendType.Action, config.Channel, args.Avatar?.Name + " " + msg.Substring(4) );
                 else
-                    irc.SendMessage(SendType.Message, config.Channel, args.Avatar.Name + ": " +  msg );
+                    irc.SendMessage(SendType.Message, config.Channel, args.Avatar?.Name + ": " +  msg );
         }
 
         void onWorldConsole(VirtualParadiseClient sender, ChatMessage console)
